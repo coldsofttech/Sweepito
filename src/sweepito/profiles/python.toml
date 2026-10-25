@@ -1,0 +1,82 @@
+id = "python"
+description = "Python, Django, Flask, FastAPI, pytest, Ruff, mypy, tox, coverage"
+markers = ["pyproject.toml", "setup.py", "setup.cfg", "requirements*.txt", "Pipfile", "manage.py"]
+
+[[rule]]
+id = "python.pycache"
+paths = ["__pycache__/", "*.pyc", "*.pyo"]
+risk = "safe"
+description = "Bytecode caches"
+
+[[rule]]
+id = "python.pytest"
+paths = [".pytest_cache/"]
+risk = "safe"
+description = "pytest cache"
+
+[[rule]]
+id = "python.ruff"
+paths = [".ruff_cache/"]
+risk = "safe"
+description = "Ruff cache"
+
+[[rule]]
+id = "python.mypy"
+paths = [".mypy_cache/", ".dmypy.json"]
+risk = "safe"
+description = "mypy cache"
+
+[[rule]]
+id = "python.typecheckers"
+paths = [".pyre/", ".pytype/"]
+risk = "safe"
+description = "Pyre and pytype caches"
+
+[[rule]]
+id = "python.coverage"
+paths = [".coverage", ".coverage.*", "htmlcov/", "coverage.xml"]
+risk = "safe"
+description = "Coverage data and reports"
+
+[[rule]]
+id = "python.hypothesis"
+paths = [".hypothesis/"]
+risk = "configurable"
+description = "Hypothesis example database (holds regression seeds)"
+
+[[rule]]
+id = "python.tox"
+paths = [".tox/", ".nox/"]
+risk = "configurable"
+description = "tox and nox environments"
+
+[[rule]]
+id = "python.eggs"
+paths = [".eggs/", "*.egg-info/"]
+risk = "configurable"
+description = "Setuptools build metadata"
+
+[[rule]]
+id = "python.build"
+paths = ["/build/"]
+risk = "configurable"
+description = "Build output"
+
+[[rule]]
+id = "python.dist"
+paths = ["/dist/"]
+risk = "configurable"
+description = "Distribution artifacts"
+
+[[rule]]
+id = "django.static"
+paths = ["/staticfiles/"]
+requires = ["manage.py"]
+risk = "configurable"
+description = "Django collectstatic output"
+
+[[rule]]
+id = "python.venv"
+paths = ["/.venv/", "/venv/", "/env/"]
+risk = "high-impact"
+description = "Virtual environments"

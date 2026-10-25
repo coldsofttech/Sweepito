@@ -1,0 +1,15 @@
+id = "rust"
+description = "Rust and Cargo"
+markers = ["Cargo.toml"]
+
+[[rule]]
+id = "rust.target"
+paths = ["/target/"]
+risk = "configurable"
+description = "Cargo build output (slow to rebuild)"
+
+[[rule]]
+id = "rust.profiling"
+paths = ["flamegraph.svg", "perf.data", "perf.data.*"]
+risk = "configurable"
+description = "Profiling output"

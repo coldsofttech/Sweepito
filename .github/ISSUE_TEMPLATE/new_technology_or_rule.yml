@@ -1,0 +1,42 @@
+name: New technology or rule
+description: Propose a new profile or a new cleanup rule
+labels: [enhancement, profile]
+body:
+  - type: input
+    id: technology
+    attributes:
+      label: Technology or framework
+      placeholder: "e.g. Zig, Deno, Unity"
+    validations:
+      required: true
+  - type: textarea
+    id: targets
+    attributes:
+      label: Folders or files to clean
+      description: Exact names, and where they are generated.
+    validations:
+      required: true
+  - type: textarea
+    id: markers
+    attributes:
+      label: How can a project be recognised?
+      description: Marker files that identify it, e.g. `build.zig`.
+    validations:
+      required: true
+  - type: dropdown
+    id: risk
+    attributes:
+      label: Suggested risk level
+      options:
+        - safe (regenerated automatically, no user data)
+        - configurable (costly to rebuild or mildly valuable)
+        - high-impact (dependencies or hard to recreate)
+    validations:
+      required: true
+  - type: textarea
+    id: regenerate
+    attributes:
+      label: How is it regenerated, and what would be lost?
+      description: This decides the risk level.
+    validations:
+      required: true

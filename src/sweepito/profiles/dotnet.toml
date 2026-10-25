@@ -1,0 +1,37 @@
+id = "dotnet"
+description = ".NET: C#, F#, ASP.NET Core"
+markers = ["*.csproj", "*.fsproj", "*.vbproj", "*.sln"]
+
+[[rule]]
+id = "dotnet.testresults"
+paths = ["TestResults/"]
+risk = "safe"
+description = "Test run output"
+
+[[rule]]
+id = "dotnet.bin-obj"
+paths = ["/bin/", "/obj/"]
+requires = ["*.csproj", "*.fsproj", "*.vbproj"]
+risk = "configurable"
+description = "Build and intermediate output"
+
+[[rule]]
+id = "dotnet.artifacts"
+paths = ["/artifacts/"]
+requires = ["Directory.Build.props", "*.sln"]
+risk = "configurable"
+description = "Centralised build artifacts"
+
+[[rule]]
+id = "dotnet.vs"
+paths = ["/.vs/"]
+requires = ["*.sln"]
+risk = "configurable"
+description = "Visual Studio per-user state"
+
+[[rule]]
+id = "dotnet.publish"
+paths = ["/publish/"]
+requires = ["*.csproj", "*.fsproj"]
+risk = "configurable"
+description = "dotnet publish output"

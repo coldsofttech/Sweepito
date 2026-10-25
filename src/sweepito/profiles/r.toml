@@ -1,0 +1,42 @@
+id = "r"
+description = "R, Shiny, renv, RMarkdown"
+markers = ["DESCRIPTION", "*.Rproj", "renv.lock"]
+
+[[rule]]
+id = "r.rcheck"
+paths = ["*.Rcheck/"]
+risk = "safe"
+description = "R CMD check output"
+
+[[rule]]
+id = "r.rproj-user"
+paths = ["/.Rproj.user/"]
+requires = ["*.Rproj"]
+risk = "configurable"
+description = "RStudio per-user state"
+
+[[rule]]
+id = "r.knitr-cache"
+paths = ["*_cache/", "*_files/"]
+requires = ["*.Rmd", "*.qmd"]
+risk = "configurable"
+description = "knitr and RMarkdown caches and figures"
+
+[[rule]]
+id = "r.history"
+paths = ["/.Rhistory"]
+risk = "configurable"
+description = "R command history"
+
+[[rule]]
+id = "r.rdata"
+paths = ["/.RData"]
+risk = "high-impact"
+description = "Saved workspace (may hold unsaved work)"
+
+[[rule]]
+id = "r.renv-library"
+paths = ["/renv/library/"]
+requires = ["renv.lock"]
+risk = "high-impact"
+description = "renv project library"

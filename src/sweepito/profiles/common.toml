@@ -1,0 +1,33 @@
+id = "common"
+description = "OS and editor artifacts that apply to any project"
+markers = []
+
+[[rule]]
+id = "common.os-junk"
+paths = [".DS_Store", "Thumbs.db", "desktop.ini"]
+risk = "safe"
+description = "Operating system metadata files"
+
+[[rule]]
+id = "common.pm-logs"
+paths = ["npm-debug.log*", "yarn-error.log*", "pnpm-debug.log*"]
+risk = "safe"
+description = "Package manager debug logs"
+
+[[rule]]
+id = "common.editor-temp"
+paths = ["*.swp", "*.swo", "*~"]
+risk = "configurable"
+description = "Editor swap files (may hold unsaved recovery data)"
+
+[[rule]]
+id = "common.merge-leftovers"
+paths = ["*.orig", "*.rej"]
+risk = "configurable"
+description = "Merge and patch leftovers"
+
+[[rule]]
+id = "common.logs"
+paths = ["*.log"]
+risk = "configurable"
+description = "Generic log files"

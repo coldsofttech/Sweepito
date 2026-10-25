@@ -1,0 +1,54 @@
+id = "php"
+description = "PHP: Composer, Laravel, Symfony"
+markers = ["composer.json", "artisan"]
+
+[[rule]]
+id = "php.phpunit"
+paths = [".phpunit.cache/", ".phpunit.result.cache"]
+risk = "safe"
+description = "PHPUnit caches"
+
+[[rule]]
+id = "php.tool-caches"
+paths = [".php-cs-fixer.cache", ".phpstan.cache"]
+risk = "safe"
+description = "Code style and static analysis caches"
+
+[[rule]]
+id = "laravel.cache"
+paths = [
+    "/storage/framework/cache/",
+    "/storage/framework/views/",
+    "/bootstrap/cache/*.php",
+]
+requires = ["artisan"]
+risk = "configurable"
+description = "Laravel framework caches (never storage/app)"
+
+[[rule]]
+id = "laravel.logs"
+paths = ["/storage/logs/"]
+requires = ["artisan"]
+risk = "configurable"
+description = "Laravel logs"
+
+[[rule]]
+id = "symfony.cache"
+paths = ["/var/cache/"]
+requires = ["symfony.lock"]
+risk = "configurable"
+description = "Symfony cache"
+
+[[rule]]
+id = "symfony.logs"
+paths = ["/var/log/"]
+requires = ["symfony.lock"]
+risk = "configurable"
+description = "Symfony logs"
+
+[[rule]]
+id = "php.vendor"
+paths = ["/vendor/"]
+requires = ["composer.json"]
+risk = "high-impact"
+description = "Composer dependencies"

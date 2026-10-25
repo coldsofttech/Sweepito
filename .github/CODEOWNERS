@@ -1,0 +1,6 @@
+# Safety-critical code and rule data need an owner's review.
+*                                   @coldsofttech
+/src/sweepito/planner.py            @coldsofttech
+/src/sweepito/executor.py           @coldsofttech
+/src/sweepito/git.py                @coldsofttech
+/src/sweepito/profiles/             @coldsofttech

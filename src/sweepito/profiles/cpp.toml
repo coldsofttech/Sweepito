@@ -1,0 +1,43 @@
+id = "cpp"
+description = "C and C++: CMake, Make, Ninja, Meson"
+markers = ["CMakeLists.txt", "Makefile", "build.ninja", "meson.build"]
+
+[[rule]]
+id = "cpp.clangd"
+paths = [".cache/clangd/"]
+risk = "safe"
+description = "clangd index"
+
+[[rule]]
+id = "cpp.cmake-build"
+paths = ["cmake-build-*/"]
+requires = ["CMakeLists.txt"]
+risk = "configurable"
+description = "CLion build directories"
+
+[[rule]]
+id = "cpp.build"
+paths = ["/build/"]
+requires = ["CMakeLists.txt", "meson.build", "build.ninja"]
+risk = "configurable"
+description = "Out-of-source build directory"
+
+[[rule]]
+id = "cpp.cmake-in-source"
+paths = ["/CMakeCache.txt", "/CMakeFiles/"]
+requires = ["CMakeLists.txt"]
+risk = "configurable"
+description = "In-source CMake build leftovers"
+
+[[rule]]
+id = "cpp.objects"
+paths = ["*.o", "*.obj", "*.a"]
+risk = "configurable"
+description = "Object files and static libraries"
+
+[[rule]]
+id = "cpp.ninja"
+paths = ["/.ninja_log", "/.ninja_deps"]
+requires = ["build.ninja"]
+risk = "configurable"
+description = "Ninja logs"

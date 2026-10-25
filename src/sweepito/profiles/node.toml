@@ -1,0 +1,98 @@
+id = "node"
+description = "Node.js, React, Next.js, Vue, Nuxt, Angular, Vite, Svelte, Astro"
+markers = ["package.json"]
+
+[[rule]]
+id = "node.eslint"
+paths = [".eslintcache"]
+risk = "safe"
+description = "ESLint cache"
+
+[[rule]]
+id = "node.tsbuildinfo"
+paths = ["*.tsbuildinfo"]
+risk = "safe"
+description = "TypeScript incremental build info"
+
+[[rule]]
+id = "node.modules-cache"
+paths = ["node_modules/.cache/"]
+risk = "safe"
+description = "Babel, webpack and ESLint caches inside node_modules"
+
+[[rule]]
+id = "node.vite"
+paths = [".vite/"]
+risk = "safe"
+description = "Vite cache"
+
+[[rule]]
+id = "node.turbo"
+paths = [".turbo/"]
+risk = "safe"
+description = "Turborepo local cache"
+
+[[rule]]
+id = "node.parcel"
+paths = [".parcel-cache/"]
+risk = "safe"
+description = "Parcel cache"
+
+[[rule]]
+id = "node.angular-cache"
+paths = [".angular/cache/"]
+requires = ["angular.json"]
+risk = "safe"
+description = "Angular CLI cache"
+
+[[rule]]
+id = "node.astro"
+paths = [".astro/"]
+requires = ["astro.config.*"]
+risk = "safe"
+description = "Astro generated types and cache"
+
+[[rule]]
+id = "node.next"
+paths = ["/.next/"]
+requires = ["next.config.*"]
+risk = "configurable"
+description = "Next.js build output"
+
+[[rule]]
+id = "node.nuxt"
+paths = ["/.nuxt/", "/.output/"]
+requires = ["nuxt.config.*"]
+risk = "configurable"
+description = "Nuxt build output"
+
+[[rule]]
+id = "node.svelte-kit"
+paths = ["/.svelte-kit/"]
+requires = ["svelte.config.*"]
+risk = "configurable"
+description = "SvelteKit generated output"
+
+[[rule]]
+id = "node.dist"
+paths = ["/dist/"]
+risk = "configurable"
+description = "Build and distribution output"
+
+[[rule]]
+id = "node.build"
+paths = ["/build/", "/out/"]
+risk = "configurable"
+description = "Build output and static exports"
+
+[[rule]]
+id = "node.coverage"
+paths = ["/coverage/"]
+risk = "configurable"
+description = "Test coverage reports"
+
+[[rule]]
+id = "node.modules"
+paths = ["/node_modules/"]
+risk = "high-impact"
+description = "Installed dependencies (requires reinstall)"

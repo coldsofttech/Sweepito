@@ -1,0 +1,4 @@
+# Normalise line endings. Hook scripts and shell snippets must keep LF on Windows.
+* text=auto eol=lf
+*.png binary
+*.ico binary
