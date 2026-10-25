@@ -1,0 +1,50 @@
+name: Bug report
+description: Something did not behave as expected
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        If Sweepito deleted something it should not have (a tracked file, or anything
+        outside the project), please use **private vulnerability reporting** from the
+        Security tab instead of this form.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What did you expect, and what did you see instead?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: The command, plus `sweepito scan --json -v` output if relevant.
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: config
+    attributes:
+      label: Configuration
+      description: Contents of `sweepito.toml` (or `[tool.sweepito]`), if you have one.
+      render: toml
+  - type: input
+    id: version
+    attributes:
+      label: Sweepito version
+      description: Output of `sweepito --version`
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options: [Windows, macOS, Linux]
+    validations:
+      required: true
+  - type: input
+    id: python
+    attributes:
+      label: Python and Git versions
+      placeholder: "Python 3.12.4, git 2.45.0"

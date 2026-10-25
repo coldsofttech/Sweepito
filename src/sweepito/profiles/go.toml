@@ -1,0 +1,21 @@
+id = "go"
+description = "Go modules and build tools"
+markers = ["go.mod", "go.work"]
+
+[[rule]]
+id = "go.test-artifacts"
+paths = ["*.test", "*.prof", "coverage.out"]
+risk = "safe"
+description = "Compiled test binaries and profiles"
+
+[[rule]]
+id = "go.bin"
+paths = ["/bin/"]
+risk = "configurable"
+description = "Conventional project build output"
+
+[[rule]]
+id = "go.vendor"
+paths = ["/vendor/"]
+risk = "high-impact"
+description = "Vendored dependencies (often committed; tracked files are protected)"

@@ -1,0 +1,31 @@
+id = "terraform"
+description = "Terraform and Terragrunt (state files and lock files are never cleaned)"
+markers = ["*.tf", "terragrunt.hcl"]
+
+[[rule]]
+id = "terraform.crash-log"
+paths = ["crash.log", "crash.*.log"]
+requires = ["*.tf"]
+risk = "safe"
+description = "Terraform crash logs"
+
+[[rule]]
+id = "terraform.plans"
+paths = ["*.tfplan", "tfplan"]
+requires = ["*.tf"]
+risk = "configurable"
+description = "Saved plans (a plan may be awaiting apply)"
+
+[[rule]]
+id = "terraform.dir"
+paths = ["/.terraform/"]
+requires = ["*.tf"]
+risk = "configurable"
+description = "Provider plugins (terraform init required again)"
+
+[[rule]]
+id = "terragrunt.cache"
+paths = ["/.terragrunt-cache/"]
+requires = ["terragrunt.hcl"]
+risk = "configurable"
+description = "Terragrunt module cache"

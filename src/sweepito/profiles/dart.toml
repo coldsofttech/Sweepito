@@ -1,0 +1,21 @@
+id = "dart"
+description = "Dart and Flutter"
+markers = ["pubspec.yaml"]
+
+[[rule]]
+id = "dart.tool"
+paths = ["/.dart_tool/"]
+risk = "configurable"
+description = "Dart tool cache (pub get regenerates)"
+
+[[rule]]
+id = "dart.build"
+paths = ["/build/"]
+risk = "configurable"
+description = "Flutter build output"
+
+[[rule]]
+id = "dart.legacy"
+paths = ["/.packages", "/.flutter-plugins", "/.flutter-plugins-dependencies"]
+risk = "configurable"
+description = "Generated plugin and package files"

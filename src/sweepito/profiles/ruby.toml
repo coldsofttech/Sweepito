@@ -1,0 +1,45 @@
+id = "ruby"
+description = "Ruby: Bundler, Rails, Sinatra"
+markers = ["Gemfile", "config/application.rb"]
+
+[[rule]]
+id = "ruby.yard"
+paths = ["/.yardoc/"]
+requires = ["Gemfile"]
+risk = "safe"
+description = "YARD documentation cache"
+
+[[rule]]
+id = "ruby.coverage"
+paths = ["/coverage/"]
+requires = ["Gemfile"]
+risk = "safe"
+description = "SimpleCov reports"
+
+[[rule]]
+id = "rails.tmp-cache"
+paths = ["/tmp/cache/"]
+requires = ["config/application.rb"]
+risk = "configurable"
+description = "Rails Bootsnap and asset caches"
+
+[[rule]]
+id = "rails.tmp"
+paths = ["/tmp/pids/", "/tmp/sockets/"]
+requires = ["config/application.rb"]
+risk = "configurable"
+description = "Stale PID files and sockets"
+
+[[rule]]
+id = "rails.logs"
+paths = ["/log/*.log"]
+requires = ["config/application.rb"]
+risk = "configurable"
+description = "Rails logs"
+
+[[rule]]
+id = "ruby.vendor-bundle"
+paths = ["/vendor/bundle/"]
+requires = ["Gemfile"]
+risk = "high-impact"
+description = "Bundled gems (requires reinstall)"

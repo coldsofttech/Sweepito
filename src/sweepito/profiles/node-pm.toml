@@ -1,0 +1,17 @@
+id = "node-pm"
+description = "npm, pnpm, Yarn and Bun project-local stores"
+markers = ["package-lock.json", "pnpm-lock.yaml", "yarn.lock", "bun.lockb", "bun.lock"]
+
+[[rule]]
+id = "node-pm.yarn-cache"
+paths = ["/.yarn/cache/"]
+requires = ["yarn.lock"]
+risk = "configurable"
+description = "Yarn offline cache (skipped automatically when tracked)"
+
+[[rule]]
+id = "node-pm.pnpm-store"
+paths = ["/.pnpm-store/"]
+requires = ["pnpm-lock.yaml"]
+risk = "high-impact"
+description = "Local pnpm content-addressable store"

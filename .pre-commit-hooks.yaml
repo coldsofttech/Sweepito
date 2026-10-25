@@ -1,0 +1,17 @@
+- id: sweepito-scan
+  name: sweepito scan
+  description: Report git-ignored caches and build artifacts that could be cleaned.
+  entry: sweepito scan --hook --quiet
+  language: python
+  stages: [pre-commit]
+  pass_filenames: false
+  always_run: true
+
+- id: sweepito-clean
+  name: sweepito clean
+  description: Remove git-ignored caches and build artifacts after each commit.
+  entry: sweepito clean --hook --non-interactive --quiet
+  language: python
+  stages: [post-commit]
+  pass_filenames: false
+  always_run: true

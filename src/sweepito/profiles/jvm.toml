@@ -1,0 +1,38 @@
+id = "jvm"
+description = "Java and JVM: Maven, Gradle, Kotlin, Spring Boot"
+markers = ["pom.xml", "build.gradle", "build.gradle.kts", "settings.gradle", "settings.gradle.kts"]
+
+[[rule]]
+id = "jvm.kotlin"
+paths = ["/.kotlin/"]
+requires = ["build.gradle", "build.gradle.kts"]
+risk = "safe"
+description = "Kotlin compiler session data"
+
+[[rule]]
+id = "jvm.maven-target"
+paths = ["/target/"]
+requires = ["pom.xml"]
+risk = "configurable"
+description = "Maven build output"
+
+[[rule]]
+id = "jvm.gradle-project"
+paths = ["/.gradle/"]
+requires = ["settings.gradle", "settings.gradle.kts", "build.gradle", "build.gradle.kts"]
+risk = "configurable"
+description = "Project-level Gradle cache (not ~/.gradle)"
+
+[[rule]]
+id = "jvm.gradle-build"
+paths = ["/build/"]
+requires = ["build.gradle", "build.gradle.kts"]
+risk = "configurable"
+description = "Gradle build output"
+
+[[rule]]
+id = "jvm.idea-out"
+paths = ["/out/"]
+requires = ["*.iml"]
+risk = "configurable"
+description = "IntelliJ default output directory"

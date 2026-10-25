@@ -1,0 +1,38 @@
+id = "jupyter"
+description = "Jupyter notebooks and ML workflow outputs"
+markers = ["*.ipynb", "dvc.yaml", "MLproject"]
+
+[[rule]]
+id = "jupyter.checkpoints"
+paths = [".ipynb_checkpoints/"]
+requires = ["*.ipynb"]
+risk = "safe"
+description = "Notebook autosave checkpoints"
+
+[[rule]]
+id = "ml.lightning-logs"
+paths = ["/lightning_logs/", "/catboost_info/"]
+requires = ["pyproject.toml", "requirements.txt", "setup.py", "*.ipynb"]
+risk = "configurable"
+description = "Training logs"
+
+[[rule]]
+id = "ml.mlruns"
+paths = ["/mlruns/"]
+requires = ["pyproject.toml", "requirements.txt", "setup.py", "*.ipynb", "MLproject"]
+risk = "high-impact"
+description = "MLflow experiment history"
+
+[[rule]]
+id = "ml.wandb"
+paths = ["/wandb/"]
+requires = ["pyproject.toml", "requirements.txt", "setup.py", "*.ipynb"]
+risk = "high-impact"
+description = "Weights & Biases local runs (may be unsynced)"
+
+[[rule]]
+id = "ml.dvc-cache"
+paths = ["/.dvc/cache/"]
+requires = ["dvc.yaml"]
+risk = "high-impact"
+description = "Local copies of DVC-tracked data"

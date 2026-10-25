@@ -1,0 +1,31 @@
+id = "swift"
+description = "Swift Package Manager and Xcode"
+markers = ["Package.swift", "*.xcodeproj/project.pbxproj", "Podfile"]
+
+[[rule]]
+id = "swift.build"
+paths = ["/.build/"]
+requires = ["Package.swift"]
+risk = "configurable"
+description = "SwiftPM build output"
+
+[[rule]]
+id = "swift.swiftpm"
+paths = ["/.swiftpm/"]
+requires = ["Package.swift"]
+risk = "configurable"
+description = "SwiftPM and Xcode package state"
+
+[[rule]]
+id = "xcode.xcuserdata"
+paths = ["xcuserdata/"]
+requires = ["*.xcodeproj/project.pbxproj"]
+risk = "configurable"
+description = "Per-user Xcode state"
+
+[[rule]]
+id = "xcode.pods"
+paths = ["/Pods/"]
+requires = ["Podfile"]
+risk = "high-impact"
+description = "CocoaPods dependencies (requires pod install)"

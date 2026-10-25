@@ -1,0 +1,39 @@
+id = "elixir"
+description = "Elixir: Mix and Phoenix"
+markers = ["mix.exs"]
+
+[[rule]]
+id = "elixir.ls"
+paths = ["/.elixir_ls/"]
+risk = "safe"
+description = "ElixirLS cache"
+
+[[rule]]
+id = "elixir.crash"
+paths = ["erl_crash.dump"]
+risk = "safe"
+description = "Erlang crash dumps"
+
+[[rule]]
+id = "elixir.cover"
+paths = ["/cover/"]
+risk = "safe"
+description = "Coverage reports"
+
+[[rule]]
+id = "elixir.build"
+paths = ["/_build/"]
+risk = "configurable"
+description = "Mix build output"
+
+[[rule]]
+id = "phoenix.static"
+paths = ["/priv/static/"]
+risk = "configurable"
+description = "Phoenix compiled assets (tracked files are protected)"
+
+[[rule]]
+id = "elixir.deps"
+paths = ["/deps/"]
+risk = "high-impact"
+description = "Mix dependencies"
