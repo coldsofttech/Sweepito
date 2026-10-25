@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 
 from tests.conftest import Repo
 
@@ -28,7 +29,9 @@ def test_scan_renders_a_titled_table(repo: Repo) -> None:
         "python.pycache",
     ):
         assert text in out
-    assert "┌" in out or "+-" in out  # a bordered Rich table
+    # Rich draws different borders per platform (light, heavy or ASCII), so only check
+    # that the table is bordered at all.
+    assert any(char in out for char in "┌┏╭+")
 
 
 def test_report_renders_one_table_per_grouping(repo: Repo) -> None:
@@ -40,7 +43,7 @@ def test_report_renders_one_table_per_grouping(repo: Repo) -> None:
     assert "rust.target" in out  # report covers every risk level
     rule_table = out.split("By rule")[1].split("By risk")[0]
     header = next(line for line in rule_table.splitlines() if "Rule" in line)
-    columns = [c.strip() for c in header.strip("│| ").replace("│", "|").split("|")]
+    columns = [c.strip() for c in re.split(r"[│┃|]", header) if c.strip()]
     assert columns == ["Rule", "Items", "Risk", "Size"]
     row = next(line for line in rule_table.splitlines() if "rust.target" in line)
     assert "configurable" in row
@@ -83,7 +86,8 @@ def test_json_output_is_plain_and_parseable(repo: Repo) -> None:
         code, out, _ = repo.run(*args, "--json", str(repo.root))
         assert code == 0, args
         json.loads(out)  # no Rich markup, borders or ANSI codes
-        assert "\x1b[" not in out and "┌" not in out
+        assert "\x1b[" not in out
+        assert not any(char in out for char in "┌┏╭│┃")
 
 
 def test_profiles_table_lists_every_profile(repo: Repo) -> None:

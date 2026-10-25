@@ -131,6 +131,9 @@ def test_a_symlink_matched_as_a_file_path_is_removed_as_a_link(repo: Repo) -> No
     (repo.root / "build" / "real.o").unlink()
     (repo.root / "build").rmdir()
     make_symlink(repo.root / "build", other)
+    # "build/" only matches real directories; git sees a symlink as a file, so ignore
+    # it by name.
+    repo.write(".gitignore", "build\n")
     repo.write(
         "sweepito.toml", '[[rule]]\nid = "custom.build-link"\npaths = ["/build"]\n'
     )
