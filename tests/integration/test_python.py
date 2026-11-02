@@ -17,6 +17,7 @@ CASE = Case(
         "python.pycache": ["pkg/__pycache__/", "mod.pyc"],
         "python.pytest": [".pytest_cache/"],
         "python.ruff": [".ruff_cache/"],
+        "python.schemathesis": [".schemathesis/"],
         "python.tox": [".tox/", ".nox/"],
         "python.typecheckers": [".pyre/", ".pytype/"],
         "python.venv": [".venv/", "venv/", "env/"],

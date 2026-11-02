@@ -78,13 +78,13 @@ Custom rules follow the same safety gates as built-in ones. Details are in
 | [`node-pm`](#node-pm) | `package-lock.json`, `pnpm-lock.yaml`, `yarn.lock`, `bun.lockb`, `bun.lock` | 2 | 0 | 1 | 1 |
 | [`node`](#node) | `package.json` | 15 | 8 | 6 | 1 |
 | [`php`](#php) | `composer.json`, `artisan` | 7 | 2 | 4 | 1 |
-| [`python`](#python) | `pyproject.toml`, `setup.py`, `setup.cfg`, `requirements*.txt`, `Pipfile`, `manage.py` | 13 | 6 | 6 | 1 |
+| [`python`](#python) | `pyproject.toml`, `setup.py`, `setup.cfg`, `requirements*.txt`, `Pipfile`, `manage.py` | 14 | 6 | 7 | 1 |
 | [`r`](#r) | `DESCRIPTION`, `*.Rproj`, `renv.lock` | 6 | 1 | 3 | 2 |
 | [`ruby`](#ruby) | `Gemfile`, `config/application.rb` | 6 | 2 | 3 | 1 |
 | [`rust`](#rust) | `Cargo.toml` | 2 | 0 | 2 | 0 |
 | [`swift`](#swift) | `Package.swift`, `*.xcodeproj/project.pbxproj`, `Podfile` | 4 | 0 | 3 | 1 |
 | [`terraform`](#terraform) | `*.tf`, `terragrunt.hcl` | 4 | 1 | 3 | 0 |
-| **Total** | | **97** | **30** | **54** | **13** |
+| **Total** | | **98** | **30** | **55** | **13** |
 
 ## common
 
@@ -512,6 +512,7 @@ Python, Django, Flask, FastAPI, pytest, Ruff, mypy, tox, coverage
 | `python.typecheckers` | `.pyre/`, `.pytype/` | `pyproject.toml`, `setup.py`, `setup.cfg`, `requirements*.txt`, `Pipfile`, `manage.py` | safe | Pyre and pytype caches |
 | `python.coverage` | `.coverage`, `.coverage.*`, `htmlcov/`, `coverage.xml` | `pyproject.toml`, `setup.py`, `setup.cfg`, `requirements*.txt`, `Pipfile`, `manage.py` | safe | Coverage data and reports |
 | `python.hypothesis` | `.hypothesis/` | `pyproject.toml`, `setup.py`, `setup.cfg`, `requirements*.txt`, `Pipfile`, `manage.py` | configurable | Hypothesis example database (holds regression seeds) |
+| `python.schemathesis` | `.schemathesis/` | `pyproject.toml`, `setup.py`, `setup.cfg`, `requirements*.txt`, `Pipfile`, `manage.py` | configurable | Schemathesis cache (holds failing cases kept for replay) |
 | `python.tox` | `.tox/`, `.nox/` | `pyproject.toml`, `setup.py`, `setup.cfg`, `requirements*.txt`, `Pipfile`, `manage.py` | configurable | tox and nox environments |
 | `python.eggs` | `.eggs/`, `*.egg-info/` | `pyproject.toml`, `setup.py`, `setup.cfg`, `requirements*.txt`, `Pipfile`, `manage.py` | configurable | Setuptools build metadata |
 | `python.build` | `/build/` | `pyproject.toml`, `setup.py`, `setup.cfg`, `requirements*.txt`, `Pipfile`, `manage.py` | configurable | Build output |

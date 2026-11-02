@@ -45,6 +45,12 @@ risk = "configurable"
 description = "Hypothesis example database (holds regression seeds)"
 
 [[rule]]
+id = "python.schemathesis"
+paths = [".schemathesis/"]
+risk = "configurable"
+description = "Schemathesis cache (holds failing cases kept for replay)"
+
+[[rule]]
 id = "python.tox"
 paths = [".tox/", ".nox/"]
 risk = "configurable"
