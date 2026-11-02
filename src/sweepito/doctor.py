@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import sys
 from dataclasses import asdict, dataclass
 from importlib import metadata
@@ -95,6 +96,18 @@ def run_checks(path: str | None = None, config_file: str | None = None) -> list[
                 "installed" if installed else "not installed",
             )
         )
+        pinned = hooks.pinned_interpreter(ctx.root, stage) if installed else None
+        if pinned and pinned != hooks.posix_path(sys.executable):
+            usable = os.access(pinned, os.X_OK)
+            checks.append(
+                Check(
+                    f"{stage} hook interpreter",
+                    usable,
+                    pinned
+                    if usable
+                    else f"{pinned} is missing; re-run `sweepito hook install`",
+                )
+            )
     return checks
 
 

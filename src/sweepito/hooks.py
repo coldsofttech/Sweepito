@@ -3,8 +3,11 @@
 from __future__ import annotations
 
 import os
+import re
+import shlex
 import stat
-from pathlib import Path
+import sys
+from pathlib import Path, PureWindowsPath
 
 from sweepito import git
 from sweepito.errors import ConfigError
@@ -12,20 +15,58 @@ from sweepito.errors import ConfigError
 BEGIN = "# >>> sweepito >>>"
 END = "# <<< sweepito <<<"
 STAGES = {
-    "post-commit": "sweepito clean --hook --non-interactive --quiet",
-    "pre-commit": "sweepito scan --hook --quiet",
+    "post-commit": "clean --hook --non-interactive --quiet",
+    "pre-commit": "scan --hook --quiet",
 }
+_PINNED = re.compile(r"^if \[ -x (?P<py>'[^\n]*?') \]", re.MULTILINE)
 
 
-def _block(stage: str) -> str:
-    command = STAGES[stage]
+def posix_path(path: str) -> str:
+    """Express an interpreter path the way POSIX sh (e.g. Git Bash) expects it."""
+    if os.name == "nt" or re.match(r"^[A-Za-z]:[\\/]", path):
+        win = PureWindowsPath(path)
+        if win.drive:
+            rest = "/".join(win.parts[1:])
+            return f"/{win.drive[0].lower()}/{rest}"
+        return win.as_posix()
+    return path
+
+
+def _quote(value: str) -> str:
+    return "'" + value.replace("'", "'\\''") + "'"
+
+
+def _block(stage: str, python: str | None = None) -> str:
+    """Hook block.
+
+    Prefer the interpreter that installed the hook (``python -m sweepito``), which
+    does not depend on PATH or on ``Scripts/sweepito[.exe]`` shims; fall back to a
+    ``sweepito`` found on PATH, and stay silent if neither is available.
+    """
+    args = STAGES[stage]
+    py = _quote(posix_path(python or sys.executable))
+    fail = f'|| echo "sweepito: {stage} hook failed (exit $?)" >&2'
     return (
         f"{BEGIN}\n"
-        f"if command -v sweepito >/dev/null 2>&1; then\n"
-        f'  {command} || echo "sweepito: {stage} hook failed" >&2\n'
+        f"if [ -x {py} ] && {py} -c 'import sweepito' >/dev/null 2>&1; then\n"
+        f"  {py} -m sweepito {args} {fail}\n"
+        f"elif command -v sweepito >/dev/null 2>&1; then\n"
+        f"  sweepito {args} {fail}\n"
         f"fi\n"
         f"{END}\n"
     )
+
+
+def pinned_interpreter(root: Path, stage: str) -> str | None:
+    """The interpreter recorded in an installed hook, or None."""
+    path = hook_path(root, stage)
+    if not path.exists():
+        return None
+    match = _PINNED.search(path.read_text(encoding="utf-8"))
+    if not match:
+        return None
+    parts = shlex.split(match.group("py"))
+    return parts[0] if parts else None
 
 
 def hook_path(root: Path, stage: str) -> Path:

@@ -5,6 +5,15 @@ All notable changes are recorded here. The format follows
 
 ## [Unreleased]
 
+### Added
+- `python.schemathesis` rule for the `.schemathesis/` cache.
+- `sweepito doctor` reports a hook whose recorded interpreter no longer exists.
+
+### Fixed
+- The Git hook failed with `Permission denied` on Windows (Git Bash). It now runs
+  `python -m sweepito` with the interpreter that installed it, falling back to `sweepito` on
+  PATH. Re-run `sweepito hook install` to update existing hooks.
+
 ## [0.1.0] - 2026-10-25
 
 ### Added
