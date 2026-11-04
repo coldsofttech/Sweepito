@@ -1,0 +1,9 @@
+id = "batchvault"
+description = "BatchVault archive staging folders"
+markers = ["batchvault.toml"]
+
+[[rule]]
+id = "batchvault.staging"
+paths = [".batchvault-*/"]
+risk = "configurable"
+description = "Staging folders left behind by an interrupted BatchVault run"

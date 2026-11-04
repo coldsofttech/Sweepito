@@ -67,6 +67,7 @@ Custom rules follow the same safety gates as built-in ones. Details are in
 
 | Profile | Detected by | Rules | Safe | Configurable | High-impact |
 |---|---|---:|---:|---:|---:|
+| [`batchvault`](#batchvault) | `batchvault.toml` | 1 | 0 | 1 | 0 |
 | [`common`](#common) | always active | 5 | 2 | 3 | 0 |
 | [`cpp`](#cpp) | `CMakeLists.txt`, `Makefile`, `build.ninja`, `meson.build` | 6 | 1 | 5 | 0 |
 | [`dart`](#dart) | `pubspec.yaml` | 3 | 0 | 3 | 0 |
@@ -84,7 +85,38 @@ Custom rules follow the same safety gates as built-in ones. Details are in
 | [`rust`](#rust) | `Cargo.toml` | 2 | 0 | 2 | 0 |
 | [`swift`](#swift) | `Package.swift`, `*.xcodeproj/project.pbxproj`, `Podfile` | 4 | 0 | 3 | 1 |
 | [`terraform`](#terraform) | `*.tf`, `terragrunt.hcl` | 4 | 1 | 3 | 0 |
-| **Total** | | **98** | **30** | **55** | **13** |
+| **Total** | | **99** | **30** | **56** | **13** |
+
+## batchvault
+
+BatchVault archive staging folders
+
+**Detected by:** `batchvault.toml`
+
+### Rules
+
+| Rule ID | Targets | Requires | Risk | Description |
+|---|---|---|---|---|
+| `batchvault.staging` | `.batchvault-*/` | `batchvault.toml` | configurable | Staging folders left behind by an interrupted BatchVault run |
+
+### Configuration
+
+```toml
+[clean]
+enable = ["batchvault.staging"]
+```
+
+Command-line equivalent:
+
+```bash
+sweepito clean -p batchvault --enable batchvault.staging
+```
+
+Notes:
+
+- BatchVault builds each archive in a `.batchvault-*` staging folder and removes it when the run ends; only a killed run leaves one behind.
+- The rule is `configurable` because a run in progress also uses a staging folder: clean only when no BatchVault run is active.
+- Archives, manifests and volumes are never targeted. Log files live in a per-user folder outside the project and are not touched.
 
 ## common
 

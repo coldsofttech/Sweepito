@@ -230,6 +230,21 @@ enable = ["r.knitr-cache", "r.rproj-user"]
             "`renv/library/` is `high-impact`; `renv.lock` is never touched.",
         ],
     },
+    "batchvault": {
+        "toml": """\
+[clean]
+enable = ["batchvault.staging"]
+""",
+        "cli": "sweepito clean -p batchvault --enable batchvault.staging",
+        "notes": [
+            "BatchVault builds each archive in a `.batchvault-*` staging folder and removes "
+            "it when the run ends; only a killed run leaves one behind.",
+            "The rule is `configurable` because a run in progress also uses a staging "
+            "folder: clean only when no BatchVault run is active.",
+            "Archives, manifests and volumes are never targeted. Log files live in a "
+            "per-user folder outside the project and are not touched.",
+        ],
+    },
     "jupyter": {
         "toml": """\
 [clean]

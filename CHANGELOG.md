@@ -5,6 +5,9 @@ All notable changes are recorded here. The format follows
 
 ## [Unreleased]
 
+### Added
+- `batchvault` profile with `batchvault.staging` for `.batchvault-*/` folders left by an interrupted run.
+
 ## [0.1.0] - 2026-10-25
 
 ### Added
