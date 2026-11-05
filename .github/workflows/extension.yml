@@ -1,0 +1,53 @@
+name: extension
+
+on:
+  push:
+    branches: [main]
+    paths: ["extensions/vscode/**", "src/**", ".github/workflows/extension.yml"]
+  pull_request:
+    paths: ["extensions/vscode/**", "src/**", ".github/workflows/extension.yml"]
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    defaults:
+      run:
+        working-directory: extensions/vscode
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: extensions/vscode/package-lock.json
+      - uses: astral-sh/setup-uv@v7
+      - name: Install the Sweepito CLI under test
+        working-directory: .
+        shell: bash
+        run: |
+          uv venv .cli-venv
+          uv pip install --python .cli-venv .
+          if [ "$RUNNER_OS" = "Windows" ]; then
+            echo "SWEEPITO_BIN=$GITHUB_WORKSPACE/.cli-venv/Scripts/sweepito.exe" >> "$GITHUB_ENV"
+          else
+            echo "SWEEPITO_BIN=$GITHUB_WORKSPACE/.cli-venv/bin/sweepito" >> "$GITHUB_ENV"
+          fi
+      - run: npm ci
+      - run: npm run typecheck
+      - name: Git identity for the fixture repository
+        run: |
+          git config --global user.email "ci@example.com"
+          git config --global user.name "ci"
+      - run: npm test
+      - run: npm run build
+      - run: npm run package
+        if: matrix.os == 'ubuntu-latest'
+      - uses: actions/upload-artifact@v7
+        if: matrix.os == 'ubuntu-latest'
+        with:
+          name: sweepito-vsix
+          path: extensions/vscode/*.vsix

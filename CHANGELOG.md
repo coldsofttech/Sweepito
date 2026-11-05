@@ -5,6 +5,10 @@ All notable changes are recorded here. The format follows
 
 ## [Unreleased]
 
+### Added
+- VS Code extension (`extensions/vscode`): scan tree, confirmed clean, Doctor, Git hook and config
+  commands, status bar, multi-root and limited untrusted-workspace support. See `docs/vscode.md`.
+
 ## [0.1.0] - 2026-10-25
 
 ### Added

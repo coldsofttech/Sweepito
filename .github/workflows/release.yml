@@ -15,8 +15,9 @@ jobs:
           tag="${GITHUB_REF_NAME#v}"
           pyproject=$(grep -m1 '^version' pyproject.toml | cut -d'"' -f2)
           package=$(grep -m1 '__version__' src/sweepito/__init__.py | cut -d'"' -f2)
-          test "$tag" = "$pyproject" && test "$tag" = "$package" \
-            || { echo "Version mismatch: tag=$tag pyproject=$pyproject package=$package"; exit 1; }
+          extension=$(grep -m1 '"version"' extensions/vscode/package.json | cut -d'"' -f4)
+          test "$tag" = "$pyproject" && test "$tag" = "$package" && test "$tag" = "$extension" \
+            || { echo "Version mismatch: tag=$tag pyproject=$pyproject package=$package extension=$extension"; exit 1; }
       - run: uv sync
       - run: uv run ruff check .
       - run: |
@@ -40,3 +41,60 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh release create "$GITHUB_REF_NAME" dist/* --generate-notes
+
+  extension:
+    needs: verify
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    defaults:
+      run:
+        working-directory: extensions/vscode
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: extensions/vscode/package-lock.json
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run package
+      - uses: actions/upload-artifact@v7
+        with:
+          name: sweepito-vsix
+          path: extensions/vscode/*.vsix
+
+  publish-extension:
+    needs: [publish, extension]
+    runs-on: ubuntu-latest
+    environment: vscode-marketplace
+    permissions:
+      contents: write
+    defaults:
+      run:
+        working-directory: extensions/vscode
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: extensions/vscode/package-lock.json
+      - run: npm ci
+      - uses: actions/download-artifact@v8
+        with:
+          name: sweepito-vsix
+          path: extensions/vscode
+      - name: Attach the .vsix to the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "$GITHUB_REF_NAME" ./*.vsix --clobber
+      - name: Publish to the Visual Studio Marketplace
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+        run: npx vsce publish --packagePath ./*.vsix --no-dependencies
+      - name: Publish to Open VSX
+        env:
+          OVSX_PAT: ${{ secrets.OVSX_PAT }}
+        run: npx --yes ovsx@0.10.1 publish ./*.vsix -p "$OVSX_PAT"

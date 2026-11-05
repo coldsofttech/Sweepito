@@ -191,6 +191,12 @@ untracked and git-ignored (or opt out of the ignore check per rule with
 
 Run `sweepito <command> --help` for every option, or read [docs/cli.md](docs/cli.md).
 
+## VS Code
+
+The [VS Code extension](extensions/vscode/README.md) shows what `sweepito scan` finds in a sidebar
+tree and runs `sweepito clean` after a confirmation. It needs this CLI installed. See
+[docs/vscode.md](docs/vscode.md).
+
 ## Git hook setup
 
 With the [pre-commit](https://pre-commit.com) framework, add to `.pre-commit-config.yaml`:
@@ -251,7 +257,7 @@ See [docs/development.md](docs/development.md) and [docs/architecture.md](docs/a
 ## Documentation
 
 [CLI](docs/cli.md) · [Configuration](docs/configuration.md) · [Profiles and rules](docs/profiles.md) ·
-[Architecture](docs/architecture.md) · [Development](docs/development.md) · [Changelog](CHANGELOG.md)
+[VS Code extension](docs/vscode.md) · [Architecture](docs/architecture.md) · [Development](docs/development.md) · [Changelog](CHANGELOG.md)
 
 ## Contributing
 

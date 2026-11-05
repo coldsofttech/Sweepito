@@ -1,0 +1,291 @@
+{
+  "name": "sweepito",
+  "displayName": "Sweepito",
+  "description": "Safely clean caches and build artifacts from inside VS Code. A thin front end for the Sweepito command line tool.",
+  "version": "0.1.0",
+  "publisher": "coldsofttech",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/coldsofttech/Sweepito.git",
+    "directory": "extensions/vscode"
+  },
+  "bugs": {
+    "url": "https://github.com/coldsofttech/Sweepito/issues"
+  },
+  "icon": "media/icon.png",
+  "homepage": "https://github.com/coldsofttech/Sweepito",
+  "keywords": [
+    "cleanup",
+    "cache",
+    "build",
+    "git",
+    "sweepito"
+  ],
+  "categories": [
+    "Other"
+  ],
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "main": "./dist/extension.js",
+  "activationEvents": [
+    "workspaceContains:.git"
+  ],
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": "limited",
+      "description": "In an untrusted workspace Sweepito can scan and run Doctor, but cannot clean files or change Git hooks. The sweepito.executablePath setting from the workspace is ignored.",
+      "restrictedConfigurations": [
+        "sweepito.executablePath"
+      ]
+    },
+    "virtualWorkspaces": {
+      "supported": false,
+      "description": "Sweepito runs a command line tool on local folders."
+    }
+  },
+  "extensionKind": [
+    "workspace"
+  ],
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "sweepito",
+          "title": "Sweepito",
+          "icon": "media/sweepito.svg"
+        }
+      ]
+    },
+    "views": {
+      "sweepito": [
+        {
+          "id": "sweepito.candidates",
+          "name": "Cleanup candidates"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "sweepito.candidates",
+        "contents": "The Sweepito command line tool was not found. It needs Python 3.11 or newer.\n[Show install options](command:sweepito.showInstallHelp)\n[Open settings](command:workbench.action.openSettings?%22sweepito.executablePath%22)",
+        "when": "sweepito.cliMissing"
+      },
+      {
+        "view": "sweepito.candidates",
+        "contents": "Nothing scanned yet.\n[Scan workspace](command:sweepito.scan)",
+        "when": "!sweepito.cliMissing && sweepito.empty"
+      }
+    ],
+    "commands": [
+      {
+        "command": "sweepito.scan",
+        "title": "Scan",
+        "category": "Sweepito",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "sweepito.clean",
+        "title": "Clean",
+        "category": "Sweepito",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "sweepito.doctor",
+        "title": "Doctor",
+        "category": "Sweepito"
+      },
+      {
+        "command": "sweepito.installHook",
+        "title": "Install Git Hook",
+        "category": "Sweepito"
+      },
+      {
+        "command": "sweepito.uninstallHook",
+        "title": "Uninstall Git Hook",
+        "category": "Sweepito"
+      },
+      {
+        "command": "sweepito.setRisk",
+        "title": "Choose Risk Level for This Session",
+        "category": "Sweepito",
+        "icon": "$(shield)"
+      },
+      {
+        "command": "sweepito.openConfig",
+        "title": "Open Config File",
+        "category": "Sweepito"
+      },
+      {
+        "command": "sweepito.createConfig",
+        "title": "Create Config File",
+        "category": "Sweepito"
+      },
+      {
+        "command": "sweepito.showInstallHelp",
+        "title": "Show Install Options",
+        "category": "Sweepito"
+      },
+      {
+        "command": "sweepito.cleanProfile",
+        "title": "Clean This Profile",
+        "category": "Sweepito",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "sweepito.cleanRule",
+        "title": "Clean This Rule",
+        "category": "Sweepito",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "sweepito.cleanFolder",
+        "title": "Clean This Folder",
+        "category": "Sweepito",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "sweepito.reveal",
+        "title": "Reveal in Explorer",
+        "category": "Sweepito"
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "sweepito.cleanProfile",
+          "when": "false"
+        },
+        {
+          "command": "sweepito.cleanRule",
+          "when": "false"
+        },
+        {
+          "command": "sweepito.cleanFolder",
+          "when": "false"
+        },
+        {
+          "command": "sweepito.reveal",
+          "when": "false"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "sweepito.scan",
+          "when": "view == sweepito.candidates",
+          "group": "navigation@1"
+        },
+        {
+          "command": "sweepito.setRisk",
+          "when": "view == sweepito.candidates",
+          "group": "navigation@2"
+        },
+        {
+          "command": "sweepito.clean",
+          "when": "view == sweepito.candidates && isWorkspaceTrusted",
+          "group": "navigation@3"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "sweepito.cleanFolder",
+          "when": "view == sweepito.candidates && viewItem == folder && isWorkspaceTrusted",
+          "group": "inline"
+        },
+        {
+          "command": "sweepito.cleanProfile",
+          "when": "view == sweepito.candidates && viewItem == profile && isWorkspaceTrusted",
+          "group": "inline"
+        },
+        {
+          "command": "sweepito.cleanRule",
+          "when": "view == sweepito.candidates && viewItem == rule && isWorkspaceTrusted",
+          "group": "inline"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Sweepito",
+      "properties": {
+        "sweepito.executablePath": {
+          "type": "string",
+          "default": "",
+          "scope": "machine-overridable",
+          "markdownDescription": "Path to the `sweepito` executable. When empty, Sweepito is looked up on `PATH`, then in the active Python environment (`python -m sweepito`). Ignored in untrusted workspaces."
+        },
+        "sweepito.risk": {
+          "type": "string",
+          "enum": [
+            "safe",
+            "configurable",
+            "high-impact"
+          ],
+          "default": "safe",
+          "scope": "resource",
+          "markdownDescription": "Highest risk level to scan and clean (`--risk`). Rules above `safe` are opt-in, as in the command line tool. Overrides the same setting in `sweepito.toml`."
+        },
+        "sweepito.enableRules": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "scope": "resource",
+          "markdownDescription": "Rule IDs to turn on regardless of risk level (`--enable`), for example `rust.target`. Combined with `sweepito.toml`."
+        },
+        "sweepito.disableRules": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "scope": "resource",
+          "markdownDescription": "Rule IDs to turn off (`--disable`). Wins over `enableRules`. Combined with `sweepito.toml`."
+        },
+        "sweepito.exclude": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "scope": "resource",
+          "markdownDescription": "Gitignore-style patterns that are never touched (`--exclude`). Combined with `sweepito.toml`."
+        },
+        "sweepito.configFile": {
+          "type": "string",
+          "default": "",
+          "scope": "resource",
+          "markdownDescription": "Use this config file instead of searching for `sweepito.toml` or `[tool.sweepito]` (`--config`)."
+        },
+        "sweepito.autoScan": {
+          "type": "boolean",
+          "default": true,
+          "scope": "window",
+          "description": "Scan when a workspace opens and after files change. Turn off for very large workspaces and use Sweepito: Scan instead."
+        },
+        "sweepito.statusBar.enabled": {
+          "type": "boolean",
+          "default": true,
+          "scope": "window",
+          "description": "Show the reclaimable size in the status bar."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "typecheck": "tsc -p . --noEmit",
+    "build": "node esbuild.mjs",
+    "compile-tests": "tsc -p .",
+    "test": "npm run compile-tests && node --test \"out/test/**/*.test.js\"",
+    "package": "vsce package --no-dependencies",
+    "vscode:prepublish": "node esbuild.mjs --production"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/vscode": "1.90.0",
+    "@vscode/vsce": "^4.1.0",
+    "esbuild": "^0.25.0",
+    "typescript": "^5.6.0"
+  }
+}
