@@ -217,6 +217,93 @@ enable = ["elixir.build", "phoenix.static"]
             "`deps/` is `high-impact` and needs `mix deps.get` afterwards.",
         ],
     },
+    "scala": {
+        "toml": """\
+[clean]
+enable = ["scala.target"]
+""",
+        "cli": "sweepito clean -p scala --enable scala.target",
+        "notes": [
+            '`target/` and `project/target/` only match beside `build.sbt`, and only when git-ignored and untracked.',
+            'Maven projects keep using `jvm.maven-target`, which needs `pom.xml`.',
+        ],
+    },
+    "clojure": {
+        "toml": """\
+[clean]
+enable = ["clojure.target"]
+""",
+        "cli": "sweepito clean -p clojure --enable clojure.target",
+        "notes": [
+            '`.cpcache/` needs `deps.edn`; `target/` needs `project.clj` or `deps.edn`.',
+            '`~/.m2` and `~/.gitlibs` are global and out of scope.',
+        ],
+    },
+    "haskell": {
+        "toml": """\
+[clean]
+enable = ["haskell.stack-work"]
+""",
+        "cli": "sweepito clean -p haskell --enable haskell.stack-work",
+        "notes": [
+            '`.stack-work/` is `configurable`: it holds built dependencies and can take a long time to rebuild.',
+            '`cabal.project.freeze` and `stack.yaml.lock` are lock files and are never targeted.',
+        ],
+    },
+    "ocaml": {
+        "toml": """\
+[clean]
+enable = ["ocaml.build"]
+""",
+        "cli": "sweepito clean -p ocaml --enable ocaml.build",
+        "notes": [
+            '`_build/` is only matched beside `dune-project`.',
+        ],
+    },
+    "perl": {
+        "toml": """\
+[clean]
+enable = ["perl.blib"]
+""",
+        "cli": "sweepito clean -p perl",
+        "notes": [
+            'Targets are the generated outputs of `perl Makefile.PL` and `perl Build.PL`: `blib/`, `pm_to_blib`, `_build/` and `MYMETA.*`.',
+            '`Makefile` is not targeted, since it may be hand-written.',
+        ],
+    },
+    "unity": {
+        "toml": """\
+[clean]
+enable = ["unity.library"]
+""",
+        "cli": "sweepito clean -p unity --enable unity.library",
+        "notes": [
+            '`Library/` is the asset import cache and can take hours to rebuild on large projects, so it is `configurable`.',
+            '`Assets/`, `Packages/` and `ProjectSettings/` are never targeted.',
+        ],
+    },
+    "unreal": {
+        "toml": """\
+[clean]
+enable = ["unreal.intermediate", "unreal.binaries"]
+""",
+        "cli": "sweepito clean -p unreal --enable unreal.intermediate",
+        "notes": [
+            'Rebuilding needs the engine and a compiler toolchain, so both rules are `configurable`.',
+            '`Saved/` is deliberately not targeted: it holds autosaves, crash dumps, config and local save data.',
+            '`Content/` and `Config/` are never targeted.',
+        ],
+    },
+    "godot": {
+        "toml": """\
+[clean]
+enable = ["godot.cache"]
+""",
+        "cli": "sweepito clean -p godot",
+        "notes": [
+            '`.godot/` is recreated when the project is next opened in the editor.',
+        ],
+    },
     "r": {
         "toml": """\
 [clean]

@@ -1,0 +1,10 @@
+id = "scala"
+description = "Scala: sbt"
+markers = ["build.sbt"]
+
+[[rule]]
+id = "scala.target"
+paths = ["/target/", "/project/target/"]
+requires = ["build.sbt"]
+risk = "safe"
+description = "sbt build output"

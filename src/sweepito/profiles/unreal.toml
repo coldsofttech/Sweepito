@@ -1,0 +1,17 @@
+id = "unreal"
+description = "Unreal Engine projects"
+markers = ["*.uproject"]
+
+[[rule]]
+id = "unreal.intermediate"
+paths = ["/Intermediate/"]
+requires = ["*.uproject"]
+risk = "configurable"
+description = "Generated intermediate build files (needs engine and compiler to rebuild)"
+
+[[rule]]
+id = "unreal.binaries"
+paths = ["/Binaries/"]
+requires = ["*.uproject"]
+risk = "configurable"
+description = "Compiled binaries (needs engine and compiler to rebuild)"

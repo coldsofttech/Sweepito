@@ -1,0 +1,24 @@
+id = "unity"
+description = "Unity projects"
+markers = ["ProjectSettings/ProjectVersion.txt"]
+
+[[rule]]
+id = "unity.temp"
+paths = ["/Temp/"]
+requires = ["ProjectSettings/ProjectVersion.txt"]
+risk = "safe"
+description = "Editor temporary files"
+
+[[rule]]
+id = "unity.obj"
+paths = ["/obj/"]
+requires = ["ProjectSettings/ProjectVersion.txt"]
+risk = "safe"
+description = "Generated C# project build output"
+
+[[rule]]
+id = "unity.library"
+paths = ["/Library/"]
+requires = ["ProjectSettings/ProjectVersion.txt"]
+risk = "configurable"
+description = "Asset import cache (can take hours to rebuild on large projects)"

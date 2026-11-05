@@ -67,24 +67,63 @@ Custom rules follow the same safety gates as built-in ones. Details are in
 
 | Profile | Detected by | Rules | Safe | Configurable | High-impact |
 |---|---|---:|---:|---:|---:|
+| [`clojure`](#clojure) | `project.clj`, `deps.edn` | 2 | 2 | 0 | 0 |
 | [`common`](#common) | always active | 5 | 2 | 3 | 0 |
 | [`cpp`](#cpp) | `CMakeLists.txt`, `Makefile`, `build.ninja`, `meson.build` | 6 | 1 | 5 | 0 |
 | [`dart`](#dart) | `pubspec.yaml` | 3 | 0 | 3 | 0 |
 | [`dotnet`](#dotnet) | `*.csproj`, `*.fsproj`, `*.vbproj`, `*.sln` | 5 | 1 | 4 | 0 |
 | [`elixir`](#elixir) | `mix.exs` | 6 | 3 | 2 | 1 |
 | [`go`](#go) | `go.mod`, `go.work` | 3 | 1 | 1 | 1 |
+| [`godot`](#godot) | `project.godot` | 1 | 1 | 0 | 0 |
+| [`haskell`](#haskell) | `*.cabal`, `stack.yaml` | 2 | 1 | 1 | 0 |
 | [`jupyter`](#jupyter) | `*.ipynb`, `dvc.yaml`, `MLproject` | 5 | 1 | 1 | 3 |
 | [`jvm`](#jvm) | `pom.xml`, `build.gradle`, `build.gradle.kts`, `settings.gradle`, `settings.gradle.kts` | 5 | 1 | 4 | 0 |
 | [`node-pm`](#node-pm) | `package-lock.json`, `pnpm-lock.yaml`, `yarn.lock`, `bun.lockb`, `bun.lock` | 2 | 0 | 1 | 1 |
 | [`node`](#node) | `package.json` | 15 | 8 | 6 | 1 |
+| [`ocaml`](#ocaml) | `dune-project` | 1 | 1 | 0 | 0 |
+| [`perl`](#perl) | `Makefile.PL`, `Build.PL`, `cpanfile` | 3 | 3 | 0 | 0 |
 | [`php`](#php) | `composer.json`, `artisan` | 7 | 2 | 4 | 1 |
 | [`python`](#python) | `pyproject.toml`, `setup.py`, `setup.cfg`, `requirements*.txt`, `Pipfile`, `manage.py` | 13 | 6 | 6 | 1 |
 | [`r`](#r) | `DESCRIPTION`, `*.Rproj`, `renv.lock` | 6 | 1 | 3 | 2 |
 | [`ruby`](#ruby) | `Gemfile`, `config/application.rb` | 6 | 2 | 3 | 1 |
 | [`rust`](#rust) | `Cargo.toml` | 2 | 0 | 2 | 0 |
+| [`scala`](#scala) | `build.sbt` | 1 | 1 | 0 | 0 |
 | [`swift`](#swift) | `Package.swift`, `*.xcodeproj/project.pbxproj`, `Podfile` | 4 | 0 | 3 | 1 |
 | [`terraform`](#terraform) | `*.tf`, `terragrunt.hcl` | 4 | 1 | 3 | 0 |
-| **Total** | | **97** | **30** | **54** | **13** |
+| [`unity`](#unity) | `ProjectSettings/ProjectVersion.txt` | 3 | 2 | 1 | 0 |
+| [`unreal`](#unreal) | `*.uproject` | 2 | 0 | 2 | 0 |
+| **Total** | | **112** | **41** | **58** | **13** |
+
+## clojure
+
+Clojure: Leiningen and tools.deps
+
+**Detected by:** `project.clj`, `deps.edn`
+
+### Rules
+
+| Rule ID | Targets | Requires | Risk | Description |
+|---|---|---|---|---|
+| `clojure.cpcache` | `/.cpcache/` | `deps.edn` | safe | tools.deps classpath cache |
+| `clojure.target` | `/target/` | `project.clj`, `deps.edn` | safe | Leiningen and tools.build output |
+
+### Configuration
+
+```toml
+[clean]
+enable = ["clojure.target"]
+```
+
+Command-line equivalent:
+
+```bash
+sweepito clean -p clojure --enable clojure.target
+```
+
+Notes:
+
+- `.cpcache/` needs `deps.edn`; `target/` needs `project.clj` or `deps.edn`.
+- `~/.m2` and `~/.gitlibs` are global and out of scope.
 
 ## common
 
@@ -301,6 +340,66 @@ Notes:
 - `vendor/` is `high-impact` and often committed. Tracked files are protected, so a committed `vendor/` is never touched.
 - The Go build and module caches are global; use `go clean -cache` for those. Sweepito does not manage them.
 
+## godot
+
+Godot projects
+
+**Detected by:** `project.godot`
+
+### Rules
+
+| Rule ID | Targets | Requires | Risk | Description |
+|---|---|---|---|---|
+| `godot.cache` | `/.godot/` | `project.godot` | safe | Editor import cache (recreated when the project is opened) |
+
+### Configuration
+
+```toml
+[clean]
+enable = ["godot.cache"]
+```
+
+Command-line equivalent:
+
+```bash
+sweepito clean -p godot
+```
+
+Notes:
+
+- `.godot/` is recreated when the project is next opened in the editor.
+
+## haskell
+
+Haskell: Cabal and Stack
+
+**Detected by:** `*.cabal`, `stack.yaml`
+
+### Rules
+
+| Rule ID | Targets | Requires | Risk | Description |
+|---|---|---|---|---|
+| `haskell.dist-newstyle` | `/dist-newstyle/` | `*.cabal` | safe | Cabal build output |
+| `haskell.stack-work` | `/.stack-work/` | `stack.yaml` | configurable | Stack build output (holds built dependencies; slow to rebuild) |
+
+### Configuration
+
+```toml
+[clean]
+enable = ["haskell.stack-work"]
+```
+
+Command-line equivalent:
+
+```bash
+sweepito clean -p haskell --enable haskell.stack-work
+```
+
+Notes:
+
+- `.stack-work/` is `configurable`: it holds built dependencies and can take a long time to rebuild.
+- `cabal.project.freeze` and `stack.yaml.lock` are lock files and are never targeted.
+
 ## jupyter
 
 Jupyter notebooks and ML workflow outputs
@@ -456,6 +555,67 @@ Notes:
 - Monorepos work per package: each directory with its own `package.json` and config is matched separately.
 - `node.modules` (`node_modules/`) is `high-impact` and needs `--enable node.modules`. `node_modules/.cache` is a separate `safe` rule.
 - When both are selected, `node_modules/` replaces its `.cache` child in the plan.
+
+## ocaml
+
+OCaml: dune
+
+**Detected by:** `dune-project`
+
+### Rules
+
+| Rule ID | Targets | Requires | Risk | Description |
+|---|---|---|---|---|
+| `ocaml.build` | `/_build/` | `dune-project` | safe | dune build output |
+
+### Configuration
+
+```toml
+[clean]
+enable = ["ocaml.build"]
+```
+
+Command-line equivalent:
+
+```bash
+sweepito clean -p ocaml --enable ocaml.build
+```
+
+Notes:
+
+- `_build/` is only matched beside `dune-project`.
+
+## perl
+
+Perl: ExtUtils::MakeMaker and Module::Build
+
+**Detected by:** `Makefile.PL`, `Build.PL`, `cpanfile`
+
+### Rules
+
+| Rule ID | Targets | Requires | Risk | Description |
+|---|---|---|---|---|
+| `perl.blib` | `/blib/`, `/pm_to_blib` | `Makefile.PL`, `Build.PL` | safe | Staged build library (blib/) |
+| `perl.build-dir` | `/_build/` | `Build.PL` | safe | Module::Build state |
+| `perl.mymeta` | `/MYMETA.json`, `/MYMETA.yml` | `Makefile.PL`, `Build.PL` | safe | Generated build metadata |
+
+### Configuration
+
+```toml
+[clean]
+enable = ["perl.blib"]
+```
+
+Command-line equivalent:
+
+```bash
+sweepito clean -p perl
+```
+
+Notes:
+
+- Targets are the generated outputs of `perl Makefile.PL` and `perl Build.PL`: `blib/`, `pm_to_blib`, `_build/` and `MYMETA.*`.
+- `Makefile` is not targeted, since it may be hand-written.
 
 ## php
 
@@ -652,6 +812,36 @@ Notes:
 - Cargo workspaces share one `target/` at the workspace root; it is matched beside the `Cargo.toml` that contains it.
 - `~/.cargo` registry caches are global and out of scope.
 
+## scala
+
+Scala: sbt
+
+**Detected by:** `build.sbt`
+
+### Rules
+
+| Rule ID | Targets | Requires | Risk | Description |
+|---|---|---|---|---|
+| `scala.target` | `/target/`, `/project/target/` | `build.sbt` | safe | sbt build output |
+
+### Configuration
+
+```toml
+[clean]
+enable = ["scala.target"]
+```
+
+Command-line equivalent:
+
+```bash
+sweepito clean -p scala --enable scala.target
+```
+
+Notes:
+
+- `target/` and `project/target/` only match beside `build.sbt`, and only when git-ignored and untracked.
+- Maven projects keep using `jvm.maven-target`, which needs `pom.xml`.
+
 ## swift
 
 Swift Package Manager and Xcode
@@ -719,3 +909,67 @@ Notes:
 - State files (`*.tfstate`, `*.tfstate.backup`) and `.terraform.lock.hcl` are never targeted by any rule.
 - `terraform.dir` removes provider plugins, so `terraform init` must run again.
 - `terraform.plans` is opt-in because a saved plan may be awaiting apply.
+
+## unity
+
+Unity projects
+
+**Detected by:** `ProjectSettings/ProjectVersion.txt`
+
+### Rules
+
+| Rule ID | Targets | Requires | Risk | Description |
+|---|---|---|---|---|
+| `unity.temp` | `/Temp/` | `ProjectSettings/ProjectVersion.txt` | safe | Editor temporary files |
+| `unity.obj` | `/obj/` | `ProjectSettings/ProjectVersion.txt` | safe | Generated C# project build output |
+| `unity.library` | `/Library/` | `ProjectSettings/ProjectVersion.txt` | configurable | Asset import cache (can take hours to rebuild on large projects) |
+
+### Configuration
+
+```toml
+[clean]
+enable = ["unity.library"]
+```
+
+Command-line equivalent:
+
+```bash
+sweepito clean -p unity --enable unity.library
+```
+
+Notes:
+
+- `Library/` is the asset import cache and can take hours to rebuild on large projects, so it is `configurable`.
+- `Assets/`, `Packages/` and `ProjectSettings/` are never targeted.
+
+## unreal
+
+Unreal Engine projects
+
+**Detected by:** `*.uproject`
+
+### Rules
+
+| Rule ID | Targets | Requires | Risk | Description |
+|---|---|---|---|---|
+| `unreal.intermediate` | `/Intermediate/` | `*.uproject` | configurable | Generated intermediate build files (needs engine and compiler to rebuild) |
+| `unreal.binaries` | `/Binaries/` | `*.uproject` | configurable | Compiled binaries (needs engine and compiler to rebuild) |
+
+### Configuration
+
+```toml
+[clean]
+enable = ["unreal.intermediate", "unreal.binaries"]
+```
+
+Command-line equivalent:
+
+```bash
+sweepito clean -p unreal --enable unreal.intermediate
+```
+
+Notes:
+
+- Rebuilding needs the engine and a compiler toolchain, so both rules are `configurable`.
+- `Saved/` is deliberately not targeted: it holds autosaves, crash dumps, config and local save data.
+- `Content/` and `Config/` are never targeted.

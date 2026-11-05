@@ -1,0 +1,10 @@
+id = "godot"
+description = "Godot projects"
+markers = ["project.godot"]
+
+[[rule]]
+id = "godot.cache"
+paths = ["/.godot/"]
+requires = ["project.godot"]
+risk = "safe"
+description = "Editor import cache (recreated when the project is opened)"

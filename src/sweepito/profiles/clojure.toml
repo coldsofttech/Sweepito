@@ -1,0 +1,17 @@
+id = "clojure"
+description = "Clojure: Leiningen and tools.deps"
+markers = ["project.clj", "deps.edn"]
+
+[[rule]]
+id = "clojure.cpcache"
+paths = ["/.cpcache/"]
+requires = ["deps.edn"]
+risk = "safe"
+description = "tools.deps classpath cache"
+
+[[rule]]
+id = "clojure.target"
+paths = ["/target/"]
+requires = ["project.clj", "deps.edn"]
+risk = "safe"
+description = "Leiningen and tools.build output"

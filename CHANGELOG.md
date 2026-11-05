@@ -5,6 +5,11 @@ All notable changes are recorded here. The format follows
 
 ## [Unreleased]
 
+### Added
+- Profiles for Scala, Clojure, Haskell, OCaml, Perl, Unity, Unreal Engine and Godot.
+  Julia and PowerShell get no profile: no verified project-local generated location exists.
+  Unreal `Saved/` is intentionally never targeted.
+
 ## [0.1.0] - 2026-10-25
 
 ### Added

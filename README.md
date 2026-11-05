@@ -118,6 +118,14 @@ Add `--json` for plain machine-readable output, or `--no-color` to turn colour o
 | `r` | R, Shiny, renv, RMarkdown | 6 | 1 / 3 / 2 |
 | `jupyter` | Notebooks and ML workflow outputs | 5 | 1 / 1 / 3 |
 | `terraform` | Terraform and Terragrunt | 4 | 1 / 3 / 0 |
+| `scala` | Scala and sbt | 1 | 1 / 0 / 0 |
+| `clojure` | Leiningen and tools.deps | 2 | 2 / 0 / 0 |
+| `haskell` | Cabal and Stack | 2 | 1 / 1 / 0 |
+| `ocaml` | OCaml and dune | 1 | 1 / 0 / 0 |
+| `perl` | MakeMaker and Module::Build | 3 | 3 / 0 / 0 |
+| `unity` | Unity projects | 3 | 2 / 1 / 0 |
+| `unreal` | Unreal Engine projects | 2 | 0 / 2 / 0 |
+| `godot` | Godot projects | 1 | 1 / 0 / 0 |
 | `common` | OS and editor junk, generic logs (always active) | 5 | 2 / 3 / 0 |
 
 The full list of targets, markers and risk levels is in [docs/profiles.md](docs/profiles.md).
