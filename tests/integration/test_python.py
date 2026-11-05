@@ -5,7 +5,11 @@ from tests.integration.support import Case, ProfileSuite
 CASE = Case(
     id="python",
     profile="python",
-    markers={"manage.py": "", "pyproject.toml": "[project]\nname='x'\n"},
+    markers={
+        "manage.py": "",
+        "pyproject.toml": "[project]\nname='x'\n",
+        "tox.ini": "",
+    },
     targets={
         "django.static": ["staticfiles/"],
         "python.build": ["build/"],
@@ -19,9 +23,13 @@ CASE = Case(
         "python.ruff": [".ruff_cache/"],
         "python.tox": [".tox/", ".nox/"],
         "python.typecheckers": [".pyre/", ".pytype/"],
+        "python.tool-cache": [".cache/"],
         "python.venv": [".venv/", "venv/", "env/"],
     },
-    blocked_without={"django.static": ["manage.py"]},
+    blocked_without={
+        "django.static": ["manage.py"],
+        "python.tool-cache": ["tox.ini"],
+    },
 )
 
 CASES = [CASE]

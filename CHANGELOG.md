@@ -5,6 +5,14 @@ All notable changes are recorded here. The format follows
 
 ## [Unreleased]
 
+### Added
+- Extra rules for existing profiles: `node-pm.yarn-unplugged` (high-impact), `python.tool-cache`,
+  `jvm.sbt-target`, `jvm.scala-tools`, `go.gocache`, `go.coverage`, `cpp.compile-commands` (configurable), `ruby.bundle-config` (high-impact) and `terraform.d`.
+- `build.sbt` is now a JVM profile marker.
+- Reviewed and left unchanged: Rust nextest (output is under `target/nextest/`, already removed by
+  `rust.target`), Python `.pytype/` (already in `python.typecheckers`) and PHP
+  `bootstrap/cache/` (already in `laravel.cache`).
+
 ## [0.1.0] - 2026-10-25
 
 ### Added

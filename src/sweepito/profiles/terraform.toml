@@ -29,3 +29,10 @@ paths = ["/.terragrunt-cache/"]
 requires = ["terragrunt.hcl"]
 risk = "configurable"
 description = "Terragrunt module cache"
+
+[[rule]]
+id = "terraform.d"
+paths = ["/.terraform.d/"]
+requires = ["*.tf"]
+risk = "configurable"
+description = "Project-local generated data only (anchored to the project; never ~/.terraform.d)"

@@ -68,23 +68,23 @@ Custom rules follow the same safety gates as built-in ones. Details are in
 | Profile | Detected by | Rules | Safe | Configurable | High-impact |
 |---|---|---:|---:|---:|---:|
 | [`common`](#common) | always active | 5 | 2 | 3 | 0 |
-| [`cpp`](#cpp) | `CMakeLists.txt`, `Makefile`, `build.ninja`, `meson.build` | 6 | 1 | 5 | 0 |
+| [`cpp`](#cpp) | `CMakeLists.txt`, `Makefile`, `build.ninja`, `meson.build` | 7 | 1 | 6 | 0 |
 | [`dart`](#dart) | `pubspec.yaml` | 3 | 0 | 3 | 0 |
 | [`dotnet`](#dotnet) | `*.csproj`, `*.fsproj`, `*.vbproj`, `*.sln` | 5 | 1 | 4 | 0 |
 | [`elixir`](#elixir) | `mix.exs` | 6 | 3 | 2 | 1 |
-| [`go`](#go) | `go.mod`, `go.work` | 3 | 1 | 1 | 1 |
+| [`go`](#go) | `go.mod`, `go.work` | 5 | 3 | 1 | 1 |
 | [`jupyter`](#jupyter) | `*.ipynb`, `dvc.yaml`, `MLproject` | 5 | 1 | 1 | 3 |
-| [`jvm`](#jvm) | `pom.xml`, `build.gradle`, `build.gradle.kts`, `settings.gradle`, `settings.gradle.kts` | 5 | 1 | 4 | 0 |
-| [`node-pm`](#node-pm) | `package-lock.json`, `pnpm-lock.yaml`, `yarn.lock`, `bun.lockb`, `bun.lock` | 2 | 0 | 1 | 1 |
+| [`jvm`](#jvm) | `build.sbt`, `pom.xml`, `build.gradle`, `build.gradle.kts`, `settings.gradle`, `settings.gradle.kts` | 7 | 3 | 4 | 0 |
+| [`node-pm`](#node-pm) | `package-lock.json`, `pnpm-lock.yaml`, `yarn.lock`, `bun.lockb`, `bun.lock` | 3 | 0 | 1 | 2 |
 | [`node`](#node) | `package.json` | 15 | 8 | 6 | 1 |
 | [`php`](#php) | `composer.json`, `artisan` | 7 | 2 | 4 | 1 |
-| [`python`](#python) | `pyproject.toml`, `setup.py`, `setup.cfg`, `requirements*.txt`, `Pipfile`, `manage.py` | 13 | 6 | 6 | 1 |
+| [`python`](#python) | `pyproject.toml`, `setup.py`, `setup.cfg`, `requirements*.txt`, `Pipfile`, `manage.py` | 14 | 6 | 7 | 1 |
 | [`r`](#r) | `DESCRIPTION`, `*.Rproj`, `renv.lock` | 6 | 1 | 3 | 2 |
-| [`ruby`](#ruby) | `Gemfile`, `config/application.rb` | 6 | 2 | 3 | 1 |
+| [`ruby`](#ruby) | `Gemfile`, `config/application.rb` | 7 | 2 | 3 | 2 |
 | [`rust`](#rust) | `Cargo.toml` | 2 | 0 | 2 | 0 |
 | [`swift`](#swift) | `Package.swift`, `*.xcodeproj/project.pbxproj`, `Podfile` | 4 | 0 | 3 | 1 |
-| [`terraform`](#terraform) | `*.tf`, `terragrunt.hcl` | 4 | 1 | 3 | 0 |
-| **Total** | | **97** | **30** | **54** | **13** |
+| [`terraform`](#terraform) | `*.tf`, `terragrunt.hcl` | 5 | 1 | 4 | 0 |
+| **Total** | | **106** | **34** | **57** | **15** |
 
 ## common
 
@@ -139,6 +139,7 @@ C and C++: CMake, Make, Ninja, Meson
 | `cpp.cmake-in-source` | `/CMakeCache.txt`, `/CMakeFiles/` | `CMakeLists.txt` | configurable | In-source CMake build leftovers |
 | `cpp.objects` | `*.o`, `*.obj`, `*.a` | `CMakeLists.txt`, `Makefile`, `build.ninja`, `meson.build` | configurable | Object files and static libraries |
 | `cpp.ninja` | `/.ninja_log`, `/.ninja_deps` | `build.ninja` | configurable | Ninja logs |
+| `cpp.compile-commands` | `/compile_commands.json` | `CMakeLists.txt`, `meson.build`, `build.ninja`, `Makefile` | configurable | Generated compilation database (clangd needs it; regenerate with CMake, Bear or similar) |
 
 ### Configuration
 
@@ -282,6 +283,8 @@ Go modules and build tools
 | `go.test-artifacts` | `*.test`, `*.prof`, `coverage.out` | `go.mod`, `go.work` | safe | Compiled test binaries and profiles |
 | `go.bin` | `/bin/` | `go.mod`, `go.work` | configurable | Conventional project build output |
 | `go.vendor` | `/vendor/` | `go.mod`, `go.work` | high-impact | Vendored dependencies (often committed; tracked files are protected) |
+| `go.gocache` | `/.gocache/` | `go.mod`, `go.work` | safe | Project-local Go build cache (GOCACHE pointed at the project, never the user cache) |
+| `go.coverage` | `/coverage/` | `go.mod` | safe | Coverage output folder |
 
 ### Configuration
 
@@ -341,7 +344,7 @@ Notes:
 
 Java and JVM: Maven, Gradle, Kotlin, Spring Boot
 
-**Detected by:** `pom.xml`, `build.gradle`, `build.gradle.kts`, `settings.gradle`, `settings.gradle.kts`
+**Detected by:** `build.sbt`, `pom.xml`, `build.gradle`, `build.gradle.kts`, `settings.gradle`, `settings.gradle.kts`
 
 ### Rules
 
@@ -352,6 +355,8 @@ Java and JVM: Maven, Gradle, Kotlin, Spring Boot
 | `jvm.gradle-project` | `/.gradle/` | `settings.gradle`, `settings.gradle.kts`, `build.gradle`, `build.gradle.kts` | configurable | Project-level Gradle cache (not ~/.gradle) |
 | `jvm.gradle-build` | `/build/` | `build.gradle`, `build.gradle.kts` | configurable | Gradle build output |
 | `jvm.idea-out` | `/out/` | `*.iml` | configurable | IntelliJ default output directory |
+| `jvm.sbt-target` | `/project/target/`, `/project/project/` | `build.sbt` | safe | SBT meta-build output |
+| `jvm.scala-tools` | `/.bloop/`, `/.metals/` | `build.sbt`, `build.sc`, `pom.xml`, `build.gradle`, `build.gradle.kts` | safe | Bloop and Metals build and language-server caches |
 
 ### Configuration
 
@@ -385,6 +390,7 @@ npm, pnpm, Yarn and Bun project-local stores
 |---|---|---|---|---|
 | `node-pm.yarn-cache` | `/.yarn/cache/` | `yarn.lock` | configurable | Yarn offline cache (skipped automatically when tracked) |
 | `node-pm.pnpm-store` | `/.pnpm-store/` | `pnpm-lock.yaml` | high-impact | Local pnpm content-addressable store |
+| `node-pm.yarn-unplugged` | `/.yarn/unplugged/`, `/.yarn/install-state.gz`, `/.yarn/build-state.yml` | `yarn.lock` | high-impact | Extracted Yarn dependencies and install state (yarn install required again) |
 
 ### Configuration
 
@@ -518,6 +524,7 @@ Python, Django, Flask, FastAPI, pytest, Ruff, mypy, tox, coverage
 | `python.dist` | `/dist/` | `pyproject.toml`, `setup.py`, `setup.cfg`, `requirements*.txt`, `Pipfile`, `manage.py` | configurable | Distribution artifacts |
 | `django.static` | `/staticfiles/` | `manage.py` | configurable | Django collectstatic output |
 | `python.venv` | `/.venv/`, `/venv/`, `/env/` | `pyproject.toml`, `setup.py`, `setup.cfg`, `requirements*.txt`, `Pipfile`, `manage.py` | high-impact | Virtual environments |
+| `python.tool-cache` | `/.cache/` | `tox.ini`, `noxfile.py`, `pytest.ini`, `.pre-commit-config.yaml` | configurable | Project-local tool caches (only with tox, nox, pytest or pre-commit markers) |
 
 ### Configuration
 
@@ -599,6 +606,7 @@ Ruby: Bundler, Rails, Sinatra
 | `rails.tmp` | `/tmp/pids/`, `/tmp/sockets/` | `config/application.rb` | configurable | Stale PID files and sockets |
 | `rails.logs` | `/log/*.log` | `config/application.rb` | configurable | Rails logs |
 | `ruby.vendor-bundle` | `/vendor/bundle/` | `Gemfile` | high-impact | Bundled gems (requires reinstall) |
+| `ruby.bundle-config` | `/.bundle/` | `Gemfile` | high-impact | Local Bundler settings and cache (may hold deliberate BUNDLE_PATH or source credentials) |
 
 ### Configuration
 
@@ -700,6 +708,7 @@ Terraform and Terragrunt (state files and lock files are never cleaned)
 | `terraform.plans` | `*.tfplan`, `tfplan` | `*.tf` | configurable | Saved plans (a plan may be awaiting apply) |
 | `terraform.dir` | `/.terraform/` | `*.tf` | configurable | Provider plugins (terraform init required again) |
 | `terragrunt.cache` | `/.terragrunt-cache/` | `terragrunt.hcl` | configurable | Terragrunt module cache |
+| `terraform.d` | `/.terraform.d/` | `*.tf` | configurable | Project-local generated data only (anchored to the project; never ~/.terraform.d) |
 
 ### Configuration
 

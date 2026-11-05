@@ -5,9 +5,15 @@ from tests.integration.support import Case, ProfileSuite
 CASE = Case(
     id="cpp",
     profile="cpp",
-    markers={"CMakeLists.txt": "", "build.ninja": "", "meson.build": ""},
+    markers={
+        "CMakeLists.txt": "",
+        "Makefile": "",
+        "build.ninja": "",
+        "meson.build": "",
+    },
     targets={
         "cpp.build": ["build/"],
+        "cpp.compile-commands": ["compile_commands.json"],
         "cpp.clangd": [".cache/clangd/"],
         "cpp.cmake-build": ["cmake-build-debug/"],
         "cpp.cmake-in-source": ["CMakeCache.txt", "CMakeFiles/"],
@@ -17,6 +23,12 @@ CASE = Case(
     blocked_without={
         "cpp.build": ["CMakeLists.txt", "build.ninja", "meson.build"],
         "cpp.cmake-build": ["CMakeLists.txt"],
+        "cpp.compile-commands": [
+            "CMakeLists.txt",
+            "Makefile",
+            "build.ninja",
+            "meson.build",
+        ],
         "cpp.cmake-in-source": ["CMakeLists.txt"],
         "cpp.ninja": ["build.ninja"],
     },

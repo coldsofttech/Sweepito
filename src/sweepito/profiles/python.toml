@@ -80,3 +80,10 @@ id = "python.venv"
 paths = ["/.venv/", "/venv/", "/env/"]
 risk = "high-impact"
 description = "Virtual environments"
+
+[[rule]]
+id = "python.tool-cache"
+paths = ["/.cache/"]
+requires = ["tox.ini", "noxfile.py", "pytest.ini", ".pre-commit-config.yaml"]
+risk = "configurable"
+description = "Project-local tool caches (only with tox, nox, pytest or pre-commit markers)"

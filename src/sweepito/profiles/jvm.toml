@@ -1,6 +1,6 @@
 id = "jvm"
 description = "Java and JVM: Maven, Gradle, Kotlin, Spring Boot"
-markers = ["pom.xml", "build.gradle", "build.gradle.kts", "settings.gradle", "settings.gradle.kts"]
+markers = ["build.sbt", "pom.xml", "build.gradle", "build.gradle.kts", "settings.gradle", "settings.gradle.kts"]
 
 [[rule]]
 id = "jvm.kotlin"
@@ -36,3 +36,17 @@ paths = ["/out/"]
 requires = ["*.iml"]
 risk = "configurable"
 description = "IntelliJ default output directory"
+
+[[rule]]
+id = "jvm.sbt-target"
+paths = ["/project/target/", "/project/project/"]
+requires = ["build.sbt"]
+risk = "safe"
+description = "SBT meta-build output"
+
+[[rule]]
+id = "jvm.scala-tools"
+paths = ["/.bloop/", "/.metals/"]
+requires = ["build.sbt", "build.sc", "pom.xml", "build.gradle", "build.gradle.kts"]
+risk = "safe"
+description = "Bloop and Metals build and language-server caches"
