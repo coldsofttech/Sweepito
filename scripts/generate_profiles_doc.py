@@ -257,6 +257,24 @@ enable = ["terraform.dir", "terragrunt.cache"]
             "`terraform.plans` is opt-in because a saved plan may be awaiting apply.",
         ],
     },
+    "batchvault": {
+        "toml": """\
+[clean]
+enable = ["batchvault.staging", "batchvault.manifest-tmp"]
+""",
+        "cli": "sweepito clean -p batchvault --enable batchvault.staging",
+        "notes": [
+            "Both rules are opt-in: an active BatchVault run also uses a `.batchvault-*` "
+            "staging folder and Sweepito cannot tell it from a dead one. Run them only when "
+            "no BatchVault run is active.",
+            "Staging folders sit inside the pack or unpack destination (for example "
+            "`archives/`), so they are found only when that folder is git-ignored.",
+            "Archive output (`archives/`, `restored/`, `*.bv.NNN`, `*.7z.NNN`), manifests, "
+            "signatures, keys and restored files are never targeted.",
+            "The profile is detected from `batchvault.toml`; `[tool.batchvault]` in "
+            "`pyproject.toml` is not detectable because markers match file names only.",
+        ],
+    },
     "common": {
         "toml": """\
 [clean]

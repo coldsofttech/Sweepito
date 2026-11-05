@@ -1,0 +1,17 @@
+id = "batchvault"
+description = "BatchVault archives (archive output, manifests, signatures and keys are never cleaned)"
+markers = ["batchvault.toml"]
+
+[[rule]]
+id = "batchvault.staging"
+paths = [".batchvault-*/"]
+requires = ["batchvault.toml"]
+risk = "configurable"
+description = "Staging folders left by an interrupted run (an active run also uses one)"
+
+[[rule]]
+id = "batchvault.manifest-tmp"
+paths = ["manifest.json.*.tmp"]
+requires = ["batchvault.toml"]
+risk = "configurable"
+description = "Partial manifest written when a run was killed (the real manifest is untouched)"

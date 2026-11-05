@@ -5,6 +5,10 @@ All notable changes are recorded here. The format follows
 
 ## [Unreleased]
 
+### Added
+- `batchvault` profile (`batchvault.staging`, `batchvault.manifest-tmp`), both opt-in, detected from
+  `batchvault.toml`.
+
 ## [0.1.0] - 2026-10-25
 
 ### Added

@@ -67,6 +67,7 @@ Custom rules follow the same safety gates as built-in ones. Details are in
 
 | Profile | Detected by | Rules | Safe | Configurable | High-impact |
 |---|---|---:|---:|---:|---:|
+| [`batchvault`](#batchvault) | `batchvault.toml` | 2 | 0 | 2 | 0 |
 | [`common`](#common) | always active | 5 | 2 | 3 | 0 |
 | [`cpp`](#cpp) | `CMakeLists.txt`, `Makefile`, `build.ninja`, `meson.build` | 6 | 1 | 5 | 0 |
 | [`dart`](#dart) | `pubspec.yaml` | 3 | 0 | 3 | 0 |
@@ -84,7 +85,40 @@ Custom rules follow the same safety gates as built-in ones. Details are in
 | [`rust`](#rust) | `Cargo.toml` | 2 | 0 | 2 | 0 |
 | [`swift`](#swift) | `Package.swift`, `*.xcodeproj/project.pbxproj`, `Podfile` | 4 | 0 | 3 | 1 |
 | [`terraform`](#terraform) | `*.tf`, `terragrunt.hcl` | 4 | 1 | 3 | 0 |
-| **Total** | | **97** | **30** | **54** | **13** |
+| **Total** | | **99** | **30** | **56** | **13** |
+
+## batchvault
+
+BatchVault archives (archive output, manifests, signatures and keys are never cleaned)
+
+**Detected by:** `batchvault.toml`
+
+### Rules
+
+| Rule ID | Targets | Requires | Risk | Description |
+|---|---|---|---|---|
+| `batchvault.staging` | `.batchvault-*/` | `batchvault.toml` | configurable | Staging folders left by an interrupted run (an active run also uses one) |
+| `batchvault.manifest-tmp` | `manifest.json.*.tmp` | `batchvault.toml` | configurable | Partial manifest written when a run was killed (the real manifest is untouched) |
+
+### Configuration
+
+```toml
+[clean]
+enable = ["batchvault.staging", "batchvault.manifest-tmp"]
+```
+
+Command-line equivalent:
+
+```bash
+sweepito clean -p batchvault --enable batchvault.staging
+```
+
+Notes:
+
+- Both rules are opt-in: an active BatchVault run also uses a `.batchvault-*` staging folder and Sweepito cannot tell it from a dead one. Run them only when no BatchVault run is active.
+- Staging folders sit inside the pack or unpack destination (for example `archives/`), so they are found only when that folder is git-ignored.
+- Archive output (`archives/`, `restored/`, `*.bv.NNN`, `*.7z.NNN`), manifests, signatures, keys and restored files are never targeted.
+- The profile is detected from `batchvault.toml`; `[tool.batchvault]` in `pyproject.toml` is not detectable because markers match file names only.
 
 ## common
 
