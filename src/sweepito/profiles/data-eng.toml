@@ -1,0 +1,31 @@
+id = "data-eng"
+description = "Data engineering: dbt and Apache Spark (data directories are never cleaned)"
+markers = ["dbt_project.yml", "build.sbt"]
+
+[[rule]]
+id = "dbt.target"
+paths = ["/target/"]
+requires = ["dbt_project.yml"]
+risk = "safe"
+description = "dbt compiled SQL and run artifacts (recreated by the next dbt command)"
+
+[[rule]]
+id = "dbt.logs"
+paths = ["/logs/"]
+requires = ["dbt_project.yml"]
+risk = "safe"
+description = "dbt logs (recreated by the next dbt command)"
+
+[[rule]]
+id = "dbt.packages"
+paths = ["/dbt_packages/"]
+requires = ["dbt_project.yml"]
+risk = "high-impact"
+description = "dbt packages (dbt deps required again, needs network)"
+
+[[rule]]
+id = "spark.warehouse"
+paths = ["/spark-warehouse/"]
+requires = ["build.sbt"]
+risk = "high-impact"
+description = "Spark SQL warehouse (may hold managed-table data, not just cache)"

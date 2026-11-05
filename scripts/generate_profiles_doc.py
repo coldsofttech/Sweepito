@@ -244,6 +244,26 @@ exclude = ["experiments/baseline/"]   # keep results for a finished experiment
             "ML rules need a Python project marker or an `*.ipynb` file.",
         ],
     },
+    "data-eng": {
+        "toml": """\
+[clean]
+enable = ["dbt.packages"]
+exclude = ["analytics/target/"]   # keep artifacts used for state comparison
+""",
+        "cli": "sweepito clean -p data-eng --enable dbt.packages",
+        "notes": [
+            "Only the default dbt paths are targeted; `target-path` and `log-path` set in "
+            "`dbt_project.yml` are not read. Add a custom rule for non-default locations.",
+            "`dbt.target` is `safe`, but removes `manifest.json` and `run_results.json`, which "
+            "`--state` comparisons and CI may reuse.",
+            "`dbt.packages` is `high-impact`: `dbt deps` needs network access to restore it.",
+            "`spark.warehouse` is `high-impact` because Spark SQL managed tables store real "
+            "data there; it needs `build.sbt`.",
+            "`data/`, `warehouse/`, `models/` and experiment outputs are never targeted. "
+            "Kedro has no rules: its datasets live in `data/`.",
+            "DVC (`ml.dvc-cache`) and MLflow (`ml.mlruns`) stay in the `jupyter` profile.",
+        ],
+    },
     "terraform": {
         "toml": """\
 [clean]

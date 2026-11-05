@@ -5,6 +5,11 @@ All notable changes are recorded here. The format follows
 
 ## [Unreleased]
 
+### Added
+- `data-eng` profile: `dbt.target`, `dbt.logs`, `dbt.packages` (high-impact) and `spark.warehouse`
+  (high-impact). Data directories are never targeted; Kedro has no rules; DVC and MLflow stay in
+  `jupyter`.
+
 ## [0.1.0] - 2026-10-25
 
 ### Added

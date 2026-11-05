@@ -117,6 +117,7 @@ Add `--json` for plain machine-readable output, or `--no-color` to turn colour o
 | `elixir` | Mix and Phoenix | 6 | 3 / 2 / 1 |
 | `r` | R, Shiny, renv, RMarkdown | 6 | 1 / 3 / 2 |
 | `jupyter` | Notebooks and ML workflow outputs | 5 | 1 / 1 / 3 |
+| `data-eng` | dbt and Apache Spark | 4 | 2 / 0 / 2 |
 | `terraform` | Terraform and Terragrunt | 4 | 1 / 3 / 0 |
 | `common` | OS and editor junk, generic logs (always active) | 5 | 2 / 3 / 0 |
 
