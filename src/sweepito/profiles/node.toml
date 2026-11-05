@@ -1,5 +1,5 @@
 id = "node"
-description = "Node.js, React, Next.js, Vue, Nuxt, Angular, Vite, Svelte, Astro"
+description = "Node.js, React, Next.js, Vue, Nuxt, Angular, Vite, Svelte, Astro, Nx, Vitest, Storybook, Webpack, Playwright, Cypress, Rush"
 markers = ["package.json"]
 
 [[rule]]
@@ -51,6 +51,55 @@ paths = [".astro/"]
 requires = ["astro.config.*"]
 risk = "safe"
 description = "Astro generated types and cache"
+
+[[rule]]
+id = "node.nx"
+paths = ["/.nx/cache/"]
+requires = ["nx.json"]
+risk = "safe"
+description = "Nx computation cache"
+
+[[rule]]
+id = "node.vitest"
+paths = ["/.vitest/"]
+requires = ["vitest.config.*"]
+risk = "safe"
+description = "Vitest cache"
+
+[[rule]]
+id = "node.storybook"
+paths = ["/storybook-static/"]
+requires = [".storybook/main.*"]
+risk = "safe"
+description = "Storybook static build"
+
+[[rule]]
+id = "node.webpack"
+paths = ["/.cache/webpack/"]
+requires = ["webpack.config.*"]
+risk = "safe"
+description = "Webpack filesystem cache"
+
+[[rule]]
+id = "node.playwright"
+paths = ["/test-results/", "/playwright-report/"]
+requires = ["playwright.config.*"]
+risk = "configurable"
+description = "Playwright test results and reports (may be needed to debug failures)"
+
+[[rule]]
+id = "node.cypress"
+paths = ["/cypress/videos/", "/cypress/screenshots/"]
+requires = ["cypress.config.*"]
+risk = "configurable"
+description = "Cypress videos and screenshots (may be needed to debug failures)"
+
+[[rule]]
+id = "node.rush-temp"
+paths = ["/common/temp/"]
+requires = ["rush.json"]
+risk = "configurable"
+description = "Rush temporary install files (rush install recreates them)"
 
 [[rule]]
 id = "node.next"

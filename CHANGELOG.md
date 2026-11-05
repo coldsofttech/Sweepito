@@ -5,6 +5,10 @@ All notable changes are recorded here. The format follows
 
 ## [Unreleased]
 
+### Added
+- `node` profile: Nx, Vitest, Storybook and Webpack cache rules (`safe`), and opt-in Playwright,
+  Cypress and Rush rules (`configurable`). Each requires its own marker file.
+
 ## [0.1.0] - 2026-10-25
 
 ### Added

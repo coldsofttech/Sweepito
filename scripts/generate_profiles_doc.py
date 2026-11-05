@@ -50,15 +50,25 @@ enable  = ["node.next", "node.dist", "node.build"]   # framework build output
 exclude = ["apps/legacy-admin/"]                      # a project you want untouched
 
 [[rule]]
-id = "custom.storybook"
-paths = ["/storybook-static/"]
-requires = ["package.json"]
+id = "custom.jest-cache"
+paths = ["/.jest-cache/"]       # only if your jest.config sets cacheDirectory here
+requires = ["jest.config.*"]
 """,
         "cli": "sweepito clean -p node --enable node.next --enable node.nuxt",
         "notes": [
             "Framework rules need their config file: `node.next` needs `next.config.*`, "
             "`node.nuxt` needs `nuxt.config.*`, `node.svelte-kit` needs `svelte.config.*`, "
             "`node.astro` needs `astro.config.*` and `node.angular-cache` needs `angular.json`.",
+            "Tool rules need their own marker: `node.nx` needs `nx.json`, `node.vitest` needs "
+            "`vitest.config.*`, `node.storybook` needs `.storybook/main.*`, `node.webpack` needs "
+            "`webpack.config.*`, `node.playwright` needs `playwright.config.*`, `node.cypress` "
+            "needs `cypress.config.*` and `node.rush-temp` needs `rush.json`.",
+            "Playwright and Cypress outputs can be the only evidence of a failing run, so "
+            "`node.playwright` and `node.cypress` are `configurable` (opt-in). `node.rush-temp` "
+            "holds Rush's install files, so it is also opt-in.",
+            "Jest and Lerna have no rule: Jest caches in the system temp dir by default and "
+            "`.lerna/` is not a confirmed generated directory. Add a custom rule if your "
+            "project sets a local `cacheDirectory`.",
             "Monorepos work per package: each directory with its own `package.json` and "
             "config is matched separately.",
             "`node.modules` (`node_modules/`) is `high-impact` and needs "
