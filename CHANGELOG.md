@@ -5,6 +5,11 @@ All notable changes are recorded here. The format follows
 
 ## [Unreleased]
 
+### Added
+- `docker` profile (Docker, Compose, Dev Containers, BuildKit, Skaffold) with a `docker.buildx-cache`
+  rule for local BuildKit cache exports. Docker daemon storage, volumes and bind-mounted data are
+  never targeted.
+
 ## [0.1.0] - 2026-10-25
 
 ### Added

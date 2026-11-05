@@ -257,6 +257,23 @@ enable = ["terraform.dir", "terragrunt.cache"]
             "`terraform.plans` is opt-in because a saved plan may be awaiting apply.",
         ],
     },
+    "docker": {
+        "toml": """\
+[clean]
+enable = ["docker.buildx-cache"]
+""",
+        "cli": "sweepito clean -p docker --enable docker.buildx-cache",
+        "notes": [
+            "Sweepito never runs Docker commands and never touches daemon storage, images, "
+            "named volumes or global build caches.",
+            "Compose, Dev Containers and Skaffold write no fixed project-local generated "
+            "folder, so they have markers but no rules. Bind-mounted data folders are never "
+            "targeted.",
+            "`docker.buildx-cache` matches the conventional `.buildx-cache/` and "
+            "`.buildx-cache-new/` destinations of `--cache-to type=local,dest=...`; for any "
+            "other destination add a custom rule.",
+        ],
+    },
     "common": {
         "toml": """\
 [clean]
