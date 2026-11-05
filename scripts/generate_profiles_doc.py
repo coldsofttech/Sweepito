@@ -41,6 +41,13 @@ requires = ["pyproject.toml"]
             "cases that act as regression seeds.",
             "`build/` and `dist/` are anchored: they only match beside a Python marker "
             "such as `pyproject.toml`.",
+            "Documentation and tool rules need their own marker: `python.sphinx` (`_build/`) "
+            "needs `conf.py`, `python.mkdocs` (`site/`) needs `mkdocs.yml`, `python.pixi` "
+            "needs `pixi.toml` and `python.pdm` needs `pdm.lock`. Both doc folders are anchored.",
+            "`python.mkdocs` is `configurable` because `site/` may be a published folder. "
+            "`python.pixi` (`.pixi/`) is `high-impact` like `python.venv`.",
+            "Poetry and uv use `.venv/`, covered by `python.venv`. The uv cache, PDM cache "
+            "and Pyright have no project-local cache, so nothing shared or global is targeted.",
         ],
     },
     "node": {

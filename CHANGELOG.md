@@ -5,6 +5,11 @@ All notable changes are recorded here. The format follows
 
 ## [Unreleased]
 
+### Added
+- `python` profile: `python.sphinx`, `python.mkdocs`, `python.pixi`, `python.pdm` and
+  `python.pylint` rules, each gated on its own marker (`conf.py`, `mkdocs.yml`, `pixi.toml`,
+  `pdm.lock`).
+
 ## [0.1.0] - 2026-10-25
 
 ### Added

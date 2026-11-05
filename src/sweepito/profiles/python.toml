@@ -1,5 +1,5 @@
 id = "python"
-description = "Python, Django, Flask, FastAPI, pytest, Ruff, mypy, tox, coverage"
+description = "Python, Django, Flask, FastAPI, pytest, Ruff, mypy, Pylint, tox, coverage, Sphinx, MkDocs, Pixi, PDM"
 markers = ["pyproject.toml", "setup.py", "setup.cfg", "requirements*.txt", "Pipfile", "manage.py"]
 
 [[rule]]
@@ -31,6 +31,12 @@ id = "python.typecheckers"
 paths = [".pyre/", ".pytype/"]
 risk = "safe"
 description = "Pyre and pytype caches"
+
+[[rule]]
+id = "python.pylint"
+paths = [".pylint.d/"]
+risk = "safe"
+description = "Pylint stats"
 
 [[rule]]
 id = "python.coverage"
@@ -80,3 +86,31 @@ id = "python.venv"
 paths = ["/.venv/", "/venv/", "/env/"]
 risk = "high-impact"
 description = "Virtual environments"
+
+[[rule]]
+id = "python.sphinx"
+paths = ["/_build/"]
+requires = ["conf.py"]
+risk = "safe"
+description = "Sphinx documentation build output"
+
+[[rule]]
+id = "python.mkdocs"
+paths = ["/site/"]
+requires = ["mkdocs.yml"]
+risk = "configurable"
+description = "MkDocs build output (could be a published folder)"
+
+[[rule]]
+id = "python.pixi"
+paths = ["/.pixi/"]
+requires = ["pixi.toml"]
+risk = "high-impact"
+description = "Pixi environment (costly to rebuild, may need network)"
+
+[[rule]]
+id = "python.pdm"
+paths = ["/.pdm-python", "/.pdm-build/"]
+requires = ["pdm.lock"]
+risk = "configurable"
+description = "PDM interpreter pointer and build cache"

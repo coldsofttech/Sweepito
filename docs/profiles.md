@@ -78,13 +78,13 @@ Custom rules follow the same safety gates as built-in ones. Details are in
 | [`node-pm`](#node-pm) | `package-lock.json`, `pnpm-lock.yaml`, `yarn.lock`, `bun.lockb`, `bun.lock` | 2 | 0 | 1 | 1 |
 | [`node`](#node) | `package.json` | 15 | 8 | 6 | 1 |
 | [`php`](#php) | `composer.json`, `artisan` | 7 | 2 | 4 | 1 |
-| [`python`](#python) | `pyproject.toml`, `setup.py`, `setup.cfg`, `requirements*.txt`, `Pipfile`, `manage.py` | 13 | 6 | 6 | 1 |
+| [`python`](#python) | `pyproject.toml`, `setup.py`, `setup.cfg`, `requirements*.txt`, `Pipfile`, `manage.py` | 18 | 8 | 8 | 2 |
 | [`r`](#r) | `DESCRIPTION`, `*.Rproj`, `renv.lock` | 6 | 1 | 3 | 2 |
 | [`ruby`](#ruby) | `Gemfile`, `config/application.rb` | 6 | 2 | 3 | 1 |
 | [`rust`](#rust) | `Cargo.toml` | 2 | 0 | 2 | 0 |
 | [`swift`](#swift) | `Package.swift`, `*.xcodeproj/project.pbxproj`, `Podfile` | 4 | 0 | 3 | 1 |
 | [`terraform`](#terraform) | `*.tf`, `terragrunt.hcl` | 4 | 1 | 3 | 0 |
-| **Total** | | **97** | **30** | **54** | **13** |
+| **Total** | | **102** | **32** | **56** | **14** |
 
 ## common
 
@@ -497,7 +497,7 @@ Notes:
 
 ## python
 
-Python, Django, Flask, FastAPI, pytest, Ruff, mypy, tox, coverage
+Python, Django, Flask, FastAPI, pytest, Ruff, mypy, Pylint, tox, coverage, Sphinx, MkDocs, Pixi, PDM
 
 **Detected by:** `pyproject.toml`, `setup.py`, `setup.cfg`, `requirements*.txt`, `Pipfile`, `manage.py`
 
@@ -510,6 +510,7 @@ Python, Django, Flask, FastAPI, pytest, Ruff, mypy, tox, coverage
 | `python.ruff` | `.ruff_cache/` | `pyproject.toml`, `setup.py`, `setup.cfg`, `requirements*.txt`, `Pipfile`, `manage.py` | safe | Ruff cache |
 | `python.mypy` | `.mypy_cache/`, `.dmypy.json` | `pyproject.toml`, `setup.py`, `setup.cfg`, `requirements*.txt`, `Pipfile`, `manage.py` | safe | mypy cache |
 | `python.typecheckers` | `.pyre/`, `.pytype/` | `pyproject.toml`, `setup.py`, `setup.cfg`, `requirements*.txt`, `Pipfile`, `manage.py` | safe | Pyre and pytype caches |
+| `python.pylint` | `.pylint.d/` | `pyproject.toml`, `setup.py`, `setup.cfg`, `requirements*.txt`, `Pipfile`, `manage.py` | safe | Pylint stats |
 | `python.coverage` | `.coverage`, `.coverage.*`, `htmlcov/`, `coverage.xml` | `pyproject.toml`, `setup.py`, `setup.cfg`, `requirements*.txt`, `Pipfile`, `manage.py` | safe | Coverage data and reports |
 | `python.hypothesis` | `.hypothesis/` | `pyproject.toml`, `setup.py`, `setup.cfg`, `requirements*.txt`, `Pipfile`, `manage.py` | configurable | Hypothesis example database (holds regression seeds) |
 | `python.tox` | `.tox/`, `.nox/` | `pyproject.toml`, `setup.py`, `setup.cfg`, `requirements*.txt`, `Pipfile`, `manage.py` | configurable | tox and nox environments |
@@ -518,6 +519,10 @@ Python, Django, Flask, FastAPI, pytest, Ruff, mypy, tox, coverage
 | `python.dist` | `/dist/` | `pyproject.toml`, `setup.py`, `setup.cfg`, `requirements*.txt`, `Pipfile`, `manage.py` | configurable | Distribution artifacts |
 | `django.static` | `/staticfiles/` | `manage.py` | configurable | Django collectstatic output |
 | `python.venv` | `/.venv/`, `/venv/`, `/env/` | `pyproject.toml`, `setup.py`, `setup.cfg`, `requirements*.txt`, `Pipfile`, `manage.py` | high-impact | Virtual environments |
+| `python.sphinx` | `/_build/` | `conf.py` | safe | Sphinx documentation build output |
+| `python.mkdocs` | `/site/` | `mkdocs.yml` | configurable | MkDocs build output (could be a published folder) |
+| `python.pixi` | `/.pixi/` | `pixi.toml` | high-impact | Pixi environment (costly to rebuild, may need network) |
+| `python.pdm` | `/.pdm-python`, `/.pdm-build/` | `pdm.lock` | configurable | PDM interpreter pointer and build cache |
 
 ### Configuration
 
@@ -546,6 +551,9 @@ Notes:
 - `db.sqlite3` and Flask `instance/` hold application data and are never targeted.
 - `python.hypothesis` is opt-in because the example database stores failing cases that act as regression seeds.
 - `build/` and `dist/` are anchored: they only match beside a Python marker such as `pyproject.toml`.
+- Documentation and tool rules need their own marker: `python.sphinx` (`_build/`) needs `conf.py`, `python.mkdocs` (`site/`) needs `mkdocs.yml`, `python.pixi` needs `pixi.toml` and `python.pdm` needs `pdm.lock`. Both doc folders are anchored.
+- `python.mkdocs` is `configurable` because `site/` may be a published folder. `python.pixi` (`.pixi/`) is `high-impact` like `python.venv`.
+- Poetry and uv use `.venv/`, covered by `python.venv`. The uv cache, PDM cache and Pyright have no project-local cache, so nothing shared or global is targeted.
 
 ## r
 
