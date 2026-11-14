@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- productbuild distribution for the Sweepito installer package. scripts/build_installer.py fills
+     the @...@ values in and writes the result next to the component package. -->
+<installer-gui-script minSpecVersion="2">
+    <title>@TITLE@</title>
+    <organization>@IDENTIFIER_PREFIX@</organization>
+    <!-- System-wide: files go to /usr/local, which needs an administrator. -->
+    <domains enable_anywhere="false" enable_currentUserHome="false" enable_localSystem="true"/>
+    <options customize="never" require-scripts="false" hostArchitectures="@HOST_ARCH@"/>
+    <license file="LICENSE.txt" mime-type="text/plain"/>
+    <choices-outline>
+        <line choice="default"/>
+    </choices-outline>
+    <choice id="default" title="@TITLE@">
+        <pkg-ref id="@IDENTIFIER@"/>
+    </choice>
+    <pkg-ref id="@IDENTIFIER@" version="@VERSION@" onConclusion="none">@COMPONENT@</pkg-ref>
+</installer-gui-script>

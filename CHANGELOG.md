@@ -5,6 +5,11 @@ All notable changes are recorded here. The format follows
 
 ## [Unreleased]
 
+### Added
+- Native installers that bundle Python: a Windows `setup.exe` (NSIS) and portable zip, Linux `.deb`
+  and `.rpm` packages (nfpm), and a macOS `.pkg` and tarball. Built by `scripts/build_installer.py`,
+  checked on pull requests by the `installers` workflow and attached to each release.
+
 ## [0.2.0] - 2026-11-15
 
 ### Added

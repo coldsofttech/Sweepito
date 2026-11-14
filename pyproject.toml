@@ -42,6 +42,10 @@ dev = [
     "mypy>=2.4.1",
     "pytest-cov>=6.0",
 ]
+# Builds the installers (scripts/build_installer.py); not needed to run or test Sweepito.
+installer = [
+    "pyinstaller>=6.22.3",
+]
 
 [tool.uv]
 package = true

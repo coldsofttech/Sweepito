@@ -73,6 +73,10 @@ uvx sweepito scan              # run once without installing
 
 Check the install with `sweepito --version`, and your setup with `sweepito doctor`.
 
+No Python? Download a native installer from the
+[releases](https://github.com/coldsofttech/Sweepito/releases): a `setup.exe` for Windows, a `.deb`
+or `.rpm` for Linux, and a `.pkg` for macOS. See [Packaging](docs/packaging.md).
+
 ## Quick start
 
 ```bash
@@ -230,7 +234,7 @@ error, so you can redirect them yourself.
 ## Documentation
 
 [CLI](docs/guides/cli.md) · [Configuration](docs/guides/configuration.md) · [Profiles and rules](docs/profiles.md) ·
-[Architecture](docs/architecture.md) · [Development](docs/development.md) · [Changelog](CHANGELOG.md)
+[Packaging](docs/packaging.md) · [Architecture](docs/architecture.md) · [Development](docs/development.md) · [Changelog](CHANGELOG.md)
 
 See [docs/README.md](docs/README.md) for an overview, and [SUPPORT.md](SUPPORT.md) if you need help.
 

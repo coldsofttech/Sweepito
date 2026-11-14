@@ -1,0 +1,159 @@
+name: installers
+
+# Builds the installers on pull requests that touch them and checks that each one installs, runs
+# and uninstalls: setup.exe (Windows), deb and rpm (Linux), pkg (macOS). Nothing is published here;
+# release.yml builds the same files for a release.
+on:
+  pull_request:
+    paths:
+      - installer/**
+      - scripts/build_installer.py
+      - src/**
+      - pyproject.toml
+      - uv.lock
+      - .github/workflows/installers.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: installers-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  windows:
+    name: windows (setup.exe)
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v7
+        with:
+          python-version: "3.13"
+      - name: Read tool versions
+        id: tools
+        shell: bash
+        run: |
+          python -c "import tomllib, os; t = tomllib.load(open('installer/tools.toml', 'rb'))['tools']; open(os.environ['GITHUB_OUTPUT'], 'a').write(''.join(f'{k}={v}\n' for k, v in t.items()))"
+      - name: Install NSIS
+        run: choco install nsis --version "${{ steps.tools.outputs.nsis }}" --yes --no-progress
+      - run: uv sync --locked --group installer
+      - name: Build the installer and smoke test the executable
+        run: uv run python scripts/build_installer.py --smoke
+      - name: Install, run and uninstall the setup (per user)
+        shell: pwsh
+        run: |
+          $setup = Get-ChildItem "dist/installer/sweepito-*.setup.exe" | Select-Object -First 1
+          $dir = Join-Path $env:RUNNER_TEMP "installed-sweepito"
+          $exe = "$dir/sweepito.exe"
+          $userPath = { [Environment]::GetEnvironmentVariable('Path', 'User') }
+
+          $install = Start-Process -Wait -PassThru -FilePath $setup.FullName -ArgumentList '/S', '/currentuser', "/D=$dir"
+          if ($install.ExitCode -ne 0) { throw "the setup exited with code $($install.ExitCode)" }
+          if (-not (Test-Path $exe)) { throw "the setup did not install into $dir" }
+          $run = Start-Process -Wait -PassThru -NoNewWindow -FilePath $exe -ArgumentList '--version'
+          if ($run.ExitCode -ne 0) { throw "sweepito failed after installing" }
+          if (-not (Test-Path "$dir/uninstall.exe")) { throw "no uninstaller" }
+          if (-not ((& $userPath) -like "*$dir*")) { throw "the setup did not add itself to PATH" }
+
+          # _?= makes the uninstaller run in place, so Start-Process can wait for it.
+          Start-Process -Wait -FilePath "$dir/uninstall.exe" -ArgumentList '/S', "_?=$dir"
+          if (Test-Path $exe) { throw "uninstall left the program behind" }
+          if ((& $userPath) -like "*$dir*") { throw "uninstall left PATH changed" }
+      - uses: actions/upload-artifact@v7
+        with:
+          name: installers-windows
+          path: |
+            dist/installer/*.exe
+            dist/installer/*.zip
+          retention-days: 7
+
+  linux:
+    name: linux (deb, rpm)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v7
+        with:
+          python-version: "3.13"
+      - name: Read tool versions
+        id: tools
+        run: |
+          python3 -c "import tomllib, os; t = tomllib.load(open('installer/tools.toml', 'rb'))['tools']; open(os.environ['GITHUB_OUTPUT'], 'a').write(''.join(f'{k}={v}\n' for k, v in t.items()))"
+      - name: Install nfpm (checksum verified)
+        env:
+          VERSION: ${{ steps.tools.outputs.nfpm }}
+        run: |
+          base="https://github.com/goreleaser/nfpm/releases/download/v${VERSION}"
+          curl -fsSLO "${base}/nfpm_${VERSION}_Linux_x86_64.tar.gz"
+          curl -fsSLO "${base}/checksums.txt"
+          sha256sum --ignore-missing --check checksums.txt
+          tar -xzf "nfpm_${VERSION}_Linux_x86_64.tar.gz" nfpm
+          sudo install nfpm /usr/local/bin/nfpm
+          nfpm --version
+      - run: uv sync --locked --group installer
+      - name: Build the packages and smoke test the executable
+        run: uv run python scripts/build_installer.py --smoke
+      - name: Install, run and remove the deb
+        run: |
+          sudo apt-get install --yes ./dist/installer/*.deb
+          sweepito --version
+          sweepito profiles > /dev/null
+          sudo apt-get remove --yes sweepito
+          hash -r
+          if command -v sweepito; then echo "sweepito is still installed"; exit 1; fi
+          if [ -e /usr/lib/sweepito ]; then echo "files were left behind"; exit 1; fi
+      - name: Install, run and remove the rpm (Fedora)
+        run: |
+          docker run --rm --volume "$PWD/dist/installer:/pkgs:ro" fedora:latest bash -euxc '
+            dnf install --assumeyes /pkgs/*.rpm
+            sweepito --version
+            sweepito profiles > /dev/null
+            dnf remove --assumeyes sweepito
+            hash -r
+            if command -v sweepito; then echo "sweepito is still installed"; exit 1; fi
+          '
+      - uses: actions/upload-artifact@v7
+        with:
+          name: installers-linux
+          path: |
+            dist/installer/*.deb
+            dist/installer/*.rpm
+          retention-days: 7
+
+  macos:
+    name: macos (${{ matrix.arch }} pkg)
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: macos-15, arch: arm64 }
+          - { os: macos-15-intel, arch: x86_64 }
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v7
+        with:
+          python-version: "3.13"
+      - run: uv sync --locked --group installer
+      - name: Build the package and smoke test the executable
+        run: uv run python scripts/build_installer.py --smoke
+      - name: Install, run and uninstall the pkg
+        run: |
+          sudo installer -pkg dist/installer/*.pkg -target /
+          sweepito --version
+          sweepito profiles > /dev/null
+          sudo /usr/local/lib/sweepito/uninstall.sh
+          hash -r
+          if command -v sweepito; then echo "sweepito is still installed"; exit 1; fi
+          if [ -e /usr/local/lib/sweepito ]; then echo "files were left behind"; exit 1; fi
+      - uses: actions/upload-artifact@v7
+        with:
+          name: installers-macos-${{ matrix.arch }}
+          path: |
+            dist/installer/*.pkg
+            dist/installer/*.tar.gz
+          retention-days: 7
