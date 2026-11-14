@@ -74,9 +74,23 @@ profiles. Extra tools, pinned in `installer/tools.toml`:
 
 Installers are unsigned by default, so Windows SmartScreen and macOS Gatekeeper warn on first run.
 
-- **Windows:** set `SIGN_COMMAND` to a command that signs one file, with `{file}` where its path
+- **Windows, any signing tool:** set `SIGN_COMMAND` to a command that signs one file, with `{file}` where its path
   goes. The executable and the setup are signed. In CI, store it as the repository variable
   `SIGN_COMMAND`.
+- **Windows releases (SignPath):** `release.yml` can sign the setup with
+  [SignPath](https://signpath.org/) (free certificates for open-source projects). It is off until you
+  set it up once:
+  1. Apply to the SignPath Foundation for the project and, once approved, create a project with the
+     slug `sweepito`, a signing policy `release-signing` and the artifact configuration in
+     `installer/signpath/artifact-configuration.xml` (slug `windows-setup`). Link the GitHub
+     repository as the trusted build system.
+  2. In the repository, add the secret `SIGNPATH_API_TOKEN` and the variable
+     `SIGNPATH_ORGANIZATION_ID`. Only if your slugs differ, also set `SIGNPATH_PROJECT_SLUG`,
+     `SIGNPATH_SIGNING_POLICY_SLUG` and `SIGNPATH_ARTIFACT_CONFIGURATION_SLUG`.
+
+  The release then signs `sweepito-<version>.setup.exe`; the signature is checked against this
+  workflow run. The portable zip and the `sweepito.exe` inside the setup stay unsigned. SignPath's
+  free tier covers Windows only, so the Linux and macOS files are not signed this way.
 - **macOS:** set `MACOS_CODESIGN_IDENTITY` (Developer ID Application) and
   `MACOS_INSTALLER_IDENTITY` (Developer ID Installer). Notarize the signed `.pkg` afterwards with
   `xcrun notarytool submit --wait` and `xcrun stapler staple`.

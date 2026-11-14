@@ -42,6 +42,9 @@ jobs:
     name: installers (${{ matrix.name }})
     runs-on: ${{ matrix.os }}
     timeout-minutes: 30
+    permissions:
+      contents: read
+      actions: read # SignPath reads this run to verify where the file came from
     strategy:
       fail-fast: true
       matrix:
@@ -79,6 +82,35 @@ jobs:
         env:
           SIGN_COMMAND: ${{ vars.SIGN_COMMAND }}
         run: uv run python scripts/build_installer.py --smoke
+
+      # Windows code signing with SignPath (free for open source: https://signpath.org/). It runs
+      # only when the repository variable SIGNPATH_ORGANIZATION_ID is set, so releases keep working
+      # before the project is approved. See docs/packaging.md for the one-time setup.
+      - name: Upload the unsigned setup
+        id: unsigned
+        if: matrix.name == 'windows' && vars.SIGNPATH_ORGANIZATION_ID != ''
+        uses: actions/upload-artifact@v7
+        with:
+          name: unsigned-windows
+          path: dist/installer/*.setup.exe
+      - name: Sign the setup with SignPath
+        if: matrix.name == 'windows' && vars.SIGNPATH_ORGANIZATION_ID != ''
+        uses: signpath/github-action-submit-signing-request@v1
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: ${{ vars.SIGNPATH_PROJECT_SLUG || 'sweepito' }}
+          signing-policy-slug: ${{ vars.SIGNPATH_SIGNING_POLICY_SLUG || 'release-signing' }}
+          artifact-configuration-slug: ${{ vars.SIGNPATH_ARTIFACT_CONFIGURATION_SLUG || 'windows-setup' }}
+          github-artifact-id: ${{ steps.unsigned.outputs.artifact-id }}
+          wait-for-completion: true
+          output-artifact-directory: signed-windows
+      - name: Replace the unsigned setup with the signed one
+        if: matrix.name == 'windows' && vars.SIGNPATH_ORGANIZATION_ID != ''
+        shell: bash
+        run: |
+          rm dist/installer/*.setup.exe
+          cp signed-windows/*.setup.exe dist/installer/
       - uses: actions/upload-artifact@v7
         with:
           name: installers-${{ matrix.name }}
