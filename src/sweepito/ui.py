@@ -2,13 +2,15 @@
 
 from __future__ import annotations
 
-from rich.console import Console
-from rich.panel import Panel
-from rich.table import Table
-from rich.text import Text
+from typing import TYPE_CHECKING, Any
 
-from sweepito.doctor import Check
-from sweepito.models import CleanResult, Plan, Profile, Rule, format_size
+if TYPE_CHECKING:
+    from rich.console import Console
+    from rich.panel import Panel
+    from rich.text import Text
+
+    from sweepito.doctor import Check
+    from sweepito.models import CleanResult, Plan, Profile, Rule
 
 LABEL_STYLE = "bold cyan"
 RISK_STYLE = {
@@ -20,14 +22,22 @@ RISK_STYLE = {
 
 
 def make_console(no_color: bool = False, stderr: bool = False) -> Console:
+    from rich.console import Console
+
     return Console(highlight=False, no_color=no_color, stderr=stderr, soft_wrap=True)
 
 
 def _risk(label: str) -> Text:
+    from rich.text import Text
+
     return Text(label, style=RISK_STYLE.get(label, ""))
 
 
 def _info_panel(title: str, rows: list[tuple[str, str]]) -> Panel:
+    from rich.panel import Panel
+    from rich.table import Table
+    from rich.text import Text
+
     grid = Table.grid(padding=(0, 2))
     grid.add_column(style=LABEL_STYLE)
     grid.add_column(overflow="fold")
@@ -37,22 +47,35 @@ def _info_panel(title: str, rows: list[tuple[str, str]]) -> Panel:
 
 
 def success(console: Console, message: str) -> None:
+    from rich.text import Text
+
     console.print(Text(message, style="green"))
 
 
 def info(console: Console, message: str) -> None:
+    from rich.text import Text
+
     console.print(Text(message))
 
 
 def warning(console: Console, message: str) -> None:
+    from rich.text import Text
+
     console.print(Text(message, style="yellow"))
 
 
 def error(console: Console, message: str) -> None:
+    from rich.text import Text
+
     console.print(Text(f"sweepito: error: {message}", style="bold red"))
 
 
 def print_plan(console: Console, plan: Plan, verbose: bool = False) -> None:
+    from rich.table import Table
+    from rich.text import Text
+
+    from sweepito.models import format_size
+
     console.print(
         Text.assemble(
             ("Project: ", LABEL_STYLE),
@@ -83,6 +106,10 @@ def print_plan(console: Console, plan: Plan, verbose: bool = False) -> None:
 
 
 def print_summary(console: Console, plan: Plan, *, deleting: bool = False) -> None:
+    from rich.text import Text
+
+    from sweepito.models import format_size
+
     count = len(plan.candidates)
     skipped = f" Skipped {len(plan.skipped)} protected path(s)." if plan.skipped else ""
     if not count:
@@ -100,6 +127,10 @@ def print_summary(console: Console, plan: Plan, *, deleting: bool = False) -> No
 
 
 def print_result(console: Console, result: CleanResult) -> None:
+    from rich.text import Text
+
+    from sweepito.models import format_size
+
     if result.removed:
         success(
             console,
@@ -113,8 +144,16 @@ def print_result(console: Console, result: CleanResult) -> None:
 
 
 def print_report(
-    console: Console, root: str, groups: dict[str, dict[str, dict]], total: int
+    console: Console,
+    root: str,
+    groups: dict[str, dict[str, dict[str, Any]]],
+    total: int,
 ) -> None:
+    from rich.table import Table
+    from rich.text import Text
+
+    from sweepito.models import format_size
+
     console.print(Text.assemble(("Project: ", LABEL_STYLE), root))
     for kind, entries in groups.items():
         table = Table(title=f"By {kind}", title_justify="left")
@@ -125,7 +164,7 @@ def print_report(
         table.add_column("Size", justify="right")
         for key, slot in sorted(entries.items(), key=lambda kv: -kv[1]["bytes"]):
             name = _risk(key) if kind == "risk" else Text(key)
-            cells = [name, str(slot["count"])]
+            cells: list[Text | str] = [name, str(slot["count"])]
             if kind == "rule":
                 cells.append(_risk(slot["risk"]))
             cells.append(format_size(slot["bytes"]))
@@ -140,6 +179,9 @@ def print_report(
 
 
 def print_rules(console: Console, rules: list[Rule]) -> None:
+    from rich.table import Table
+    from rich.text import Text
+
     table = Table(title="Sweepito rules")
     table.add_column("Profile", style="cyan")
     table.add_column("Rule")
@@ -168,6 +210,8 @@ def _markers(profile: Profile) -> str:
 
 
 def print_profiles(console: Console, profiles: list[Profile]) -> None:
+    from rich.table import Table
+
     table = Table(title="Sweepito profiles")
     table.add_column("Profile", style="cyan", no_wrap=True)
     table.add_column("Description", overflow="fold", min_width=11)
@@ -209,7 +253,7 @@ def print_profile_detail(console: Console, profile: Profile) -> None:
         print_rules(console, list(profile.rules))
 
 
-def print_rule_detail(console: Console, details: dict) -> None:
+def print_rule_detail(console: Console, details: dict[str, Any]) -> None:
     rows = [
         ("Profile", details["profile"]),
         ("Risk", details["risk"]),
@@ -221,7 +265,7 @@ def print_rule_detail(console: Console, details: dict) -> None:
     console.print(_info_panel(f"Rule {details['id']}", rows))
 
 
-def print_config(console: Console, payload: dict) -> None:
+def print_config(console: Console, payload: dict[str, Any]) -> None:
     settings = payload["settings"]
 
     def listing(values: list[str]) -> str:
@@ -240,6 +284,9 @@ def print_config(console: Console, payload: dict) -> None:
 
 
 def print_hook_status(console: Console, state: dict[str, bool]) -> None:
+    from rich.table import Table
+    from rich.text import Text
+
     table = Table(title="Sweepito hooks")
     table.add_column("Stage")
     table.add_column("State")
@@ -254,6 +301,9 @@ def print_hook_status(console: Console, state: dict[str, bool]) -> None:
 
 
 def print_checks(console: Console, checks: list[Check]) -> None:
+    from rich.table import Table
+    from rich.text import Text
+
     table = Table(title="Sweepito doctor")
     table.add_column("Check")
     table.add_column("Result")

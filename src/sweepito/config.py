@@ -3,13 +3,14 @@
 from __future__ import annotations
 
 import re
-import tomllib
 from dataclasses import dataclass, field
-from pathlib import Path
+from typing import TYPE_CHECKING, Any
 
 from sweepito.errors import ConfigError
 from sweepito.models import Risk, Rule
-from sweepito.registry import CUSTOM_PROFILE
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 CONFIG_NAMES = ("sweepito.toml", ".sweepito.toml")
 
@@ -72,7 +73,7 @@ class Settings:
     no_git_check: bool = False
     quiet: bool = False
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "profiles": list(self.profiles),
             "risk": self.risk.label,
@@ -101,7 +102,9 @@ def find_config(start: Path, stop: Path | None = None) -> Path | None:
         current = current.parent
 
 
-def _read_toml(path: Path) -> dict:
+def _read_toml(path: Path) -> dict[str, Any]:
+    import tomllib
+
     try:
         return tomllib.loads(path.read_text(encoding="utf-8"))
     except (OSError, UnicodeDecodeError) as exc:
@@ -117,11 +120,11 @@ def _has_pyproject_table(path: Path) -> bool:
         return False
 
 
-def _norm(table: dict) -> dict:
+def _norm(table: dict[str, Any]) -> dict[str, Any]:
     return {key.replace("-", "_"): value for key, value in table.items()}
 
 
-def _table(value: object, where: str, allowed: set[str]) -> dict:
+def _table(value: object, where: str, allowed: set[str]) -> dict[str, Any]:
     if not isinstance(value, dict):
         raise ConfigError(f"[{where}] must be a table.")
     table = _norm(value)
@@ -152,6 +155,8 @@ def validate_pattern(pattern: str, where: str) -> None:
 
 
 def _parse_rule(raw: object, index: int) -> Rule:
+    from sweepito.registry import CUSTOM_PROFILE
+
     where = f"[[rule]] #{index + 1}"
     table = _table(raw, where, _RULE_KEYS)
     if "exec" in table:

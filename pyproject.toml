@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "sweepito"
-version = "0.1.0"
+dynamic = ["version"]
 description = "Safely clean caches and build artifacts across languages, frameworks and tools."
 readme = "README.md"
 license = { file = "LICENSE" }
@@ -39,10 +39,14 @@ dev = [
     "pytest-xdist>=3",
     "ruff>=0.6",
     "pre-commit>=3",
+    "mypy>=2.4.1",
 ]
 
 [tool.uv]
 package = true
+
+[tool.hatch.version]
+path = "src/sweepito/__init__.py"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/sweepito"]
@@ -53,7 +57,13 @@ pythonpath = ["src"]
 addopts = "--strict-markers"
 markers = [
     "e2e: tests that run the installed command line program",
+    "integration: tests that drive real git repositories (everything in tests/integration)",
 ]
+
+[tool.mypy]
+strict = true
+files = ["src"]
+python_version = "3.11"
 
 [tool.ruff]
 line-length = 88
@@ -62,6 +72,3 @@ src = ["src", "tests"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B"]
-
-[tool.ruff.lint.per-file-ignores]
-"scripts/*" = ["E501"]   # long documentation prose

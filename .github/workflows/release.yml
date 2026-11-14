@@ -13,10 +13,9 @@ jobs:
       - name: Check versions match the tag
         run: |
           tag="${GITHUB_REF_NAME#v}"
-          pyproject=$(grep -m1 '^version' pyproject.toml | cut -d'"' -f2)
           package=$(grep -m1 '__version__' src/sweepito/__init__.py | cut -d'"' -f2)
-          test "$tag" = "$pyproject" && test "$tag" = "$package" \
-            || { echo "Version mismatch: tag=$tag pyproject=$pyproject package=$package"; exit 1; }
+          test "$tag" = "$package" \
+            || { echo "Version mismatch: tag=$tag package=$package"; exit 1; }
       - run: uv sync
       - run: uv run ruff check .
       - run: |

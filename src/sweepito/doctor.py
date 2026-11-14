@@ -4,10 +4,9 @@ from __future__ import annotations
 
 import sys
 from dataclasses import asdict, dataclass
-from importlib import metadata
+from typing import Any
 
-from sweepito import __version__, api, git, hooks
-from sweepito.config import Options
+from sweepito import __version__
 from sweepito.errors import SweepitoError
 
 MIN_PYTHON = (3, 11)
@@ -20,11 +19,13 @@ class Check:
     detail: str
     required: bool = False  # a failed required check makes doctor exit non-zero
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, Any]:
         return asdict(self)
 
 
 def _dependency(name: str) -> Check:
+    from importlib import metadata
+
     try:
         return Check(name, True, metadata.version(name), required=True)
     except metadata.PackageNotFoundError:
@@ -32,6 +33,9 @@ def _dependency(name: str) -> Check:
 
 
 def run_checks(path: str | None = None, config_file: str | None = None) -> list[Check]:
+    from sweepito import api, git, hooks
+    from sweepito.config import Options
+
     python = sys.version_info
     checks = [
         Check("Sweepito", True, __version__),

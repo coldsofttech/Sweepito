@@ -4,10 +4,12 @@ from __future__ import annotations
 
 import os
 import stat
-from pathlib import Path
+from typing import TYPE_CHECKING
 
-from sweepito import git
 from sweepito.errors import ConfigError
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 BEGIN = "# >>> sweepito >>>"
 END = "# <<< sweepito <<<"
@@ -29,6 +31,8 @@ def _block(stage: str) -> str:
 
 
 def hook_path(root: Path, stage: str) -> Path:
+    from sweepito import git
+
     if stage not in STAGES:
         raise ConfigError(
             f"Unsupported hook stage {stage!r}; use post-commit or pre-commit."

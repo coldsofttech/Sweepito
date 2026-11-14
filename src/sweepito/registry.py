@@ -2,17 +2,20 @@
 
 from __future__ import annotations
 
-import tomllib
-from dataclasses import replace
-from importlib import resources
+from typing import TYPE_CHECKING
 
-from sweepito.errors import ConfigError
-from sweepito.models import Profile, Risk, Rule
+if TYPE_CHECKING:
+    from sweepito.models import Profile, Rule
 
 CUSTOM_PROFILE = "custom"
 
 
 def _load_builtin() -> dict[str, Profile]:
+    import tomllib
+    from importlib import resources
+
+    from sweepito.models import Profile, Risk, Rule
+
     profiles: dict[str, Profile] = {}
     package = resources.files("sweepito.profiles")
     for entry in sorted(package.iterdir(), key=lambda e: e.name):
@@ -44,6 +47,8 @@ class Registry:
     """All known profiles and rules, built-in plus custom."""
 
     def __init__(self, profiles: dict[str, Profile]) -> None:
+        from sweepito.errors import ConfigError
+
         self.profiles = profiles
         self.rules: dict[str, Rule] = {}
         for profile in profiles.values():
@@ -58,6 +63,10 @@ class Registry:
         custom_profiles: dict[str, tuple[tuple[str, ...], str]] | None = None,
         custom_rules: tuple[Rule, ...] = (),
     ) -> Registry:
+        from dataclasses import replace
+
+        from sweepito.models import Profile
+
         profiles = _load_builtin()
         for name, (markers, description) in (custom_profiles or {}).items():
             existing = profiles.get(name)
