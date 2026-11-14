@@ -13,6 +13,7 @@ All notable changes are recorded here. The format follows
   daemon storage, volumes and bind-mounted data are never targeted.
 - `node` profile: Nx, Vitest, Storybook and Webpack caches, plus opt-in Playwright, Cypress and Rush
   rules.
+- `python` profile: Sphinx, MkDocs, Pixi, PDM and Pylint rules, each gated on its own marker.
 
 ## [0.1.0] - 2026-10-25
 
