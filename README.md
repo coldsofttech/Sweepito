@@ -29,7 +29,7 @@ what the folder is.** A `build/` directory is a candidate beside a `CMakeLists.t
 
 ## What you get
 
-- **20 technology profiles and 113 rules**, detected automatically from marker files
+- **21 technology profiles and 117 rules**, detected automatically from marker files
   (`Cargo.toml`, `pom.xml`, `package.json`, ...). Repositories with several technologies and
   nested projects are handled per project.
 - **Conservative by default.** Only `safe` caches are cleaned. Build output is opt-in, and
@@ -124,6 +124,7 @@ Add `--json` for plain machine-readable output, or `--no-color` to turn colour o
 | `elixir` | Mix and Phoenix | 6 | 3 / 2 / 1 |
 | `r` | R, Shiny, renv, RMarkdown | 6 | 1 / 3 / 2 |
 | `jupyter` | Notebooks and ML workflow outputs | 5 | 1 / 1 / 3 |
+| `data-eng` | dbt and Apache Spark | 4 | 2 / 0 / 2 |
 | `terraform` | Terraform and Terragrunt | 4 | 1 / 3 / 0 |
 | `batchvault` | BatchVault leftover staging and manifest temp files | 2 | 0 / 2 / 0 |
 | `commitrocket` | CommitRocket report temp files | 1 | 1 / 0 / 0 |

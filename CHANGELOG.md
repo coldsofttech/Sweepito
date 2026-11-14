@@ -14,6 +14,8 @@ All notable changes are recorded here. The format follows
 - `node` profile: Nx, Vitest, Storybook and Webpack caches, plus opt-in Playwright, Cypress and Rush
   rules.
 - `python` profile: Sphinx, MkDocs, Pixi, PDM and Pylint rules, each gated on its own marker.
+- `data-eng` profile with dbt (`dbt.target`, `dbt.logs`, `dbt.packages`) and Spark (`spark.warehouse`)
+  rules. Data directories are never targeted.
 
 ## [0.1.0] - 2026-10-25
 
