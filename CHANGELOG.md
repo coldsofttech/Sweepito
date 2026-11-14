@@ -18,6 +18,7 @@ All notable changes are recorded here. The format follows
   rules. Data directories are never targeted.
 - More cleanup rules for the `node-pm`, `python`, `jvm`, `go`, `cpp`, `ruby` and `terraform` profiles,
   and `build.sbt` now activates the JVM profile.
+- Profiles for Clojure, Haskell, OCaml, Perl, Unity, Unreal Engine and Godot.
 
 ## [0.1.0] - 2026-10-25
 

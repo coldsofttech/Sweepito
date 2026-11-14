@@ -67,6 +67,7 @@ Custom rules follow the same safety gates as built-in ones.
 | Profile | Detected by | Rules | Safe | Configurable | High-impact |
 |---|---|---:|---:|---:|---:|
 | [`batchvault`](profiles/batchvault.md) | `batchvault.toml` | 2 | 0 | 2 | 0 |
+| [`clojure`](profiles/clojure.md) | `project.clj`, `deps.edn` | 2 | 2 | 0 | 0 |
 | [`commitrocket`](profiles/commitrocket.md) | `commitrocket.toml`, `.commitrocketignore` | 1 | 1 | 0 | 0 |
 | [`common`](profiles/common.md) | always active | 5 | 2 | 3 | 0 |
 | [`cpp`](profiles/cpp.md) | `CMakeLists.txt`, `Makefile`, `build.ninja`, `meson.build` | 7 | 1 | 6 | 0 |
@@ -76,10 +77,14 @@ Custom rules follow the same safety gates as built-in ones.
 | [`dotnet`](profiles/dotnet.md) | `*.csproj`, `*.fsproj`, `*.vbproj`, `*.sln` | 5 | 1 | 4 | 0 |
 | [`elixir`](profiles/elixir.md) | `mix.exs` | 6 | 3 | 2 | 1 |
 | [`go`](profiles/go.md) | `go.mod`, `go.work` | 5 | 3 | 1 | 1 |
+| [`godot`](profiles/godot.md) | `project.godot` | 1 | 1 | 0 | 0 |
+| [`haskell`](profiles/haskell.md) | `*.cabal`, `stack.yaml` | 2 | 1 | 1 | 0 |
 | [`jupyter`](profiles/jupyter.md) | `*.ipynb`, `dvc.yaml`, `MLproject` | 5 | 1 | 1 | 3 |
 | [`jvm`](profiles/jvm.md) | `build.sbt`, `pom.xml`, `build.gradle`, `build.gradle.kts`, `settings.gradle`, `settings.gradle.kts` | 7 | 3 | 4 | 0 |
 | [`node-pm`](profiles/node-pm.md) | `package-lock.json`, `pnpm-lock.yaml`, `yarn.lock`, `bun.lockb`, `bun.lock` | 3 | 0 | 1 | 2 |
 | [`node`](profiles/node.md) | `package.json` | 22 | 12 | 9 | 1 |
+| [`ocaml`](profiles/ocaml.md) | `dune-project` | 1 | 1 | 0 | 0 |
+| [`perl`](profiles/perl.md) | `Makefile.PL`, `Build.PL`, `cpanfile` | 3 | 3 | 0 | 0 |
 | [`php`](profiles/php.md) | `composer.json`, `artisan` | 7 | 2 | 4 | 1 |
 | [`python`](profiles/python.md) | `pyproject.toml`, `setup.py`, `setup.cfg`, `requirements*.txt`, `Pipfile`, `manage.py` | 19 | 8 | 9 | 2 |
 | [`r`](profiles/r.md) | `DESCRIPTION`, `*.Rproj`, `renv.lock` | 6 | 1 | 3 | 2 |
@@ -87,7 +92,9 @@ Custom rules follow the same safety gates as built-in ones.
 | [`rust`](profiles/rust.md) | `Cargo.toml` | 2 | 0 | 2 | 0 |
 | [`swift`](profiles/swift.md) | `Package.swift`, `*.xcodeproj/project.pbxproj`, `Podfile` | 4 | 0 | 3 | 1 |
 | [`terraform`](profiles/terraform.md) | `*.tf`, `terragrunt.hcl` | 5 | 1 | 4 | 0 |
-| **Total** | | **126** | **43** | **65** | **18** |
+| [`unity`](profiles/unity.md) | `ProjectSettings/ProjectVersion.txt` | 3 | 2 | 1 | 0 |
+| [`unreal`](profiles/unreal.md) | `*.uproject` | 2 | 0 | 2 | 0 |
+| **Total** | | **140** | **53** | **69** | **18** |
 
 Each page in `docs/profiles/` lists its rules with their targets, markers and risk, an example
 configuration and the notes about what is never targeted.

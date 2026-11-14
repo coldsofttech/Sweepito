@@ -1,0 +1,24 @@
+id = "perl"
+description = "Perl: ExtUtils::MakeMaker and Module::Build"
+markers = ["Makefile.PL", "Build.PL", "cpanfile"]
+
+[[rule]]
+id = "perl.blib"
+paths = ["/blib/", "/pm_to_blib"]
+requires = ["Makefile.PL", "Build.PL"]
+risk = "safe"
+description = "Staged build library (blib/)"
+
+[[rule]]
+id = "perl.build-dir"
+paths = ["/_build/"]
+requires = ["Build.PL"]
+risk = "safe"
+description = "Module::Build state"
+
+[[rule]]
+id = "perl.mymeta"
+paths = ["/MYMETA.json", "/MYMETA.yml"]
+requires = ["Makefile.PL", "Build.PL"]
+risk = "safe"
+description = "Generated build metadata"

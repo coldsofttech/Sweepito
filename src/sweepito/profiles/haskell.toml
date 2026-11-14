@@ -1,0 +1,17 @@
+id = "haskell"
+description = "Haskell: Cabal and Stack"
+markers = ["*.cabal", "stack.yaml"]
+
+[[rule]]
+id = "haskell.dist-newstyle"
+paths = ["/dist-newstyle/"]
+requires = ["*.cabal"]
+risk = "safe"
+description = "Cabal build output"
+
+[[rule]]
+id = "haskell.stack-work"
+paths = ["/.stack-work/"]
+requires = ["stack.yaml"]
+risk = "configurable"
+description = "Stack build output (holds built dependencies; slow to rebuild)"
