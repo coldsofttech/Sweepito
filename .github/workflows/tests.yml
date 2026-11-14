@@ -28,4 +28,7 @@ jobs:
         run: |
           git config --global user.email "ci@example.com"
           git config --global user.name "ci"
-      - run: uv run --python ${{ matrix.python }} pytest -n auto
+      - name: Unit tests
+        run: uv run --python ${{ matrix.python }} pytest tests/unit -n auto
+      - name: Integration tests
+        run: uv run --python ${{ matrix.python }} pytest tests/integration -n auto

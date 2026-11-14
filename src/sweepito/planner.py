@@ -4,21 +4,25 @@ from __future__ import annotations
 
 import os
 import stat
-from fnmatch import fnmatchcase
-from pathlib import Path
+from typing import TYPE_CHECKING
 
-import pathspec
+if TYPE_CHECKING:
+    from pathlib import Path
 
-from sweepito import git
-from sweepito.config import Settings
-from sweepito.errors import ConfigError, SafetyRefusal
-from sweepito.models import Candidate, Plan, Profile, Rule, Skipped
-from sweepito.registry import Registry
+    import pathspec
+
+    from sweepito.config import Settings
+    from sweepito.models import Plan, Profile, Rule
+    from sweepito.registry import Registry
 
 _GLOB_CHARS = set("*?[")
 
 
 def build_plan(root: Path, settings: Settings, registry: Registry) -> Plan:
+    from sweepito import git
+    from sweepito.errors import SafetyRefusal
+    from sweepito.models import Candidate, Plan, Skipped
+
     root = root.resolve()
     in_git = git.toplevel(root) is not None
     if not in_git and not settings.no_git_check:
@@ -49,11 +53,11 @@ def build_plan(root: Path, settings: Settings, registry: Registry) -> Plan:
         for rel, is_dir in _match_rule(root, rule, dirs, source):
             raw.setdefault(rel, (rule, is_dir))
 
-    exclude = (
-        pathspec.GitIgnoreSpec.from_lines(list(settings.exclude))
-        if settings.exclude
-        else None
-    )
+    exclude: pathspec.GitIgnoreSpec | None = None
+    if settings.exclude:
+        import pathspec
+
+        exclude = pathspec.GitIgnoreSpec.from_lines(list(settings.exclude))
     tracked_files, tracked_dirs = git.tracked(root) if in_git else (set(), set())
     survivors: list[tuple[str, Rule, bool]] = []
     for rel, (rule, is_dir) in sorted(raw.items()):
@@ -97,6 +101,8 @@ def build_plan(root: Path, settings: Settings, registry: Registry) -> Plan:
 
 
 def _check_rule_ids(settings: Settings, registry: Registry) -> None:
+    from sweepito.errors import ConfigError
+
     unknown = sorted(
         {
             rid
@@ -113,6 +119,10 @@ def _check_rule_ids(settings: Settings, registry: Registry) -> None:
 
 def _inventory(root: Path, in_git: bool) -> tuple[list[str], list[str]]:
     """Return (non-ignored files for marker detection, entries that may be cleaned)."""
+    from pathlib import Path
+
+    from sweepito import git
+
     if in_git:
         return git.list_files(root), git.list_ignored(root)
     files: list[str] = []
@@ -143,6 +153,8 @@ def _marker_dirs(
 
 
 def _find_marker(marker: str, files: list[str]) -> set[str]:
+    from fnmatch import fnmatchcase
+
     segments = marker.count("/") + 1
     dirs: set[str] = set()
     for name in files:
@@ -161,6 +173,8 @@ def _active_profiles(
     files: list[str],
     cache: dict[str, set[str]],
 ) -> list[str]:
+    from sweepito.errors import ConfigError
+
     requested = settings.profiles
     if "auto" in requested:
         explicit = [p for p in requested if p != "auto"]
@@ -243,6 +257,8 @@ def _match_rule(
                 continue
             found.append((rel, is_dir))
     if globs:
+        import pathspec
+
         spec = pathspec.GitIgnoreSpec.from_lines(globs)
         for entry in entries:
             is_dir = entry.endswith("/")
