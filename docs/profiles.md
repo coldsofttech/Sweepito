@@ -78,7 +78,7 @@ Custom rules follow the same safety gates as built-in ones.
 | [`jupyter`](profiles/jupyter.md) | `*.ipynb`, `dvc.yaml`, `MLproject` | 5 | 1 | 1 | 3 |
 | [`jvm`](profiles/jvm.md) | `pom.xml`, `build.gradle`, `build.gradle.kts`, `settings.gradle`, `settings.gradle.kts` | 5 | 1 | 4 | 0 |
 | [`node-pm`](profiles/node-pm.md) | `package-lock.json`, `pnpm-lock.yaml`, `yarn.lock`, `bun.lockb`, `bun.lock` | 2 | 0 | 1 | 1 |
-| [`node`](profiles/node.md) | `package.json` | 15 | 8 | 6 | 1 |
+| [`node`](profiles/node.md) | `package.json` | 22 | 12 | 9 | 1 |
 | [`php`](profiles/php.md) | `composer.json`, `artisan` | 7 | 2 | 4 | 1 |
 | [`python`](profiles/python.md) | `pyproject.toml`, `setup.py`, `setup.cfg`, `requirements*.txt`, `Pipfile`, `manage.py` | 13 | 6 | 6 | 1 |
 | [`r`](profiles/r.md) | `DESCRIPTION`, `*.Rproj`, `renv.lock` | 6 | 1 | 3 | 2 |
@@ -86,7 +86,7 @@ Custom rules follow the same safety gates as built-in ones.
 | [`rust`](profiles/rust.md) | `Cargo.toml` | 2 | 0 | 2 | 0 |
 | [`swift`](profiles/swift.md) | `Package.swift`, `*.xcodeproj/project.pbxproj`, `Podfile` | 4 | 0 | 3 | 1 |
 | [`terraform`](profiles/terraform.md) | `*.tf`, `terragrunt.hcl` | 4 | 1 | 3 | 0 |
-| **Total** | | **101** | **31** | **57** | **13** |
+| **Total** | | **108** | **35** | **60** | **13** |
 
 Each page in `docs/profiles/` lists its rules with their targets, markers and risk, an example
 configuration and the notes about what is never targeted.

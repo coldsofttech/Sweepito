@@ -11,6 +11,8 @@ All notable changes are recorded here. The format follows
   `batchvault.toml`.
 - `docker` profile with a `docker.buildx-cache` rule for local BuildKit cache exports. Docker
   daemon storage, volumes and bind-mounted data are never targeted.
+- `node` profile: Nx, Vitest, Storybook and Webpack caches, plus opt-in Playwright, Cypress and Rush
+  rules.
 
 ## [0.1.0] - 2026-10-25
 
