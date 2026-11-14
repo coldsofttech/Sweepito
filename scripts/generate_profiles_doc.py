@@ -257,6 +257,23 @@ enable = ["terraform.dir", "terragrunt.cache"]
             "`terraform.plans` is opt-in because a saved plan may be awaiting apply.",
         ],
     },
+    "commitrocket": {
+        "toml": """\
+[clean]
+disable = ["commitrocket.report-tmp"]
+""",
+        "cli": "sweepito clean -p commitrocket",
+        "notes": [
+            "`commitrocket.report-tmp` removes `<report>.json.<random>.tmp`, the partial copy "
+            "of a `--report` file left only if a run is killed mid-write. The next run "
+            "rewrites the report.",
+            "Never targeted: `.git/commitrocket-journal.json` (resume journal), "
+            "`.gitattributes`, `.lfsconfig`, `commitrocket.toml`, `.commitrocketignore`, "
+            "the `--report` output itself, and any file CommitRocket has not yet committed.",
+            "Per-run logs live in a per-user folder outside the project, so they are out of "
+            "scope. A report not named `*.json` needs a custom rule.",
+        ],
+    },
     "common": {
         "toml": """\
 [clean]

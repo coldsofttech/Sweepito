@@ -5,6 +5,9 @@ All notable changes are recorded here. The format follows
 
 ## [Unreleased]
 
+### Added
+- `commitrocket` profile with `commitrocket.report-tmp` (partial `--report` temp files). Closes #17.
+
 ## [0.1.0] - 2026-10-25
 
 ### Added

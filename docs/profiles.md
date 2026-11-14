@@ -67,6 +67,7 @@ Custom rules follow the same safety gates as built-in ones. Details are in
 
 | Profile | Detected by | Rules | Safe | Configurable | High-impact |
 |---|---|---:|---:|---:|---:|
+| [`commitrocket`](#commitrocket) | `commitrocket.toml`, `.commitrocketignore` | 1 | 1 | 0 | 0 |
 | [`common`](#common) | always active | 5 | 2 | 3 | 0 |
 | [`cpp`](#cpp) | `CMakeLists.txt`, `Makefile`, `build.ninja`, `meson.build` | 6 | 1 | 5 | 0 |
 | [`dart`](#dart) | `pubspec.yaml` | 3 | 0 | 3 | 0 |
@@ -84,7 +85,38 @@ Custom rules follow the same safety gates as built-in ones. Details are in
 | [`rust`](#rust) | `Cargo.toml` | 2 | 0 | 2 | 0 |
 | [`swift`](#swift) | `Package.swift`, `*.xcodeproj/project.pbxproj`, `Podfile` | 4 | 0 | 3 | 1 |
 | [`terraform`](#terraform) | `*.tf`, `terragrunt.hcl` | 4 | 1 | 3 | 0 |
-| **Total** | | **97** | **30** | **54** | **13** |
+| **Total** | | **98** | **31** | **54** | **13** |
+
+## commitrocket
+
+CommitRocket (batched commit and push; the resume journal in .git is never touched)
+
+**Detected by:** `commitrocket.toml`, `.commitrocketignore`
+
+### Rules
+
+| Rule ID | Targets | Requires | Risk | Description |
+|---|---|---|---|---|
+| `commitrocket.report-tmp` | `*.json.*.tmp` | `commitrocket.toml`, `.commitrocketignore` | safe | Partial JSON report left by a killed run (the next run rewrites it) |
+
+### Configuration
+
+```toml
+[clean]
+disable = ["commitrocket.report-tmp"]
+```
+
+Command-line equivalent:
+
+```bash
+sweepito clean -p commitrocket
+```
+
+Notes:
+
+- `commitrocket.report-tmp` removes `<report>.json.<random>.tmp`, the partial copy of a `--report` file left only if a run is killed mid-write. The next run rewrites the report.
+- Never targeted: `.git/commitrocket-journal.json` (resume journal), `.gitattributes`, `.lfsconfig`, `commitrocket.toml`, `.commitrocketignore`, the `--report` output itself, and any file CommitRocket has not yet committed.
+- Per-run logs live in a per-user folder outside the project, so they are out of scope. A report not named `*.json` needs a custom rule.
 
 ## common
 
