@@ -71,6 +71,7 @@ Custom rules follow the same safety gates as built-in ones.
 | [`common`](profiles/common.md) | always active | 5 | 2 | 3 | 0 |
 | [`cpp`](profiles/cpp.md) | `CMakeLists.txt`, `Makefile`, `build.ninja`, `meson.build` | 6 | 1 | 5 | 0 |
 | [`dart`](profiles/dart.md) | `pubspec.yaml` | 3 | 0 | 3 | 0 |
+| [`docker`](profiles/docker.md) | `Dockerfile`, `compose.yaml`, `compose.yml`, `docker-compose.yaml`, `docker-compose.yml`, `.devcontainer/devcontainer.json`, `.devcontainer.json`, `skaffold.yaml` | 1 | 0 | 1 | 0 |
 | [`dotnet`](profiles/dotnet.md) | `*.csproj`, `*.fsproj`, `*.vbproj`, `*.sln` | 5 | 1 | 4 | 0 |
 | [`elixir`](profiles/elixir.md) | `mix.exs` | 6 | 3 | 2 | 1 |
 | [`go`](profiles/go.md) | `go.mod`, `go.work` | 3 | 1 | 1 | 1 |
@@ -85,7 +86,7 @@ Custom rules follow the same safety gates as built-in ones.
 | [`rust`](profiles/rust.md) | `Cargo.toml` | 2 | 0 | 2 | 0 |
 | [`swift`](profiles/swift.md) | `Package.swift`, `*.xcodeproj/project.pbxproj`, `Podfile` | 4 | 0 | 3 | 1 |
 | [`terraform`](profiles/terraform.md) | `*.tf`, `terragrunt.hcl` | 4 | 1 | 3 | 0 |
-| **Total** | | **100** | **31** | **56** | **13** |
+| **Total** | | **101** | **31** | **57** | **13** |
 
 Each page in `docs/profiles/` lists its rules with their targets, markers and risk, an example
 configuration and the notes about what is never targeted.
