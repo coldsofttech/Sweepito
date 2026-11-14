@@ -12,6 +12,7 @@ npm, pnpm, Yarn and Bun project-local stores
 |---|---|---|---|---|
 | `node-pm.yarn-cache` | `/.yarn/cache/` | `yarn.lock` | configurable | Yarn offline cache (skipped automatically when tracked) |
 | `node-pm.pnpm-store` | `/.pnpm-store/` | `pnpm-lock.yaml` | high-impact | Local pnpm content-addressable store |
+| `node-pm.yarn-unplugged` | `/.yarn/unplugged/`, `/.yarn/install-state.gz`, `/.yarn/build-state.yml` | `yarn.lock` | high-impact | Extracted Yarn dependencies and install state (yarn install required again) |
 
 ## Configuration
 

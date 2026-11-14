@@ -43,3 +43,10 @@ paths = ["/vendor/bundle/"]
 requires = ["Gemfile"]
 risk = "high-impact"
 description = "Bundled gems (requires reinstall)"
+
+[[rule]]
+id = "ruby.bundle-config"
+paths = ["/.bundle/"]
+requires = ["Gemfile"]
+risk = "high-impact"
+description = "Local Bundler settings and cache (may hold deliberate BUNDLE_PATH or source credentials)"

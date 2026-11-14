@@ -15,3 +15,10 @@ paths = ["/.pnpm-store/"]
 requires = ["pnpm-lock.yaml"]
 risk = "high-impact"
 description = "Local pnpm content-addressable store"
+
+[[rule]]
+id = "node-pm.yarn-unplugged"
+paths = ["/.yarn/unplugged/", "/.yarn/install-state.gz", "/.yarn/build-state.yml"]
+requires = ["yarn.lock"]
+risk = "high-impact"
+description = "Extracted Yarn dependencies and install state (yarn install required again)"

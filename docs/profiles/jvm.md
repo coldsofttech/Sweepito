@@ -4,7 +4,7 @@
 
 Java and JVM: Maven, Gradle, Kotlin, Spring Boot
 
-**Detected by:** `pom.xml`, `build.gradle`, `build.gradle.kts`, `settings.gradle`, `settings.gradle.kts`
+**Detected by:** `build.sbt`, `pom.xml`, `build.gradle`, `build.gradle.kts`, `settings.gradle`, `settings.gradle.kts`
 
 ## Rules
 
@@ -15,6 +15,8 @@ Java and JVM: Maven, Gradle, Kotlin, Spring Boot
 | `jvm.gradle-project` | `/.gradle/` | `settings.gradle`, `settings.gradle.kts`, `build.gradle`, `build.gradle.kts` | configurable | Project-level Gradle cache (not ~/.gradle) |
 | `jvm.gradle-build` | `/build/` | `build.gradle`, `build.gradle.kts` | configurable | Gradle build output |
 | `jvm.idea-out` | `/out/` | `*.iml` | configurable | IntelliJ default output directory |
+| `jvm.sbt-target` | `/project/target/`, `/project/project/` | `build.sbt` | safe | SBT meta-build output |
+| `jvm.scala-tools` | `/.bloop/`, `/.metals/` | `build.sbt`, `build.sc`, `pom.xml`, `build.gradle`, `build.gradle.kts` | safe | Bloop and Metals build and language-server caches |
 
 ## Configuration
 

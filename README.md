@@ -29,7 +29,7 @@ what the folder is.** A `build/` directory is a candidate beside a `CMakeLists.t
 
 ## What you get
 
-- **21 technology profiles and 117 rules**, detected automatically from marker files
+- **21 technology profiles and 126 rules**, detected automatically from marker files
   (`Cargo.toml`, `pom.xml`, `package.json`, ...). Repositories with several technologies and
   nested projects are handled per project.
 - **Conservative by default.** Only `safe` caches are cleaned. Build output is opt-in, and
@@ -109,23 +109,23 @@ Add `--json` for plain machine-readable output, or `--no-color` to turn colour o
 
 | Profile | Covers | Rules | Safe / configurable / high-impact |
 |---|---|---:|---|
-| `python` | Python, Django, Flask, FastAPI, pytest, Ruff, mypy, Pylint, tox, coverage, Sphinx, MkDocs, Pixi, PDM | 18 | 8 / 8 / 2 |
+| `python` | Python, Django, Flask, FastAPI, pytest, Ruff, mypy, Pylint, tox, coverage, Sphinx, MkDocs, Pixi, PDM | 19 | 8 / 9 / 2 |
 | `node` | Node.js, React, Next.js, Vue, Nuxt, Angular, Vite, Svelte, Astro | 22 | 12 / 9 / 1 |
-| `node-pm` | npm, pnpm, Yarn, Bun project-local stores | 2 | 0 / 1 / 1 |
+| `node-pm` | npm, pnpm, Yarn, Bun project-local stores | 3 | 0 / 1 / 2 |
 | `rust` | Rust and Cargo | 2 | 0 / 2 / 0 |
-| `jvm` | Maven, Gradle, Kotlin, Spring Boot | 5 | 1 / 4 / 0 |
+| `jvm` | Maven, Gradle, Kotlin, Spring Boot | 7 | 3 / 4 / 0 |
 | `dotnet` | C#, F#, ASP.NET Core | 5 | 1 / 4 / 0 |
-| `go` | Go modules and build tools | 3 | 1 / 1 / 1 |
-| `cpp` | CMake, Make, Ninja, Meson | 6 | 1 / 5 / 0 |
+| `go` | Go modules and build tools | 5 | 3 / 1 / 1 |
+| `cpp` | CMake, Make, Ninja, Meson | 7 | 1 / 6 / 0 |
 | `php` | Composer, Laravel, Symfony | 7 | 2 / 4 / 1 |
-| `ruby` | Bundler, Rails, Sinatra | 6 | 2 / 3 / 1 |
+| `ruby` | Bundler, Rails, Sinatra | 7 | 2 / 3 / 2 |
 | `dart` | Dart and Flutter | 3 | 0 / 3 / 0 |
 | `swift` | Swift Package Manager, Xcode | 4 | 0 / 3 / 1 |
 | `elixir` | Mix and Phoenix | 6 | 3 / 2 / 1 |
 | `r` | R, Shiny, renv, RMarkdown | 6 | 1 / 3 / 2 |
 | `jupyter` | Notebooks and ML workflow outputs | 5 | 1 / 1 / 3 |
 | `data-eng` | dbt and Apache Spark | 4 | 2 / 0 / 2 |
-| `terraform` | Terraform and Terragrunt | 4 | 1 / 3 / 0 |
+| `terraform` | Terraform and Terragrunt | 5 | 1 / 4 / 0 |
 | `batchvault` | BatchVault leftover staging and manifest temp files | 2 | 0 / 2 / 0 |
 | `commitrocket` | CommitRocket report temp files | 1 | 1 / 0 / 0 |
 | `docker` | Docker, Compose, Dev Containers, BuildKit, Skaffold | 1 | 0 / 1 / 0 |

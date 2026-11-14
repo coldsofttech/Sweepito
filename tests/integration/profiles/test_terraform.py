@@ -8,12 +8,14 @@ CASE = Case(
     markers={"main.tf": "", "terragrunt.hcl": ""},
     targets={
         "terraform.crash-log": ["crash.log"],
+        "terraform.d": [".terraform.d/"],
         "terraform.dir": [".terraform/"],
         "terraform.plans": ["plan.tfplan"],
         "terragrunt.cache": [".terragrunt-cache/"],
     },
     blocked_without={
         "terraform.crash-log": ["main.tf"],
+        "terraform.d": ["main.tf"],
         "terraform.dir": ["main.tf"],
         "terraform.plans": ["main.tf"],
         "terragrunt.cache": ["terragrunt.hcl"],

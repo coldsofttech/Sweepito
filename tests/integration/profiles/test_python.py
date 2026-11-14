@@ -11,7 +11,9 @@ CASE = Case(
         "mkdocs.yml": "",
         "pixi.toml": "",
         "pdm.lock": "",
-        "pyproject.toml": "[project]\nname='x'\n"},
+        "pyproject.toml": "[project]\nname='x'\n",
+        "tox.ini": "",
+    },
     targets={
         "django.static": ["staticfiles/"],
         "python.build": ["build/"],
@@ -30,6 +32,7 @@ CASE = Case(
         "python.sphinx": ["_build/"],
         "python.tox": [".tox/", ".nox/"],
         "python.typecheckers": [".pyre/", ".pytype/"],
+        "python.tool-cache": [".cache/"],
         "python.venv": [".venv/", "venv/", "env/"],
     },
     blocked_without={
@@ -38,6 +41,7 @@ CASE = Case(
         "python.pdm": ["pdm.lock"],
         "python.pixi": ["pixi.toml"],
         "python.sphinx": ["conf.py"],
+        "python.tool-cache": ["tox.ini"],
     },
 )
 

@@ -19,3 +19,17 @@ id = "go.vendor"
 paths = ["/vendor/"]
 risk = "high-impact"
 description = "Vendored dependencies (often committed; tracked files are protected)"
+
+[[rule]]
+id = "go.gocache"
+paths = ["/.gocache/"]
+requires = ["go.mod", "go.work"]
+risk = "safe"
+description = "Project-local Go build cache (GOCACHE pointed at the project, never the user cache)"
+
+[[rule]]
+id = "go.coverage"
+paths = ["/coverage/"]
+requires = ["go.mod"]
+risk = "safe"
+description = "Coverage output folder"

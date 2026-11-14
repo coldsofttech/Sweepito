@@ -28,6 +28,7 @@ Python, Django, Flask, FastAPI, pytest, Ruff, mypy, Pylint, tox, coverage, Sphin
 | `django.static` | `/staticfiles/` | `manage.py` | configurable | Django collectstatic output |
 | `python.pixi` | `/.pixi/` | `pixi.toml` | high-impact | Pixi environment (costly to rebuild, may need network) |
 | `python.venv` | `/.venv/`, `/venv/`, `/env/` | `pyproject.toml`, `setup.py`, `setup.cfg`, `requirements*.txt`, `Pipfile`, `manage.py` | high-impact | Virtual environments |
+| `python.tool-cache` | `/.cache/` | `tox.ini`, `noxfile.py`, `pytest.ini`, `.pre-commit-config.yaml` | configurable | Project-local tool caches (only with tox, nox, pytest or pre-commit markers) |
 
 ## Configuration
 

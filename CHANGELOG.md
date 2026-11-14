@@ -16,6 +16,8 @@ All notable changes are recorded here. The format follows
 - `python` profile: Sphinx, MkDocs, Pixi, PDM and Pylint rules, each gated on its own marker.
 - `data-eng` profile with dbt (`dbt.target`, `dbt.logs`, `dbt.packages`) and Spark (`spark.warehouse`)
   rules. Data directories are never targeted.
+- More cleanup rules for the `node-pm`, `python`, `jvm`, `go`, `cpp`, `ruby` and `terraform` profiles,
+  and `build.sbt` now activates the JVM profile.
 
 ## [0.1.0] - 2026-10-25
 

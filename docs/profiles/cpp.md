@@ -16,6 +16,7 @@ C and C++: CMake, Make, Ninja, Meson
 | `cpp.cmake-in-source` | `/CMakeCache.txt`, `/CMakeFiles/` | `CMakeLists.txt` | configurable | In-source CMake build leftovers |
 | `cpp.objects` | `*.o`, `*.obj`, `*.a` | `CMakeLists.txt`, `Makefile`, `build.ninja`, `meson.build` | configurable | Object files and static libraries |
 | `cpp.ninja` | `/.ninja_log`, `/.ninja_deps` | `build.ninja` | configurable | Ninja logs |
+| `cpp.compile-commands` | `/compile_commands.json` | `CMakeLists.txt`, `meson.build`, `build.ninja`, `Makefile` | configurable | Generated compilation database (clangd needs it; regenerate with CMake, Bear or similar) |
 
 ## Configuration
 

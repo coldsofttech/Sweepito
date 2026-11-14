@@ -9,6 +9,7 @@ CASE = Case(
         "app.iml": "",
         "build.gradle": "",
         "build.gradle.kts": "",
+        "build.sbt": "",
         "pom.xml": "<project/>",
         "settings.gradle": "",
     },
@@ -17,6 +18,8 @@ CASE = Case(
         "jvm.gradle-project": [".gradle/"],
         "jvm.idea-out": ["out/"],
         "jvm.kotlin": [".kotlin/"],
+        "jvm.sbt-target": ["project/target/", "project/project/"],
+        "jvm.scala-tools": [".bloop/", ".metals/"],
         "jvm.maven-target": ["target/"],
     },
     blocked_without={
@@ -25,6 +28,13 @@ CASE = Case(
         "jvm.idea-out": ["app.iml"],
         "jvm.kotlin": ["build.gradle", "build.gradle.kts"],
         "jvm.maven-target": ["pom.xml"],
+        "jvm.sbt-target": ["build.sbt"],
+        "jvm.scala-tools": [
+            "build.sbt",
+            "pom.xml",
+            "build.gradle",
+            "build.gradle.kts",
+        ],
     },
 )
 

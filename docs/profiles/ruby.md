@@ -16,6 +16,7 @@ Ruby: Bundler, Rails, Sinatra
 | `rails.tmp` | `/tmp/pids/`, `/tmp/sockets/` | `config/application.rb` | configurable | Stale PID files and sockets |
 | `rails.logs` | `/log/*.log` | `config/application.rb` | configurable | Rails logs |
 | `ruby.vendor-bundle` | `/vendor/bundle/` | `Gemfile` | high-impact | Bundled gems (requires reinstall) |
+| `ruby.bundle-config` | `/.bundle/` | `Gemfile` | high-impact | Local Bundler settings and cache (may hold deliberate BUNDLE_PATH or source credentials) |
 
 ## Configuration
 

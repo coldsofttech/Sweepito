@@ -13,6 +13,7 @@ Terraform and Terragrunt (state files and lock files are never cleaned)
 | `terraform.crash-log` | `crash.log`, `crash.*.log` | `*.tf` | safe | Terraform crash logs |
 | `terraform.plans` | `*.tfplan`, `tfplan` | `*.tf` | configurable | Saved plans (a plan may be awaiting apply) |
 | `terraform.dir` | `/.terraform/` | `*.tf` | configurable | Provider plugins (terraform init required again) |
+| `terraform.d` | `/.terraform.d/` | `*.tf` | configurable | Project-local generated data only (anchored to the project; never ~/.terraform.d) |
 | `terragrunt.cache` | `/.terragrunt-cache/` | `terragrunt.hcl` | configurable | Terragrunt module cache |
 
 ## Configuration

@@ -9,10 +9,16 @@ CASE = Case(
     targets={
         "node-pm.pnpm-store": [".pnpm-store/"],
         "node-pm.yarn-cache": [".yarn/cache/"],
+        "node-pm.yarn-unplugged": [
+            ".yarn/unplugged/",
+            ".yarn/install-state.gz",
+            ".yarn/build-state.yml",
+        ],
     },
     blocked_without={
         "node-pm.pnpm-store": ["pnpm-lock.yaml"],
         "node-pm.yarn-cache": ["yarn.lock"],
+        "node-pm.yarn-unplugged": ["yarn.lock"],
     },
 )
 
