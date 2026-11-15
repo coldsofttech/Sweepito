@@ -72,7 +72,7 @@ export class CandidatesProvider {
     getChildren(node) {
         const descriptions = new Map(entries().flatMap((e) => [...e.descriptions]));
         // The id is the path from the top, so a node keeps its identity across scans.
-        return childrenOf(entries(), node, descriptions).map((child) => ({
+        return childrenOf(entries(), node, descriptions).map((/** @type {any} */ child) => ({
             ...child,
             id: `${node?.id ?? ""}/${child.root ?? child.label}`,
         }));
