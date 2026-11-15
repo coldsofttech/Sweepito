@@ -1,20 +1,18 @@
 #!/usr/bin/env python3
-"""Build the Sweepito installers: a PyInstaller folder, then a native package for this OS.
+"""Build the Sweepito installers: a PyInstaller folder, then a native package.
 
     Windows   dist/installer/sweepito-<version>.setup.exe (NSIS) and a portable .zip
-    Linux     dist/installer/sweepito_<version>_<arch>.deb and sweepito-<version>.<arch>.rpm (nfpm)
-    macOS     dist/installer/sweepito-<version>-macos-<arch>.pkg and a .tar.gz
+    Linux     dist/installer/sweepito_<version>_<arch>.deb and
+              sweepito-<version>.<arch>.rpm (nfpm)
 
 Names, version, description, author, homepage and license come from pyproject.toml and
-``sweepito.__version__``, so renaming the project needs no edit here. Tool versions are pinned in
-installer/tools.toml. An installer is built on the OS it is for: PyInstaller does not cross-compile.
+``sweepito.__version__``, so renaming the project needs no edit here. Tool versions
+are pinned in installer/tools.toml. An installer is built on the OS it is for:
+PyInstaller does not cross-compile.
 
 Signing is off by default.
-  Windows  set SIGN_COMMAND to a command that signs one file, with {file} where its path goes
-           (a signtool or SignPath call); the executable and the setup.exe are signed.
-  macOS    set MACOS_CODESIGN_IDENTITY ("Developer ID Application: ...") to sign the executables
-           and MACOS_INSTALLER_IDENTITY ("Developer ID Installer: ...") to sign the .pkg.
-           Notarization is a separate step (see docs/packaging.md).
+  Windows  set SIGN_COMMAND to a command that signs one file, with {file} where its
+           path goes (a signtool call); the executable and the setup.exe are signed.
 
 Usage:  uv sync --group installer
         uv run python scripts/build_installer.py [--sync] [--smoke] [--formats deb rpm]
@@ -32,7 +30,6 @@ import shutil
 import stat
 import subprocess
 import sys
-import tarfile
 import tomllib
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
@@ -44,19 +41,23 @@ OUT = ROOT / "dist" / "installer"
 SPEC = ROOT / "installer" / "pyinstaller" / "cli.spec"
 NSIS_FILE = ROOT / "installer" / "windows" / "cli.nsi"
 NFPM_CONFIG = ROOT / "installer" / "linux" / "nfpm.yaml"
-MACOS_DIR = ROOT / "installer" / "macos"
 
 WINDOWS = sys.platform == "win32"
 LINUX = sys.platform.startswith("linux")
-MACOS = sys.platform == "darwin"
 
-PROJECT = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]
+PROJECT = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))[
+    "project"
+]
 NAME: str = PROJECT["name"]  # also the command's name ([project.scripts])
 TITLE = NAME.capitalize()
 URLS: dict[str, str] = PROJECT.get("urls", {})
 AUTHOR: dict[str, str] = (PROJECT.get("authors") or [{}])[0]
-PUBLISHER = AUTHOR.get("name", TITLE)
-BUNDLE_ID = f"io.github.{PUBLISHER.lower()}.{NAME}"
+PUBLISHER: str = (
+    tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
+    .get("tool", {})
+    .get("installer", {})
+    .get("publisher", AUTHOR.get("name", TITLE))
+)
 
 
 def read_version() -> str:
@@ -70,7 +71,9 @@ def read_version() -> str:
 VERSION = read_version()
 
 
-def run(command: list[str], *, env: dict[str, str] | None = None, cwd: Path = ROOT) -> None:
+def run(
+    command: list[str], *, env: dict[str, str] | None = None, cwd: Path = ROOT
+) -> None:
     print("+", " ".join(shlex.quote(part) for part in command), flush=True)
     subprocess.run(command, check=True, cwd=cwd, env=env)
 
@@ -88,15 +91,18 @@ def sign_windows(files: list[Path]) -> None:
     if not template:
         return
     if "{file}" not in template:
-        raise SystemExit("SIGN_COMMAND must contain {file}, where the file to sign goes.")
+        raise SystemExit(
+            "SIGN_COMMAND must contain {file}, where the file to sign goes."
+        )
     for file in files:
         command = template.replace("{file}", f'"{file}"')
         print("+", command, flush=True)
-        # SIGN_COMMAND is set by whoever runs the build (a CI variable), so it is trusted input.
+        # SIGN_COMMAND is set by whoever runs the build (a CI variable), so it is
+        # trusted input.
         subprocess.run(command, check=True, cwd=ROOT, shell=True)  # noqa: S602
 
 
-# ---- PyInstaller -------------------------------------------------------------------------------
+# ---- PyInstaller ---------------------------------------------------------------------
 def freeze() -> Path:
     """Run PyInstaller and return its output folder (build/installer/sweepito)."""
     run(
@@ -112,7 +118,7 @@ def executable(folder: Path) -> Path:
     return folder / (f"{NAME}.exe" if WINDOWS else NAME)
 
 
-# ---- Windows: NSIS -----------------------------------------------------------------------------
+# ---- Windows: NSIS -------------------------------------------------------------------
 def find_makensis() -> str:
     found = shutil.which("makensis")
     if found:
@@ -121,7 +127,9 @@ def find_makensis() -> str:
         candidate = Path(os.environ.get(variable, "")) / "NSIS" / "makensis.exe"
         if candidate.is_file():
             return str(candidate)
-    raise SystemExit("makensis not found. Install NSIS (version in installer/tools.toml).")
+    raise SystemExit(
+        "makensis not found. Install NSIS (version in installer/tools.toml)."
+    )
 
 
 def numeric_version(version: str) -> str:
@@ -130,9 +138,14 @@ def numeric_version(version: str) -> str:
 
 
 def optional_brand(pattern: str) -> Path | None:
-    """The first file in brand/ matching ``pattern``, if the project has a brand folder."""
+    """The first file in brand/ matching ``pattern``, preferring brand/dark/."""
     folder = ROOT / "brand"
-    return next(iter(sorted(folder.rglob(pattern))), None) if folder.is_dir() else None
+    if not folder.is_dir():
+        return None
+    return next(
+        iter(sorted(folder.rglob(pattern), key=lambda p: ("dark" not in p.parts, p))),
+        None,
+    )
 
 
 def package_windows(folder: Path) -> list[Path]:
@@ -140,6 +153,8 @@ def package_windows(folder: Path) -> list[Path]:
     sign_windows([executable(folder)])
     setup = OUT / f"{NAME}-{VERSION}.setup.exe"
     icon = optional_brand("*.ico")
+    header = optional_brand("header.bmp")
+    welcome = optional_brand("welcome.bmp")
     flags = {
         "APP_NAME": TITLE,
         "APP_VERSION": VERSION,
@@ -147,25 +162,29 @@ def package_windows(folder: Path) -> list[Path]:
         "SOURCE_DIR": str(folder),
         "OUT_FILE": str(setup),
         "ICON_FILE": str(icon) if icon else "",
+        "HEADER_IMAGE": str(header) if header else "",
+        "WELCOME_IMAGE": str(welcome) if welcome else "",
         "LICENSE_FILE": str(ROOT / "LICENSE"),
         "PUBLISHER": PUBLISHER,
         "URL": URLS.get("Homepage", ""),
+        "SUPPORT_URL": URLS.get("Support", URLS.get("Issues", "")),
     }
     command = [find_makensis(), "/V2"]
     command += [f"/D{key}={value}" for key, value in flags.items() if value]
     run([*command, str(NSIS_FILE)])
     sign_windows([setup])
+    arch_label = "x64" if machine() == "x86_64" else machine()
     portable = shutil.make_archive(
-        str(OUT / f"{NAME}-{VERSION}-windows-{'x64' if machine() == 'x86_64' else machine()}"),
+        str(OUT / f"{NAME}-{VERSION}-windows-{arch_label}"),
         "zip",
         root_dir=folder,
     )
     return [setup, Path(portable)]
 
 
-# ---- Linux: nfpm -------------------------------------------------------------------------------
+# ---- Linux: nfpm ---------------------------------------------------------------------
 def normalise_modes(folder: Path) -> None:
-    """Folders 755, files 644, and 755 for anything executable, whatever the build umask was."""
+    """Folders 755, files 644, and 755 for anything executable, whatever the umask."""
     for path in [folder, *folder.rglob("*")]:
         if path.is_symlink():
             continue
@@ -199,7 +218,9 @@ def package_linux(folder: Path, formats: list[str]) -> list[Path]:
     }
     nfpm = shlex.split(os.environ.get("NFPM", "nfpm"))
     if shutil.which(nfpm[0]) is None:
-        raise SystemExit("nfpm not found. Install it (version in installer/tools.toml) or set NFPM.")
+        raise SystemExit(
+            "nfpm not found. Install it (version in installer/tools.toml) or set NFPM."
+        )
     before = set(OUT.iterdir())
 
     def package(packager: str) -> None:
@@ -215,77 +236,22 @@ def package_linux(folder: Path, formats: list[str]) -> list[Path]:
     return sorted(set(OUT.iterdir()) - before)
 
 
-# ---- macOS: pkgbuild and productbuild ----------------------------------------------------------
-def package_macos(folder: Path) -> list[Path]:
-    """A system-wide .pkg (files in /usr/local/lib/sweepito, command in /usr/local/bin) and a tarball."""
-    OUT.mkdir(parents=True, exist_ok=True)
-    arch = machine()
-    codesign = os.environ.get("MACOS_CODESIGN_IDENTITY", "").strip()
-    if codesign:
-        # Every Mach-O file (the executable, the interpreter library, extension modules) is signed
-        # with the hardened runtime, which notarization requires.
-        for path in sorted(p for p in folder.rglob("*") if p.is_file() and not p.is_symlink()):
-            if path.suffix in {".so", ".dylib"} or path == executable(folder):
-                run(["codesign", "--force", "--timestamp", "--options", "runtime",
-                     "--sign", codesign, str(path)])  # fmt: skip
-    normalise_modes(folder)
-
-    stage = WORK / "macos"
-    shutil.rmtree(stage, ignore_errors=True)
-    payload = stage / "payload"
-    lib = payload / "usr" / "local" / "lib" / NAME
-    bin_dir = payload / "usr" / "local" / "bin"
-    shutil.copytree(folder, lib, symlinks=True)
-    shutil.copy2(MACOS_DIR / "uninstall.sh", lib / "uninstall.sh")
-    (lib / "uninstall.sh").chmod(0o755)
-    bin_dir.mkdir(parents=True)
-    (bin_dir / NAME).symlink_to(f"../lib/{NAME}/{NAME}")
-
-    component = stage / f"{NAME}-component.pkg"
-    run(["pkgbuild", "--root", str(payload), "--identifier", BUNDLE_ID, "--version", VERSION,
-         "--install-location", "/", str(component)])  # fmt: skip
-
-    resources = stage / "resources"
-    resources.mkdir()
-    shutil.copy2(ROOT / "LICENSE", resources / "LICENSE.txt")
-    distribution = (MACOS_DIR / "distribution.xml.in").read_text(encoding="utf-8")
-    for key, value in {
-        "TITLE": TITLE,
-        "IDENTIFIER_PREFIX": PUBLISHER,
-        "IDENTIFIER": BUNDLE_ID,
-        "VERSION": VERSION,
-        "COMPONENT": component.name,
-        "HOST_ARCH": arch,
-    }.items():
-        distribution = distribution.replace(f"@{key}@", value)
-    distribution_file = stage / "distribution.xml"
-    distribution_file.write_text(distribution, encoding="utf-8")
-
-    pkg = OUT / f"{NAME}-{VERSION}-macos-{arch}.pkg"
-    command = ["productbuild", "--distribution", str(distribution_file),
-               "--resources", str(resources), "--package-path", str(stage)]  # fmt: skip
-    installer_identity = os.environ.get("MACOS_INSTALLER_IDENTITY", "").strip()
-    if installer_identity:
-        command += ["--sign", installer_identity, "--timestamp"]
-    run([*command, str(pkg)])
-
-    tarball = OUT / f"{NAME}-{VERSION}-macos-{arch}.tar.gz"
-    with tarfile.open(tarball, "w:gz") as archive:
-        archive.add(folder, arcname=NAME)
-    return [pkg, tarball]
-
-
-# ---- smoke test --------------------------------------------------------------------------------
+# ---- smoke test ----------------------------------------------------------------------
 def smoke(folder: Path) -> None:
-    """Start the frozen program: it reports its version and loads the bundled profiles."""
+    """Start the frozen program: it reports its version and loads its profiles."""
     exe = str(executable(folder))
-    result = subprocess.run([exe, "--version"], capture_output=True, text=True, check=True)
+    result = subprocess.run(
+        [exe, "--version"], capture_output=True, text=True, check=True
+    )
     if VERSION not in result.stdout + result.stderr:
         raise SystemExit(f"{exe} --version did not report {VERSION}: {result.stdout!r}")
-    # The profiles are data files inside the bundle; this fails if PyInstaller left them out.
+    # The profiles are data files inside the bundle; this fails if PyInstaller
+    # left them out.
     result = subprocess.run([exe, "profiles", "--json"], capture_output=True, text=True)
     if result.returncode != 0 or "python" not in result.stdout.lower():
-        raise SystemExit(f"{exe} profiles failed ({result.returncode}): {result.stderr}")
+        raise SystemExit(
+            f"{exe} profiles failed ({result.returncode}): {result.stderr}"
+        )
     print(f"smoke test passed: {exe}")
 
 
@@ -298,14 +264,27 @@ def sync() -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("--sync", action="store_true", help="uv sync the installer group first")
-    parser.add_argument("--smoke", action="store_true", help="run the built executable and check it")
-    parser.add_argument("--formats", nargs="+", default=["deb", "rpm"], choices=["deb", "rpm"],
-                        help="Linux package formats")  # fmt: skip
+    parser.add_argument(
+        "--sync", action="store_true", help="uv sync the installer group first"
+    )
+    parser.add_argument(
+        "--smoke", action="store_true", help="run the built executable and check it"
+    )
+    parser.add_argument(
+        "--formats",
+        nargs="+",
+        choices=["deb", "rpm"],
+        help="Linux package formats (default: both; Linux only)",
+    )
     args = parser.parse_args()
 
-    if not (WINDOWS or LINUX or MACOS):
-        raise SystemExit("Installers are built on Windows, Linux and macOS only.")
+    if not (WINDOWS or LINUX):
+        raise SystemExit("Installers are built on Windows and Linux only.")
+    if WINDOWS and args.formats:
+        raise SystemExit(
+            "--formats builds Linux packages and needs Linux (WSL or a Linux "
+            "machine); on Windows this builds the setup.exe and portable zip."
+        )
     if args.sync:
         sync()
     folder = freeze()
@@ -313,10 +292,8 @@ def main() -> None:
         smoke(folder)
     if WINDOWS:
         built = package_windows(folder)
-    elif MACOS:
-        built = package_macos(folder)
     else:
-        built = package_linux(folder, args.formats)
+        built = package_linux(folder, args.formats or ["deb", "rpm"])
     print("\nBuilt:")
     for path in built:
         print(f"  {path.relative_to(ROOT)}  ({path.stat().st_size / 1_048_576:.1f} MB)")

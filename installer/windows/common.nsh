@@ -15,7 +15,8 @@
 ;   APP_VERSION   e.g. 0.1.0 (APP_VERSION_NUMERIC "0.1.0.0" is derived if not given)
 ;   SOURCE_DIR    the PyInstaller folder to install (build/installer/example-cli)
 ;   OUT_FILE      the installer to write (e.g. dist/example-cli-0.1.0.setup.exe)
-;   PUBLISHER (default: APP_NAME; also the install folder's parent), URL, ICON_FILE (.ico), LICENSE_FILE   optional
+;   PUBLISHER (default: APP_NAME; also the install folder's parent), URL (home page),
+;   SUPPORT_URL (help link), ICON_FILE (.ico), LICENSE_FILE   optional
 ;   HEADER_IMAGE (.bmp, 150x57), WELCOME_IMAGE (.bmp, 164x314)   optional, from brand/
 ;   USER_DATA_DIR optional: folder with settings and data; the uninstaller asks before removing it
 ;
@@ -210,6 +211,9 @@ Section "!${APP_NAME}" SecMain
   WriteRegStr SHCTX "${UNINSTALL_KEY}" "DisplayIcon" "$INSTDIR\${MAIN_EXE}"
   !ifdef URL
     WriteRegStr SHCTX "${UNINSTALL_KEY}" "URLInfoAbout" "${URL}"
+  !endif
+  !ifdef SUPPORT_URL
+    WriteRegStr SHCTX "${UNINSTALL_KEY}" "HelpLink" "${SUPPORT_URL}"
   !endif
   WriteRegDWORD SHCTX "${UNINSTALL_KEY}" "NoModify" 1
   WriteRegDWORD SHCTX "${UNINSTALL_KEY}" "NoRepair" 1

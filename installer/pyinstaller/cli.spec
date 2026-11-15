@@ -18,10 +18,9 @@ from PyInstaller.utils.hooks import collect_data_files, collect_submodules
 ROOT = Path(SPECPATH).resolve().parents[1]
 NAME = "sweepito"
 WINDOWS = sys.platform == "win32"
-MACOS = sys.platform == "darwin"
 ICON_DIR = ROOT / "brand"
-ICON_SUFFIX = ".ico" if WINDOWS else ".icns" if MACOS else None
-ICON = next(iter(sorted(ICON_DIR.rglob(f"*{ICON_SUFFIX}"))), None) if ICON_SUFFIX else None
+ICON_SUFFIX = ".ico" if WINDOWS else None
+ICON = next(iter(sorted(ICON_DIR.rglob(f"*{ICON_SUFFIX}"), key=lambda p: ("dark" not in p.parts, p))), None) if ICON_SUFFIX else None
 
 # Profiles are TOML files read through importlib.resources, and the modules load lazily, so
 # PyInstaller's own scan would miss them.

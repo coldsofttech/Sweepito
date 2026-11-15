@@ -29,6 +29,7 @@ dependencies = [
 [project.urls]
 Homepage = "https://github.com/coldsofttech/Sweepito"
 Issues = "https://github.com/coldsofttech/Sweepito/issues"
+Support = "https://github.com/coldsofttech/Sweepito/blob/main/SUPPORT.md"
 
 [project.scripts]
 sweepito = "sweepito.cli:main"
@@ -69,6 +70,10 @@ markers = [
 strict = true
 files = ["src"]
 python_version = "3.11"
+
+[tool.installer]
+# The company shown as publisher in Add/Remove programs, the file properties and the install folder.
+publisher = "ColdSoft Technologies"
 
 [tool.ruff]
 line-length = 88

@@ -5,16 +5,11 @@ All notable changes are recorded here. The format follows
 
 ## [Unreleased]
 
-### Added
-- Native installers that bundle Python: a Windows `setup.exe` (NSIS) and portable zip, Linux `.deb`
-  and `.rpm` packages (nfpm), and a macOS `.pkg` and tarball. Built by `scripts/build_installer.py`,
-  checked on pull requests by the `installers` workflow and attached to each release.
-- Optional SignPath code signing of the Windows setup in the release workflow (off until
-  `SIGNPATH_ORGANIZATION_ID` is set).
-
 ## [0.2.0] - 2026-11-15
 
 ### Added
+- Windows setup (`setup.exe`) and portable zip, and Linux `.deb` and `.rpm` packages, that bundle
+  Python, so Sweepito runs without a Python install. They are attached to each release.
 - `requires_all` for rules (built-in and custom): a rule can now require several marker files to
   exist together.
 - `cornea` profile with a `cornea.log` rule for Cornea Shell debug logs, detected from `cornea.toml`.
