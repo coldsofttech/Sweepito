@@ -10,8 +10,8 @@ Perl: ExtUtils::MakeMaker and Module::Build
 
 | Rule ID | Targets | Requires | Risk | Description |
 |---|---|---|---|---|
-| `perl.blib` | `/blib/`, `/pm_to_blib` | `Makefile.PL`, `Build.PL` | safe | Staged build library (blib/) |
-| `perl.build-dir` | `/_build/` | `Build.PL` | safe | Module::Build state |
+| `perl.blib` | `/blib/`, `/pm_to_blib` | `Makefile.PL`, `Build.PL` | configurable | Staged build library (blib/) |
+| `perl.build-dir` | `/_build/` | `Build.PL` | configurable | Module::Build state |
 | `perl.mymeta` | `/MYMETA.json`, `/MYMETA.yml` | `Makefile.PL`, `Build.PL` | safe | Generated build metadata |
 
 ## Configuration

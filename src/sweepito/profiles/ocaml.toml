@@ -6,5 +6,5 @@ markers = ["dune-project"]
 id = "ocaml.build"
 paths = ["/_build/"]
 requires = ["dune-project"]
-risk = "safe"
+risk = "configurable"
 description = "dune build output"

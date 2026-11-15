@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "sweepito"
 dynamic = ["version"]
-description = "Safely clean caches and build artifacts across languages, frameworks and tools."
+description = "Safely clean generated project artifacts across languages, frameworks, game engines, data and infrastructure tooling."
 readme = "README.md"
 license = { file = "LICENSE" }
 requires-python = ">=3.11"

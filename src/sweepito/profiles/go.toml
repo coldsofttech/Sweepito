@@ -31,5 +31,5 @@ description = "Project-local Go build cache (GOCACHE pointed at the project, nev
 id = "go.coverage"
 paths = ["/coverage/"]
 requires = ["go.mod"]
-risk = "safe"
+risk = "configurable"
 description = "Coverage output folder"

@@ -8,6 +8,8 @@ All notable changes are recorded here. The format follows
 ## [0.2.0] - 2026-11-15
 
 ### Added
+- `requires_all` for rules (built-in and custom): a rule can now require several marker files to
+  exist together.
 - `cornea` profile with a `cornea.log` rule for Cornea Shell debug logs, detected from `cornea.toml`.
 - `commitrocket` profile with `commitrocket.report-tmp` (partial `--report` temp files). Closes #17.
 - `batchvault` profile (`batchvault.staging`, `batchvault.manifest-tmp`), both opt-in, detected from
@@ -23,6 +25,11 @@ All notable changes are recorded here. The format follows
   and `build.sbt` now activates the JVM profile.
 - Profiles for Clojure, Haskell, OCaml, Perl, Unity, Unreal Engine and Godot.
 - `sweepito doctor` reports a hook whose recorded interpreter no longer exists.
+
+### Changed
+- Risk levels now follow documented principles: build output, documentation output and test
+  reports are `configurable` instead of `safe`; Unity `Library/` and Lightning logs are `high-impact`.
+- Sweepito is now described as a cleaner of generated project artifacts, not only caches.
 
 ### Fixed
 - The Git hook failed with `Permission denied` on Windows (Git Bash). Re-run `sweepito hook install`

@@ -10,7 +10,7 @@ OCaml: dune
 
 | Rule ID | Targets | Requires | Risk | Description |
 |---|---|---|---|---|
-| `ocaml.build` | `/_build/` | `dune-project` | safe | dune build output |
+| `ocaml.build` | `/_build/` | `dune-project` | configurable | dune build output |
 
 ## Configuration
 

@@ -11,7 +11,7 @@ Clojure: Leiningen and tools.deps
 | Rule ID | Targets | Requires | Risk | Description |
 |---|---|---|---|---|
 | `clojure.cpcache` | `/.cpcache/` | `deps.edn` | safe | tools.deps classpath cache |
-| `clojure.target` | `/target/` | `project.clj`, `deps.edn` | safe | Leiningen and tools.build output |
+| `clojure.target` | `/target/` | `project.clj`, `deps.edn` | configurable | Leiningen and tools.build output |
 
 ## Configuration
 

@@ -76,7 +76,8 @@ so a typo in `enable`, `disable` or `profiles` exits 2 and names the unknown val
 [[rule]]
 id = "custom.test-output"          # lowercase letters, digits, . _ -
 paths = ["test-results/", "tmp/e2e/**"]
-requires = ["package.json"]        # optional marker files; empty means project root
+requires = ["package.json"]        # optional marker files (any of); empty means project root
+requires_all = ["a.cfg", "b.cfg"]  # optional; every one of these must exist beside the target
 profile = "custom"                 # optional; groups the rule
 description = "Test output"
 allow_untracked = false            # see below
@@ -86,7 +87,8 @@ allow_untracked = false            # see below
 |---|---|---|
 | `id` | string | Required, unique. Lowercase letters, digits, `.`, `_` and `-` |
 | `paths` | list of strings | Required, not empty. Gitignore-style patterns |
-| `requires` | list of strings | Marker files that must exist beside the target. Empty means the project root |
+| `requires` | list of strings | Marker files, any one of which must exist beside the target. Empty means the project root |
+| `requires_all` | list of strings | Marker files that must all exist in the same directory as the target. Combined with `requires`, one of those and all of these are needed |
 | `profile` | string | Profile the rule is listed under (default `custom`) |
 | `description` | string | Shown by `sweepito rules` |
 | `allow_untracked` | true / false | Also match paths that are not git-ignored (default `false`) |

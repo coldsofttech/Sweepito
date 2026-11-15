@@ -14,7 +14,7 @@ Go modules and build tools
 | `go.bin` | `/bin/` | `go.mod`, `go.work` | configurable | Conventional project build output |
 | `go.vendor` | `/vendor/` | `go.mod`, `go.work` | high-impact | Vendored dependencies (often committed; tracked files are protected) |
 | `go.gocache` | `/.gocache/` | `go.mod`, `go.work` | safe | Project-local Go build cache (GOCACHE pointed at the project, never the user cache) |
-| `go.coverage` | `/coverage/` | `go.mod` | safe | Coverage output folder |
+| `go.coverage` | `/coverage/` | `go.mod` | configurable | Coverage output folder |
 
 ## Configuration
 

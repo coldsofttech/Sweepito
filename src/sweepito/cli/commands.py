@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from sweepito.cli.helpers import (
     confirm,
@@ -16,30 +16,10 @@ from sweepito.errors import EXIT_FAILED, EXIT_OK
 
 if TYPE_CHECKING:
     import argparse
+    from typing import Any
 
     from sweepito.models import Plan
     from sweepito.registry import Registry
-
-_TEMPLATE = """\
-# Sweepito configuration. See 'sweepito rules' for rule IDs.
-
-[defaults]
-profiles = ["auto"]   # or an explicit list, e.g. ["python", "node"]
-risk = "safe"         # custom | safe | configurable | high-impact
-
-[clean]
-enable = []           # e.g. ["rust.target", "node.next"]
-disable = []
-exclude = []          # e.g. ["dist/", "build/keep-me/"]
-
-[hook]
-quiet = true
-
-# Custom path rule: only git-ignored, untracked paths are ever removed.
-# [[rule]]
-# id = "custom.test-output"
-# paths = ["test-results/", "tmp/e2e/**"]
-"""
 
 
 def _scan_and_report(args: argparse.Namespace) -> Plan:
@@ -174,7 +154,8 @@ def cmd_rules(args: argparse.Namespace) -> int:
             "profile": rule.profile,
             "risk": rule.risk.label,
             "paths": list(rule.paths),
-            "requires": list(rule.requires or registry.profiles[rule.profile].markers),
+            "requires": list(rule.any_markers(registry.profiles[rule.profile].markers)),
+            "requires_all": list(rule.requires_all),
             "description": rule.description,
             "allow_untracked": rule.allow_untracked,
         }
@@ -235,7 +216,8 @@ def cmd_profiles(args: argparse.Namespace) -> int:
                             "id": r.id,
                             "risk": r.risk.label,
                             "paths": list(r.paths),
-                            "requires": list(r.requires or profile.markers),
+                            "requires": list(r.any_markers(profile.markers)),
+                            "requires_all": list(r.requires_all),
                             "description": r.description,
                         }
                         for r in profile.rules
@@ -290,6 +272,8 @@ def cmd_config(args: argparse.Namespace) -> int:
 
 
 def cmd_init(args: argparse.Namespace) -> int:
+    from importlib import resources
+
     from sweepito import api
     from sweepito.config import Options
     from sweepito.errors import SafetyRefusal
@@ -304,7 +288,10 @@ def cmd_init(args: argparse.Namespace) -> int:
     header = (
         f"# Detected profiles: {', '.join(detected) or 'none'}\n" if detected else ""
     )
-    target.write_text(header + _TEMPLATE, encoding="utf-8", newline="\n")
+    template = (
+        resources.files("sweepito.cli") / "templates" / "sweepito.toml.tmpl"
+    ).read_text(encoding="utf-8")
+    target.write_text(header + template, encoding="utf-8", newline="\n")
     success(make_console(args.no_color), f"Wrote {target}")
     return EXIT_OK
 

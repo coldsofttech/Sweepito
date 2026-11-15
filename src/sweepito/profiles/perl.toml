@@ -6,14 +6,14 @@ markers = ["Makefile.PL", "Build.PL", "cpanfile"]
 id = "perl.blib"
 paths = ["/blib/", "/pm_to_blib"]
 requires = ["Makefile.PL", "Build.PL"]
-risk = "safe"
+risk = "configurable"
 description = "Staged build library (blib/)"
 
 [[rule]]
 id = "perl.build-dir"
 paths = ["/_build/"]
 requires = ["Build.PL"]
-risk = "safe"
+risk = "configurable"
 description = "Module::Build state"
 
 [[rule]]

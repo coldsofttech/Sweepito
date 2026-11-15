@@ -16,8 +16,8 @@ Python, Django, Flask, FastAPI, pytest, Ruff, mypy, Pylint, tox, coverage, Sphin
 | `python.mypy` | `.mypy_cache/`, `.dmypy.json` | `pyproject.toml`, `setup.py`, `setup.cfg`, `requirements*.txt`, `Pipfile`, `manage.py` | safe | mypy cache |
 | `python.pylint` | `.pylint.d/` | `pyproject.toml`, `setup.py`, `setup.cfg`, `requirements*.txt`, `Pipfile`, `manage.py` | safe | Pylint stats |
 | `python.typecheckers` | `.pyre/`, `.pytype/` | `pyproject.toml`, `setup.py`, `setup.cfg`, `requirements*.txt`, `Pipfile`, `manage.py` | safe | Pyre and pytype caches |
-| `python.sphinx` | `/_build/` | `conf.py` | safe | Sphinx documentation build output |
-| `python.coverage` | `.coverage`, `.coverage.*`, `htmlcov/`, `coverage.xml` | `pyproject.toml`, `setup.py`, `setup.cfg`, `requirements*.txt`, `Pipfile`, `manage.py` | safe | Coverage data and reports |
+| `python.sphinx` | `/_build/` | `conf.py` | configurable | Sphinx documentation build output |
+| `python.coverage` | `.coverage`, `.coverage.*`, `htmlcov/`, `coverage.xml` | `pyproject.toml`, `setup.py`, `setup.cfg`, `requirements*.txt`, `Pipfile`, `manage.py` | configurable | Coverage data and reports |
 | `python.mkdocs` | `/site/` | `mkdocs.yml` | configurable | MkDocs build output (could be a published folder) |
 | `python.pdm` | `/.pdm-python`, `/.pdm-build/` | `pdm.lock` | configurable | PDM interpreter pointer and build cache |
 | `python.schemathesis` | `.schemathesis/` | `pyproject.toml`, `setup.py`, `setup.cfg`, `requirements*.txt`, `Pipfile`, `manage.py` | configurable | Schemathesis cache (holds failing cases kept for replay) |
@@ -36,7 +36,7 @@ Python, Django, Flask, FastAPI, pytest, Ruff, mypy, Pylint, tox, coverage, Sphin
 ```toml
 [clean]
 enable  = ["python.build", "python.dist", "python.tox"]   # opt in to build output
-disable = ["python.coverage"]                             # keep coverage reports
+disable = ["python.mypy"]                                 # keep the mypy cache
 exclude = ["docs/_build/", "examples/legacy/"]            # directories to leave alone
 
 # Custom rule for a project-specific scratch folder

@@ -10,7 +10,7 @@ R, Shiny, renv, RMarkdown
 
 | Rule ID | Targets | Requires | Risk | Description |
 |---|---|---|---|---|
-| `r.rcheck` | `*.Rcheck/` | `DESCRIPTION`, `*.Rproj`, `renv.lock` | safe | R CMD check output |
+| `r.rcheck` | `*.Rcheck/` | `DESCRIPTION`, `*.Rproj`, `renv.lock` | configurable | R CMD check output |
 | `r.rproj-user` | `/.Rproj.user/` | `*.Rproj` | configurable | RStudio per-user state |
 | `r.knitr-cache` | `*_cache/`, `*_files/` | `*.Rmd`, `*.qmd` | configurable | knitr and RMarkdown caches and figures |
 | `r.history` | `/.Rhistory` | `DESCRIPTION`, `*.Rproj`, `renv.lock` | configurable | R command history |

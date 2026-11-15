@@ -6,7 +6,7 @@ markers = ["dbt_project.yml", "build.sbt"]
 id = "dbt.target"
 paths = ["/target/"]
 requires = ["dbt_project.yml"]
-risk = "safe"
+risk = "configurable"
 description = "dbt compiled SQL and run artifacts (recreated by the next dbt command)"
 
 [[rule]]

@@ -30,6 +30,7 @@ def _load_builtin() -> dict[str, Profile]:
                 paths=tuple(raw["paths"]),
                 risk=Risk.parse(raw["risk"]),
                 requires=tuple(raw.get("requires", ())),
+                requires_all=tuple(raw.get("requires_all", ())),
                 description=raw.get("description", ""),
             )
             for raw in data.get("rule", [])

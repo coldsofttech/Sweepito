@@ -192,3 +192,69 @@ def test_custom_rules_appear_in_rules_and_profiles_listings(repo: Repo) -> None:
     _, out, _ = repo.run("profiles", "--json", str(repo.root))
     custom = next(p for p in json.loads(out)["profiles"] if p["id"] == "custom")
     assert custom["custom"] == 1 and custom["rules"] == 1
+
+
+def _requires_all_rule(extra: str) -> str:
+    return f'[[rule]]\nid = "custom.gen"\npaths = ["/gen/"]\n{extra}\n'
+
+
+def test_requires_all_needs_every_marker_in_the_same_directory(repo: Repo) -> None:
+    repo.write("sweepito.toml", _requires_all_rule('requires_all = ["a.cfg", "b.cfg"]'))
+    repo.write(".gitignore", "gen/\n")
+    repo.write("gen/x", "1")
+    repo.write("a.cfg", "")
+    assert repo.candidates() == {}
+    repo.write("b.cfg", "")
+    assert repo.candidates() == {"gen": "custom.gen"}
+
+
+def test_requires_all_markers_must_share_a_directory(repo: Repo) -> None:
+    repo.write("sweepito.toml", _requires_all_rule('requires_all = ["a.cfg", "b.cfg"]'))
+    repo.write(".gitignore", "gen/\n")
+    repo.write("pkg/gen/x", "1")
+    repo.write("a.cfg", "")
+    repo.write("pkg/b.cfg", "")
+    assert repo.candidates() == {}
+    repo.write("pkg/a.cfg", "")
+    assert repo.candidates() == {"pkg/gen": "custom.gen"}
+
+
+def test_requires_all_combines_with_requires_any_of(repo: Repo) -> None:
+    repo.write(
+        "sweepito.toml",
+        _requires_all_rule('requires = ["x.cfg", "y.cfg"]\nrequires_all = ["a.cfg"]'),
+    )
+    repo.write(".gitignore", "gen/\n")
+    repo.write("gen/x", "1")
+    repo.write("a.cfg", "")
+    assert repo.candidates() == {}
+    repo.write("y.cfg", "")
+    assert repo.candidates() == {"gen": "custom.gen"}
+
+
+def test_requires_all_supports_nested_marker_paths(repo: Repo) -> None:
+    repo.write(
+        "sweepito.toml",
+        _requires_all_rule(
+            'requires_all = ["ProjectSettings/ProjectVersion.txt", "a.cfg"]'
+        ),
+    )
+    repo.write(".gitignore", "gen/\n")
+    repo.write("gen/x", "1")
+    repo.write("ProjectSettings/ProjectVersion.txt", "")
+    assert repo.candidates() == {}
+    repo.write("a.cfg", "")
+    assert repo.candidates() == {"gen": "custom.gen"}
+
+
+def test_requires_all_must_be_a_list_of_strings(repo: Repo) -> None:
+    repo.write("sweepito.toml", _requires_all_rule('requires_all = "a.cfg"'))
+    code, _, err = repo.run("scan", str(repo.root))
+    assert code == 2 and "requires_all" in err
+
+
+def test_explain_lists_requires_all(repo: Repo) -> None:
+    repo.write("sweepito.toml", _requires_all_rule('requires_all = ["a.cfg", "b.cfg"]'))
+    code, data = repo.json("rules", "--explain", "custom.gen")
+    assert code == 0
+    assert data["requires"] == [] and data["requires_all"] == ["a.cfg", "b.cfg"]

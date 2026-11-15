@@ -24,7 +24,27 @@ below. Run `sweepito rules` for the same list in the terminal, or
   Other patterns match at any depth below it. Every target must also be git-ignored and
   untracked.
 - **Requires** lists the marker files a rule needs. Without its marker, the rule never fires.
-  A rule with no `requires` uses its profile's markers.
+  A rule with no `requires` uses its profile's markers. `requires` means *any of*: one
+  matching marker is enough.
+- **Requires all** (`requires_all`) lists markers that must *all* exist in the same
+  directory, for folders that need more than one piece of evidence. It can be combined with
+  `requires`: one of those markers *and* every marker listed here. A rule that lists only
+  `requires_all` does not fall back to the profile's markers.
+- A technology's own marker (`package.json`) activates its profile, but never implies a
+  specific tool: a rule for Next.js, Cypress or Nx names that tool's config file in its own
+  `requires`.
+
+### Risk levels
+
+New rules are classified by what is lost when they are removed:
+
+| Risk | What belongs here | Examples |
+|---|---|---|
+| `safe` | Compiler and tool caches, test runner caches, temporary metadata. Recreated by the next run at little cost | `__pycache__/`, `.ruff_cache/`, `.eslintcache` |
+| `configurable` | Build output, documentation output, test and coverage reports, logs. Cheap to regenerate, but someone may still want it | `.next/`, `target/`, `_build/`, `coverage/` |
+| `high-impact` | Dependencies, virtual environments, game engine libraries, experiment data. Slow or impossible to rebuild without network access or data | `node_modules/`, `.venv/`, `Library/`, `mlruns/` |
+
+When a folder could be either, choose the higher level.
 
 ## Configuring any profile
 
@@ -67,35 +87,35 @@ Custom rules follow the same safety gates as built-in ones.
 | Profile | Detected by | Rules | Safe | Configurable | High-impact |
 |---|---|---:|---:|---:|---:|
 | [`batchvault`](profiles/batchvault.md) | `batchvault.toml` | 2 | 0 | 2 | 0 |
-| [`clojure`](profiles/clojure.md) | `project.clj`, `deps.edn` | 2 | 2 | 0 | 0 |
+| [`clojure`](profiles/clojure.md) | `project.clj`, `deps.edn` | 2 | 1 | 1 | 0 |
 | [`commitrocket`](profiles/commitrocket.md) | `commitrocket.toml`, `.commitrocketignore` | 1 | 1 | 0 | 0 |
 | [`common`](profiles/common.md) | always active | 5 | 2 | 3 | 0 |
 | [`cornea`](profiles/cornea.md) | `cornea.toml` | 1 | 1 | 0 | 0 |
 | [`cpp`](profiles/cpp.md) | `CMakeLists.txt`, `Makefile`, `build.ninja`, `meson.build` | 7 | 1 | 6 | 0 |
 | [`dart`](profiles/dart.md) | `pubspec.yaml` | 3 | 0 | 3 | 0 |
-| [`data-eng`](profiles/data-eng.md) | `dbt_project.yml`, `build.sbt` | 4 | 2 | 0 | 2 |
+| [`data-eng`](profiles/data-eng.md) | `dbt_project.yml`, `build.sbt` | 4 | 1 | 1 | 2 |
 | [`docker`](profiles/docker.md) | `Dockerfile`, `compose.yaml`, `compose.yml`, `docker-compose.yaml`, `docker-compose.yml`, `.devcontainer/devcontainer.json`, `.devcontainer.json`, `skaffold.yaml` | 1 | 0 | 1 | 0 |
-| [`dotnet`](profiles/dotnet.md) | `*.csproj`, `*.fsproj`, `*.vbproj`, `*.sln` | 5 | 1 | 4 | 0 |
-| [`elixir`](profiles/elixir.md) | `mix.exs` | 6 | 3 | 2 | 1 |
-| [`go`](profiles/go.md) | `go.mod`, `go.work` | 5 | 3 | 1 | 1 |
+| [`dotnet`](profiles/dotnet.md) | `*.csproj`, `*.fsproj`, `*.vbproj`, `*.sln` | 5 | 0 | 5 | 0 |
+| [`elixir`](profiles/elixir.md) | `mix.exs` | 6 | 2 | 3 | 1 |
+| [`go`](profiles/go.md) | `go.mod`, `go.work` | 5 | 2 | 2 | 1 |
 | [`godot`](profiles/godot.md) | `project.godot` | 1 | 1 | 0 | 0 |
-| [`haskell`](profiles/haskell.md) | `*.cabal`, `stack.yaml` | 2 | 1 | 1 | 0 |
-| [`jupyter`](profiles/jupyter.md) | `*.ipynb`, `dvc.yaml`, `MLproject` | 5 | 1 | 1 | 3 |
-| [`jvm`](profiles/jvm.md) | `build.sbt`, `pom.xml`, `build.gradle`, `build.gradle.kts`, `settings.gradle`, `settings.gradle.kts` | 7 | 3 | 4 | 0 |
+| [`haskell`](profiles/haskell.md) | `*.cabal`, `stack.yaml` | 2 | 0 | 2 | 0 |
+| [`jupyter`](profiles/jupyter.md) | `*.ipynb`, `dvc.yaml`, `MLproject` | 5 | 1 | 0 | 4 |
+| [`jvm`](profiles/jvm.md) | `build.sbt`, `pom.xml`, `build.gradle`, `build.gradle.kts`, `settings.gradle`, `settings.gradle.kts` | 7 | 2 | 5 | 0 |
 | [`node-pm`](profiles/node-pm.md) | `package-lock.json`, `pnpm-lock.yaml`, `yarn.lock`, `bun.lockb`, `bun.lock` | 3 | 0 | 1 | 2 |
-| [`node`](profiles/node.md) | `package.json` | 22 | 12 | 9 | 1 |
-| [`ocaml`](profiles/ocaml.md) | `dune-project` | 1 | 1 | 0 | 0 |
-| [`perl`](profiles/perl.md) | `Makefile.PL`, `Build.PL`, `cpanfile` | 3 | 3 | 0 | 0 |
+| [`node`](profiles/node.md) | `package.json` | 22 | 11 | 10 | 1 |
+| [`ocaml`](profiles/ocaml.md) | `dune-project` | 1 | 0 | 1 | 0 |
+| [`perl`](profiles/perl.md) | `Makefile.PL`, `Build.PL`, `cpanfile` | 3 | 1 | 2 | 0 |
 | [`php`](profiles/php.md) | `composer.json`, `artisan` | 7 | 2 | 4 | 1 |
-| [`python`](profiles/python.md) | `pyproject.toml`, `setup.py`, `setup.cfg`, `requirements*.txt`, `Pipfile`, `manage.py` | 20 | 8 | 10 | 2 |
-| [`r`](profiles/r.md) | `DESCRIPTION`, `*.Rproj`, `renv.lock` | 6 | 1 | 3 | 2 |
-| [`ruby`](profiles/ruby.md) | `Gemfile`, `config/application.rb` | 7 | 2 | 3 | 2 |
+| [`python`](profiles/python.md) | `pyproject.toml`, `setup.py`, `setup.cfg`, `requirements*.txt`, `Pipfile`, `manage.py` | 20 | 6 | 12 | 2 |
+| [`r`](profiles/r.md) | `DESCRIPTION`, `*.Rproj`, `renv.lock` | 6 | 0 | 4 | 2 |
+| [`ruby`](profiles/ruby.md) | `Gemfile`, `config/application.rb` | 7 | 1 | 4 | 2 |
 | [`rust`](profiles/rust.md) | `Cargo.toml` | 2 | 0 | 2 | 0 |
 | [`swift`](profiles/swift.md) | `Package.swift`, `*.xcodeproj/project.pbxproj`, `Podfile` | 4 | 0 | 3 | 1 |
 | [`terraform`](profiles/terraform.md) | `*.tf`, `terragrunt.hcl` | 5 | 1 | 4 | 0 |
-| [`unity`](profiles/unity.md) | `ProjectSettings/ProjectVersion.txt` | 3 | 2 | 1 | 0 |
+| [`unity`](profiles/unity.md) | `ProjectSettings/ProjectVersion.txt` | 3 | 1 | 1 | 1 |
 | [`unreal`](profiles/unreal.md) | `*.uproject` | 2 | 0 | 2 | 0 |
-| **Total** | | **142** | **54** | **70** | **18** |
+| **Total** | | **142** | **38** | **84** | **20** |
 
 Each page in `docs/profiles/` lists its rules with their targets, markers and risk, an example
 configuration and the notes about what is never targeted.

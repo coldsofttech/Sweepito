@@ -11,8 +11,8 @@ Unity projects
 | Rule ID | Targets | Requires | Risk | Description |
 |---|---|---|---|---|
 | `unity.temp` | `/Temp/` | `ProjectSettings/ProjectVersion.txt` | safe | Editor temporary files |
-| `unity.obj` | `/obj/` | `ProjectSettings/ProjectVersion.txt` | safe | Generated C# project build output |
-| `unity.library` | `/Library/` | `ProjectSettings/ProjectVersion.txt` | configurable | Asset import cache (can take hours to rebuild on large projects) |
+| `unity.obj` | `/obj/` | `ProjectSettings/ProjectVersion.txt` | configurable | Generated C# project build output |
+| `unity.library` | `/Library/` | `ProjectSettings/ProjectVersion.txt` | high-impact | Asset import cache (can take hours to rebuild on large projects) |
 
 ## Configuration
 

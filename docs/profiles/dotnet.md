@@ -10,7 +10,7 @@
 
 | Rule ID | Targets | Requires | Risk | Description |
 |---|---|---|---|---|
-| `dotnet.testresults` | `TestResults/` | `*.csproj`, `*.fsproj`, `*.vbproj`, `*.sln` | safe | Test run output |
+| `dotnet.testresults` | `TestResults/` | `*.csproj`, `*.fsproj`, `*.vbproj`, `*.sln` | configurable | Test run output |
 | `dotnet.bin-obj` | `/bin/`, `/obj/` | `*.csproj`, `*.fsproj`, `*.vbproj` | configurable | Build and intermediate output |
 | `dotnet.artifacts` | `/artifacts/` | `Directory.Build.props`, `*.sln` | configurable | Centralised build artifacts |
 | `dotnet.vs` | `/.vs/` | `*.sln` | configurable | Visual Studio per-user state |
@@ -33,5 +33,5 @@ sweepito clean -p dotnet --enable dotnet.bin-obj
 Notes:
 
 - `bin/` and `obj/` are only matched beside a `*.csproj`, `*.fsproj` or `*.vbproj`, because those names are generic.
-- `dotnet.testresults` (`TestResults/`) is `safe` and matches at any depth.
+- `dotnet.testresults` (`TestResults/`) is `configurable` (test reports) and matches at any depth.
 - NuGet's global package cache is out of scope.

@@ -13,5 +13,5 @@ description = "tools.deps classpath cache"
 id = "clojure.target"
 paths = ["/target/"]
 requires = ["project.clj", "deps.edn"]
-risk = "safe"
+risk = "configurable"
 description = "Leiningen and tools.build output"

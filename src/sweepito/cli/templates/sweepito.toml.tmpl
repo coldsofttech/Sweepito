@@ -1,0 +1,18 @@
+# Sweepito configuration. See 'sweepito rules' for rule IDs.
+
+[defaults]
+profiles = ["auto"]   # or an explicit list, e.g. ["python", "node"]
+risk = "safe"         # custom | safe | configurable | high-impact
+
+[clean]
+enable = []           # e.g. ["rust.target", "node.next"]
+disable = []
+exclude = []          # e.g. ["dist/", "build/keep-me/"]
+
+[hook]
+quiet = true
+
+# Custom path rule: only git-ignored, untracked paths are ever removed.
+# [[rule]]
+# id = "custom.test-output"
+# paths = ["test-results/", "tmp/e2e/**"]

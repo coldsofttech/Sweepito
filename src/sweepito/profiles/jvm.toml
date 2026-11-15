@@ -41,7 +41,7 @@ description = "IntelliJ default output directory"
 id = "jvm.sbt-target"
 paths = ["/project/target/", "/project/project/"]
 requires = ["build.sbt"]
-risk = "safe"
+risk = "configurable"
 description = "SBT meta-build output"
 
 [[rule]]

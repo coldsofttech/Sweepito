@@ -258,7 +258,8 @@ def print_rule_detail(console: Console, details: dict[str, Any]) -> None:
         ("Profile", details["profile"]),
         ("Risk", details["risk"]),
         ("Paths", ", ".join(details["paths"])),
-        ("Requires", ", ".join(details["requires"]) or "-"),
+        ("Requires any of", ", ".join(details["requires"]) or "-"),
+        ("Requires all of", ", ".join(details.get("requires_all", [])) or "-"),
         ("Allow untracked", "yes" if details["allow_untracked"] else "no"),
         ("Description", details["description"] or "-"),
     ]

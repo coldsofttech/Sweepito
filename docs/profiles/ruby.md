@@ -11,7 +11,7 @@ Ruby: Bundler, Rails, Sinatra
 | Rule ID | Targets | Requires | Risk | Description |
 |---|---|---|---|---|
 | `ruby.yard` | `/.yardoc/` | `Gemfile` | safe | YARD documentation cache |
-| `ruby.coverage` | `/coverage/` | `Gemfile` | safe | SimpleCov reports |
+| `ruby.coverage` | `/coverage/` | `Gemfile` | configurable | SimpleCov reports |
 | `rails.tmp-cache` | `/tmp/cache/` | `config/application.rb` | configurable | Rails Bootsnap and asset caches |
 | `rails.tmp` | `/tmp/pids/`, `/tmp/sockets/` | `config/application.rb` | configurable | Stale PID files and sockets |
 | `rails.logs` | `/log/*.log` | `config/application.rb` | configurable | Rails logs |

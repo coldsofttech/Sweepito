@@ -13,12 +13,12 @@ description = "Editor temporary files"
 id = "unity.obj"
 paths = ["/obj/"]
 requires = ["ProjectSettings/ProjectVersion.txt"]
-risk = "safe"
+risk = "configurable"
 description = "Generated C# project build output"
 
 [[rule]]
 id = "unity.library"
 paths = ["/Library/"]
 requires = ["ProjectSettings/ProjectVersion.txt"]
-risk = "configurable"
+risk = "high-impact"
 description = "Asset import cache (can take hours to rebuild on large projects)"

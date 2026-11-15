@@ -20,7 +20,7 @@ Node.js, React, Next.js, Vue, Nuxt, Angular, Vite, Svelte, Astro, Nx, Vitest, St
 | `node.astro` | `.astro/` | `astro.config.*` | safe | Astro generated types and cache |
 | `node.nx` | `/.nx/cache/` | `nx.json` | safe | Nx computation cache |
 | `node.vitest` | `/.vitest/` | `vitest.config.*` | safe | Vitest cache |
-| `node.storybook` | `/storybook-static/` | `.storybook/main.*` | safe | Storybook static build |
+| `node.storybook` | `/storybook-static/` | `.storybook/main.*` | configurable | Storybook static build |
 | `node.webpack` | `/.cache/webpack/` | `webpack.config.*` | safe | Webpack filesystem cache |
 | `node.next` | `/.next/` | `next.config.*` | configurable | Next.js build output |
 | `node.nuxt` | `/.nuxt/`, `/.output/` | `nuxt.config.*` | configurable | Nuxt build output |

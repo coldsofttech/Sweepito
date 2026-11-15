@@ -2,15 +2,16 @@
 
 from __future__ import annotations
 
-import re
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
 
 from sweepito.errors import ConfigError
-from sweepito.models import Risk, Rule
+from sweepito.models import Risk
 
 if TYPE_CHECKING:
     from pathlib import Path
+
+    from sweepito.models import Rule
 
 CONFIG_NAMES = ("sweepito.toml", ".sweepito.toml")
 
@@ -21,6 +22,7 @@ _RULE_KEYS = {
     "id",
     "paths",
     "requires",
+    "requires_all",
     "risk",
     "profile",
     "description",
@@ -29,7 +31,7 @@ _RULE_KEYS = {
 }
 _PROFILE_KEYS = {"markers", "description"}
 _TOP_KEYS = {"defaults", "clean", "hook", "rule", "profile"}
-_RULE_ID = re.compile(r"^[a-z0-9][a-z0-9._-]*$")
+_RULE_ID = r"^[a-z0-9][a-z0-9._-]*$"
 
 
 @dataclass
@@ -142,6 +144,8 @@ def _strings(value: object, where: str) -> tuple[str, ...]:
 
 def validate_pattern(pattern: str, where: str) -> None:
     """Reject patterns that could escape the project root or negate matches."""
+    import re
+
     problems = (
         not pattern.strip(),
         pattern.startswith(("!", "#", "~")),
@@ -155,6 +159,9 @@ def validate_pattern(pattern: str, where: str) -> None:
 
 
 def _parse_rule(raw: object, index: int) -> Rule:
+    import re
+
+    from sweepito.models import Rule
     from sweepito.registry import CUSTOM_PROFILE
 
     where = f"[[rule]] #{index + 1}"
@@ -170,7 +177,7 @@ def _parse_rule(raw: object, index: int) -> Rule:
             "Use 'disable' to switch one off."
         )
     rule_id = table.get("id")
-    if not isinstance(rule_id, str) or not _RULE_ID.match(rule_id):
+    if not isinstance(rule_id, str) or not re.match(_RULE_ID, rule_id):
         raise ConfigError(
             f"{where}: 'id' is required (lowercase letters, digits, . _ -)."
         )
@@ -180,6 +187,7 @@ def _parse_rule(raw: object, index: int) -> Rule:
     for pattern in paths:
         validate_pattern(pattern, f"rule {rule_id!r}")
     requires = _strings(table.get("requires", []), f"{where} 'requires'")
+    requires_all = _strings(table.get("requires_all", []), f"{where} 'requires_all'")
     allow_untracked = table.get("allow_untracked", False)
     if not isinstance(allow_untracked, bool):
         raise ConfigError(f"{where}: 'allow_untracked' must be true or false.")
@@ -192,6 +200,7 @@ def _parse_rule(raw: object, index: int) -> Rule:
         paths=paths,
         risk=Risk.CUSTOM,
         requires=requires,
+        requires_all=requires_all,
         description=str(table.get("description", "")),
         allow_untracked=allow_untracked,
         builtin=False,

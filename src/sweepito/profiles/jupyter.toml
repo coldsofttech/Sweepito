@@ -13,7 +13,7 @@ description = "Notebook autosave checkpoints"
 id = "ml.lightning-logs"
 paths = ["/lightning_logs/", "/catboost_info/"]
 requires = ["pyproject.toml", "requirements.txt", "setup.py", "*.ipynb"]
-risk = "configurable"
+risk = "high-impact"
 description = "Training logs"
 
 [[rule]]

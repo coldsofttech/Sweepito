@@ -41,9 +41,17 @@ class Rule:
     paths: tuple[str, ...]
     risk: Risk
     requires: tuple[str, ...] = ()
+    requires_all: tuple[str, ...] = ()
     description: str = ""
     allow_untracked: bool = False
     builtin: bool = True
+
+    def any_markers(self, profile_markers: tuple[str, ...]) -> tuple[str, ...]:
+        """Markers of which one must exist: ``requires``, else the profile's markers.
+
+        A rule that lists only ``requires_all`` does not use the profile's markers.
+        """
+        return self.requires or (() if self.requires_all else profile_markers)
 
 
 @dataclass(frozen=True)

@@ -36,3 +36,30 @@ def test_each_page_names_its_rules() -> None:
         text = (PROFILES_DIR / f"{profile.id}.md").read_text(encoding="utf-8")
         for rule in profile.rules:
             assert f"`{rule.id}`" in text, f"{profile.id}.md does not mention {rule.id}"
+
+
+def test_each_page_states_the_risk_of_its_rules() -> None:
+    for profile in REGISTRY.profiles.values():
+        text = (PROFILES_DIR / f"{profile.id}.md").read_text(encoding="utf-8")
+        for rule in profile.rules:
+            row = next(
+                line
+                for line in text.splitlines()
+                if line.startswith(f"| `{rule.id}` |")
+            )
+            cells = [cell.strip() for cell in row.strip("|").split("|")]
+            assert cells[3] == rule.risk.label, f"{rule.id}: page says {cells[3]}"
+
+
+def test_index_counts_match_the_profiles() -> None:
+    text = INDEX.read_text("utf-8")
+    for profile in REGISTRY.profiles.values():
+        row = next(
+            line for line in text.splitlines() if line.startswith(f"| [`{profile.id}`]")
+        )
+        cells = [cell.strip() for cell in row.strip("|").split("|")]
+        counts = [
+            sum(1 for r in profile.rules if r.risk.label == x)
+            for x in ("safe", "configurable", "high-impact")
+        ]
+        assert cells[2:] == [str(len(profile.rules)), *map(str, counts)], profile.id

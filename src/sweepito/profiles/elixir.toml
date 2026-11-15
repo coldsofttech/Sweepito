@@ -17,7 +17,7 @@ description = "Erlang crash dumps"
 [[rule]]
 id = "elixir.cover"
 paths = ["/cover/"]
-risk = "safe"
+risk = "configurable"
 description = "Coverage reports"
 
 [[rule]]

@@ -70,7 +70,7 @@ description = "Vitest cache"
 id = "node.storybook"
 paths = ["/storybook-static/"]
 requires = [".storybook/main.*"]
-risk = "safe"
+risk = "configurable"
 description = "Storybook static build"
 
 [[rule]]

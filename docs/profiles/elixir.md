@@ -12,7 +12,7 @@ Elixir: Mix and Phoenix
 |---|---|---|---|---|
 | `elixir.ls` | `/.elixir_ls/` | `mix.exs` | safe | ElixirLS cache |
 | `elixir.crash` | `erl_crash.dump` | `mix.exs` | safe | Erlang crash dumps |
-| `elixir.cover` | `/cover/` | `mix.exs` | safe | Coverage reports |
+| `elixir.cover` | `/cover/` | `mix.exs` | configurable | Coverage reports |
 | `elixir.build` | `/_build/` | `mix.exs` | configurable | Mix build output |
 | `phoenix.static` | `/priv/static/` | `mix.exs` | configurable | Phoenix compiled assets (tracked files are protected) |
 | `elixir.deps` | `/deps/` | `mix.exs` | high-impact | Mix dependencies |

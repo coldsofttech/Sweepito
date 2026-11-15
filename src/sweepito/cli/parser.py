@@ -96,7 +96,7 @@ def build_parser() -> argparse.ArgumentParser:
     glob, sel = _global_parent(), _selection_parent()
     parser = argparse.ArgumentParser(
         prog="sweepito",
-        description="Safely clean caches and build artifacts across technologies.",
+        description="Safely clean generated project artifacts across technologies.",
     )
     parser.add_argument(
         "--version", action="version", version=f"sweepito {__version__}"

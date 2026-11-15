@@ -37,7 +37,9 @@ happens inside the function.
 ## Adding a technology
 
 Add `src/sweepito/profiles/<id>.toml` with `id`, `description`, `markers` and `[[rule]]`
-entries (`id`, `paths`, `risk`, optional `requires`, `description`). Add
+entries (`id`, `paths`, `risk`, optional `requires` and `requires_all`, `description`). Choose
+`risk` with the [risk levels](profiles.md#risk-levels), give each specialised rule its own
+marker, and use `requires_all` when one marker is not enough evidence. Add
 `docs/profiles/<id>.md` and a row in the summary of `docs/profiles.md`, add a changelog line, and add `tests/integration/profiles/test_<id>.py`
 with a fixture repository (see `tests/integration/profiles/support.py`). Never add rules that
 target application data, state files, secrets or IDE settings.

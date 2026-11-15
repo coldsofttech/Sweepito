@@ -13,7 +13,7 @@ description = "YARD documentation cache"
 id = "ruby.coverage"
 paths = ["/coverage/"]
 requires = ["Gemfile"]
-risk = "safe"
+risk = "configurable"
 description = "SimpleCov reports"
 
 [[rule]]

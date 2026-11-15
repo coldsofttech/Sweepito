@@ -41,7 +41,7 @@ description = "Pylint stats"
 [[rule]]
 id = "python.coverage"
 paths = [".coverage", ".coverage.*", "htmlcov/", "coverage.xml"]
-risk = "safe"
+risk = "configurable"
 description = "Coverage data and reports"
 
 [[rule]]
@@ -97,7 +97,7 @@ description = "Virtual environments"
 id = "python.sphinx"
 paths = ["/_build/"]
 requires = ["conf.py"]
-risk = "safe"
+risk = "configurable"
 description = "Sphinx documentation build output"
 
 [[rule]]

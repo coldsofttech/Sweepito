@@ -8,7 +8,8 @@
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
 
-Safely clean caches and build artifacts across languages, frameworks and tools.
+Safely clean generated project artifacts (caches, build output, test reports and tool
+leftovers) across languages, frameworks, game engines, data and infrastructure tooling.
 
 Sweepito is a command-line tool: you install it and run `sweepito`. It is not a Python
 library and has no Python API to import.
@@ -106,39 +107,10 @@ Add `--json` for plain machine-readable output, or `--no-color` to turn colour o
 
 ## Profiles
 
-| Profile | Covers | Rules | Safe / configurable / high-impact |
-|---|---|---:|---|
-| `python` | Python, Django, Flask, FastAPI, pytest, Ruff, mypy, Pylint, tox, coverage, Sphinx, MkDocs, Pixi, PDM | 20 | 8 / 10 / 2 |
-| `node` | Node.js, React, Next.js, Vue, Nuxt, Angular, Vite, Svelte, Astro | 22 | 12 / 9 / 1 |
-| `node-pm` | npm, pnpm, Yarn, Bun project-local stores | 3 | 0 / 1 / 2 |
-| `rust` | Rust and Cargo | 2 | 0 / 2 / 0 |
-| `jvm` | Maven, Gradle, Kotlin, Spring Boot | 7 | 3 / 4 / 0 |
-| `dotnet` | C#, F#, ASP.NET Core | 5 | 1 / 4 / 0 |
-| `go` | Go modules and build tools | 5 | 3 / 1 / 1 |
-| `cpp` | CMake, Make, Ninja, Meson | 7 | 1 / 6 / 0 |
-| `php` | Composer, Laravel, Symfony | 7 | 2 / 4 / 1 |
-| `ruby` | Bundler, Rails, Sinatra | 7 | 2 / 3 / 2 |
-| `dart` | Dart and Flutter | 3 | 0 / 3 / 0 |
-| `swift` | Swift Package Manager, Xcode | 4 | 0 / 3 / 1 |
-| `elixir` | Mix and Phoenix | 6 | 3 / 2 / 1 |
-| `r` | R, Shiny, renv, RMarkdown | 6 | 1 / 3 / 2 |
-| `jupyter` | Notebooks and ML workflow outputs | 5 | 1 / 1 / 3 |
-| `data-eng` | dbt and Apache Spark | 4 | 2 / 0 / 2 |
-| `terraform` | Terraform and Terragrunt | 5 | 1 / 4 / 0 |
-| `batchvault` | BatchVault leftover staging and manifest temp files | 2 | 0 / 2 / 0 |
-| `cornea` | Cornea Shell debug logs | 1 | 1 / 0 / 0 |
-| `commitrocket` | CommitRocket report temp files | 1 | 1 / 0 / 0 |
-| `docker` | Docker, Compose, Dev Containers, BuildKit, Skaffold | 1 | 0 / 1 / 0 |
-| `clojure` | Leiningen and tools.deps | 2 | 2 / 0 / 0 |
-| `haskell` | Cabal and Stack | 2 | 1 / 1 / 0 |
-| `ocaml` | OCaml and dune | 1 | 1 / 0 / 0 |
-| `perl` | MakeMaker and Module::Build | 3 | 3 / 0 / 0 |
-| `unity` | Unity projects | 3 | 2 / 1 / 0 |
-| `unreal` | Unreal Engine projects | 2 | 0 / 2 / 0 |
-| `godot` | Godot projects | 1 | 1 / 0 / 0 |
-| `common` | OS and editor junk, generic logs (always active) | 5 | 2 / 3 / 0 |
-
-The full list of targets, markers and risk levels is in [docs/profiles.md](docs/profiles.md).
+Sweepito covers web and Node.js tooling, Python, JVM languages, .NET, Go, Rust, C and C++, PHP,
+Ruby, Dart and Flutter, Swift, Elixir, R and Jupyter, Terraform, Docker, data engineering, game
+engines (Unity, Unreal, Godot), and OS and editor junk that is always cleaned. Every profile, with
+its markers, targets and risk levels, is listed in [docs/profiles.md](docs/profiles.md).
 
 ### Risk levels
 

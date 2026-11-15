@@ -10,7 +10,7 @@ Haskell: Cabal and Stack
 
 | Rule ID | Targets | Requires | Risk | Description |
 |---|---|---|---|---|
-| `haskell.dist-newstyle` | `/dist-newstyle/` | `*.cabal` | safe | Cabal build output |
+| `haskell.dist-newstyle` | `/dist-newstyle/` | `*.cabal` | configurable | Cabal build output |
 | `haskell.stack-work` | `/.stack-work/` | `stack.yaml` | configurable | Stack build output (holds built dependencies; slow to rebuild) |
 
 ## Configuration

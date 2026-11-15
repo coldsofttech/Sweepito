@@ -6,7 +6,7 @@ markers = ["*.cabal", "stack.yaml"]
 id = "haskell.dist-newstyle"
 paths = ["/dist-newstyle/"]
 requires = ["*.cabal"]
-risk = "safe"
+risk = "configurable"
 description = "Cabal build output"
 
 [[rule]]
