@@ -1,0 +1,7 @@
+node_modules/
+dist/
+*.vsix
+src/core/profiles.json
+src/core/config-template.json
+LICENSE
+.vscode-test/

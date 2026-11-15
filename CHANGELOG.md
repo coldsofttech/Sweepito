@@ -5,6 +5,12 @@ All notable changes are recorded here. The format follows
 
 ## [Unreleased]
 
+### Added
+- VS Code extension that scans and cleans your workspace from a sidebar view, the status bar
+  and the Command Palette. It runs natively, with no Python or Sweepito install needed, and
+  supports custom rules and profiles from VS Code settings or `sweepito.toml`, a Doctor
+  check and an installable Git hook.
+
 ## [0.2.0] - 2026-11-15
 
 ### Added

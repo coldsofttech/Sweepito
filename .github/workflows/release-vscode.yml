@@ -1,0 +1,153 @@
+name: Release VS Code extension
+
+# Push a tag such as vscode-v1.2.3 (matching "version" in extensions/vscode/package.json) to
+# release the extension. This is separate from release.yml, which releases the Python package on
+# v*.*.* tags. It always builds the .vsix and attaches it to a GitHub Release. Publishing to the
+# Visual Studio Marketplace and Open VSX happens only when VSCE_PAT / OVSX_PAT are set.
+on:
+  push:
+    tags: ["vscode-v*.*.*"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-vscode-${{ github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      checks: read
+    defaults:
+      run:
+        working-directory: extensions/vscode
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: extensions/vscode/package-lock.json
+      - run: npm ci
+
+      - name: The tag matches the extension version
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          VERSION="$(node -p "require('./package.json').version")"
+          if [ "$TAG" != "vscode-v$VERSION" ]; then
+            echo "Tag $TAG does not match extensions/vscode/package.json version $VERSION" >&2
+            exit 1
+          fi
+
+      - name: Require CI to have passed on this commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          CONCLUSION="$(gh api "repos/${{ github.repository }}/commits/${{ github.sha }}/check-runs?check_name=ci" \
+            --jq '[.check_runs[] | select(.status == "completed")] | sort_by(.completed_at) | last | .conclusion')"
+          if [ "$CONCLUSION" != "success" ]; then
+            echo "The ci check has not succeeded on ${{ github.sha }} (found: ${CONCLUSION:-none}). Wait for CI on main to pass, then re-tag." >&2
+            exit 1
+          fi
+
+      - run: npm run package
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: vsix
+          path: extensions/vscode/*.vsix
+          if-no-files-found: error
+
+  github-release:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v8
+        with:
+          name: vsix
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          # A release written by hand before the tag keeps its notes; only the .vsix is added.
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            gh release upload "$TAG" ./*.vsix --clobber
+          else
+            gh release create "$TAG" ./*.vsix --title "$TAG" --generate-notes --verify-tag
+          fi
+
+  publish-marketplace:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: extensions/vscode
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: extensions/vscode/package-lock.json
+      - run: npm ci
+      - uses: actions/download-artifact@v8
+        with:
+          name: vsix
+          path: extensions/vscode
+      - name: Publish to Visual Studio Marketplace
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+        run: |
+          if [ -z "$VSCE_PAT" ]; then
+            echo "VSCE_PAT is not set; skipping Marketplace publish."
+            exit 0
+          fi
+          npx vsce publish --packagePath ./*.vsix
+
+  publish-open-vsx:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: extensions/vscode
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: extensions/vscode/package-lock.json
+      - run: npm ci
+      - uses: actions/download-artifact@v8
+        with:
+          name: vsix
+          path: extensions/vscode
+      - name: Publish to Open VSX
+        env:
+          OVSX_PAT: ${{ secrets.OVSX_PAT }}
+        run: |
+          if [ -z "$OVSX_PAT" ]; then
+            echo "OVSX_PAT is not set; skipping Open VSX publish."
+            exit 0
+          fi
+          npx ovsx publish ./*.vsix --pat "$OVSX_PAT"

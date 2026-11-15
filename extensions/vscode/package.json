@@ -1,0 +1,495 @@
+{
+  "name": "sweepito",
+  "displayName": "Sweepito",
+  "description": "Safely clean caches and build artifacts from inside VS Code. Runs natively, with no Python needed.",
+  "version": "0.1.0",
+  "publisher": "coldsofttech",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/coldsofttech/Sweepito.git",
+    "directory": "extensions/vscode"
+  },
+  "bugs": {
+    "url": "https://github.com/coldsofttech/Sweepito/issues"
+  },
+  "homepage": "https://github.com/coldsofttech/Sweepito",
+  "icon": "media/icon.png",
+  "keywords": [
+    "cleanup",
+    "cache",
+    "build",
+    "git",
+    "sweepito"
+  ],
+  "categories": [
+    "Other"
+  ],
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "main": "./dist/extension.js",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "extensionKind": [
+    "workspace"
+  ],
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": "limited",
+      "description": "In an untrusted workspace Sweepito can scan but cannot clean files."
+    },
+    "virtualWorkspaces": {
+      "supported": false,
+      "description": "Sweepito works on local folders with Git."
+    }
+  },
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "sweepito",
+          "title": "Sweepito",
+          "icon": "media/sweepito.svg"
+        }
+      ]
+    },
+    "views": {
+      "sweepito": [
+        {
+          "id": "sweepito.candidates",
+          "name": "Cleanup candidates",
+          "icon": "media/sweepito.svg"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "sweepito.candidates",
+        "contents": "Nothing to clean yet.\n[Scan workspace](command:sweepito.scan)",
+        "when": "sweepito.empty"
+      }
+    ],
+    "commands": [
+      {
+        "command": "sweepito.scan",
+        "title": "Scan",
+        "category": "Sweepito",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "sweepito.clean",
+        "title": "Clean",
+        "category": "Sweepito",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "sweepito.report",
+        "title": "Report",
+        "category": "Sweepito",
+        "icon": "$(graph)"
+      },
+      {
+        "command": "sweepito.check",
+        "title": "Check",
+        "category": "Sweepito"
+      },
+      {
+        "command": "sweepito.openJson",
+        "title": "Open Result as JSON",
+        "category": "Sweepito"
+      },
+      {
+        "command": "sweepito.copyJson",
+        "title": "Copy Result as JSON",
+        "category": "Sweepito"
+      },
+      {
+        "command": "sweepito.showOutput",
+        "title": "Show Output",
+        "category": "Sweepito"
+      },
+      {
+        "command": "sweepito.showTerminal",
+        "title": "Show Terminal",
+        "category": "Sweepito"
+      },
+      {
+        "command": "sweepito.cleanWorkspace",
+        "title": "Clean This Folder's Items",
+        "category": "Sweepito",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "sweepito.createConfig",
+        "title": "Create Config File",
+        "category": "Sweepito"
+      },
+      {
+        "command": "sweepito.showConfig",
+        "title": "Show Effective Configuration",
+        "category": "Sweepito"
+      },
+      {
+        "command": "sweepito.validateConfig",
+        "title": "Validate Configuration",
+        "category": "Sweepito"
+      },
+      {
+        "command": "sweepito.doctor",
+        "title": "Doctor",
+        "category": "Sweepito"
+      },
+      {
+        "command": "sweepito.installHook",
+        "title": "Install Git Hook",
+        "category": "Sweepito"
+      },
+      {
+        "command": "sweepito.uninstallHook",
+        "title": "Uninstall Git Hook",
+        "category": "Sweepito"
+      },
+      {
+        "command": "sweepito.hookStatus",
+        "title": "Show Git Hook Status",
+        "category": "Sweepito"
+      },
+      {
+        "command": "sweepito.listRules",
+        "title": "List Rules",
+        "category": "Sweepito"
+      },
+      {
+        "command": "sweepito.listProfiles",
+        "title": "List Profiles",
+        "category": "Sweepito"
+      },
+      {
+        "command": "sweepito.explainRule",
+        "title": "Explain Rule",
+        "category": "Sweepito"
+      },
+      {
+        "command": "sweepito.explainProfile",
+        "title": "Explain Profile",
+        "category": "Sweepito"
+      },
+      {
+        "command": "sweepito.setRisk",
+        "title": "Choose Risk Level for This Session",
+        "category": "Sweepito",
+        "icon": "$(shield)"
+      },
+      {
+        "command": "sweepito.cleanProfile",
+        "title": "Clean This Profile",
+        "category": "Sweepito",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "sweepito.cleanRule",
+        "title": "Clean This Rule",
+        "category": "Sweepito",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "sweepito.cleanFolder",
+        "title": "Clean This Item",
+        "category": "Sweepito",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "sweepito.reveal",
+        "title": "Reveal in File Explorer",
+        "category": "Sweepito"
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "sweepito.cleanProfile",
+          "when": "false"
+        },
+        {
+          "command": "sweepito.cleanRule",
+          "when": "false"
+        },
+        {
+          "command": "sweepito.cleanFolder",
+          "when": "false"
+        },
+        {
+          "command": "sweepito.reveal",
+          "when": "false"
+        },
+        {
+          "command": "sweepito.cleanWorkspace",
+          "when": "false"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "sweepito.scan",
+          "when": "view == sweepito.candidates",
+          "group": "navigation@1"
+        },
+        {
+          "command": "sweepito.setRisk",
+          "when": "view == sweepito.candidates",
+          "group": "navigation@2"
+        },
+        {
+          "command": "sweepito.clean",
+          "when": "view == sweepito.candidates && isWorkspaceTrusted",
+          "group": "navigation@3"
+        },
+        {
+          "command": "sweepito.report",
+          "when": "view == sweepito.candidates",
+          "group": "navigation@4"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "sweepito.cleanWorkspace",
+          "when": "view == sweepito.candidates && viewItem == workspace && isWorkspaceTrusted",
+          "group": "inline"
+        },
+        {
+          "command": "sweepito.cleanFolder",
+          "when": "view == sweepito.candidates && viewItem == folder && isWorkspaceTrusted",
+          "group": "inline"
+        },
+        {
+          "command": "sweepito.cleanProfile",
+          "when": "view == sweepito.candidates && viewItem == profile && isWorkspaceTrusted",
+          "group": "inline"
+        },
+        {
+          "command": "sweepito.cleanRule",
+          "when": "view == sweepito.candidates && viewItem == rule && isWorkspaceTrusted",
+          "group": "inline"
+        },
+        {
+          "command": "sweepito.explainProfile",
+          "when": "view == sweepito.candidates && viewItem == profile",
+          "group": "9_explain"
+        },
+        {
+          "command": "sweepito.explainRule",
+          "when": "view == sweepito.candidates && viewItem == rule",
+          "group": "9_explain"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Sweepito",
+      "properties": {
+        "sweepito.profiles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "auto"
+          ],
+          "scope": "resource",
+          "markdownDescription": "Profiles to scan. `auto` detects them from the files in the workspace; list profile IDs such as `node` or `python` to force them on."
+        },
+        "sweepito.risk": {
+          "type": "string",
+          "enum": [
+            "custom",
+            "safe",
+            "configurable",
+            "high-impact"
+          ],
+          "default": "safe",
+          "scope": "resource",
+          "markdownDescription": "Highest risk level to scan and clean. Rules above `safe` are opt-in. `custom` runs only your own rules."
+        },
+        "sweepito.enableRules": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "scope": "resource",
+          "markdownDescription": "Rule IDs to turn on regardless of risk level, for example `rust.target`."
+        },
+        "sweepito.disableRules": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "scope": "resource",
+          "markdownDescription": "Rule IDs to turn off. Wins over `enableRules`."
+        },
+        "sweepito.exclude": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "scope": "resource",
+          "markdownDescription": "Gitignore-style patterns that are never touched."
+        },
+        "sweepito.noGitCheck": {
+          "type": "boolean",
+          "default": false,
+          "scope": "machine",
+          "markdownDescription": "**High impact.** Also scan folders that are not Git repositories. Without Git, Sweepito cannot tell tracked or ignored files apart, so cleaning always asks for an extra confirmation. Ignored in untrusted workspaces."
+        },
+        "sweepito.customRules": {
+          "type": "array",
+          "default": [],
+          "scope": "resource",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "paths"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9][a-z0-9._-]*$",
+                "description": "Unique rule ID: lowercase letters, digits, . _ -"
+              },
+              "paths": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "minItems": 1,
+                "description": "Gitignore-style patterns to clean."
+              },
+              "requires": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Marker files; one must exist in the same folder."
+              },
+              "requires_all": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Marker files that must all exist in the same folder."
+              },
+              "profile": {
+                "type": "string",
+                "description": "Profile to put the rule in. Defaults to `custom`."
+              },
+              "description": {
+                "type": "string"
+              },
+              "allow_untracked": {
+                "type": "boolean",
+                "default": false,
+                "description": "Also match untracked files that Git does not ignore. High impact."
+              }
+            }
+          },
+          "markdownDescription": "Your own cleanup rules, as in `[[rule]]` of `sweepito.toml`. They always run and are listed under the `custom` risk level. Combined with the config file."
+        },
+        "sweepito.customProfiles": {
+          "type": "object",
+          "default": {},
+          "scope": "resource",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "markers": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Files that switch the profile on."
+              },
+              "description": {
+                "type": "string"
+              }
+            }
+          },
+          "markdownDescription": "Your own profiles, or extra markers for built-in ones, as in `[profile.name]` of `sweepito.toml`."
+        },
+        "sweepito.configFile": {
+          "type": "string",
+          "default": "",
+          "scope": "machine",
+          "markdownDescription": "Use this config file instead of searching for `sweepito.toml`, `.sweepito.toml` or `[tool.sweepito]` in `pyproject.toml`. Ignored in untrusted workspaces."
+        },
+        "sweepito.confirmBeforeClean": {
+          "type": "boolean",
+          "default": true,
+          "scope": "window",
+          "description": "Ask for confirmation before deleting anything."
+        },
+        "sweepito.autoScan": {
+          "type": "boolean",
+          "default": true,
+          "scope": "window",
+          "description": "Scan when a workspace opens. Turn off for very large workspaces and use Sweepito: Scan instead."
+        },
+        "sweepito.statusBar.enabled": {
+          "type": "boolean",
+          "default": true,
+          "scope": "window",
+          "description": "Show the reclaimable size in the status bar."
+        },
+        "sweepito.quiet": {
+          "type": "boolean",
+          "default": false,
+          "scope": "window",
+          "description": "Write only failures to the Sweepito output channel, not scan, clean and report summaries."
+        },
+        "sweepito.terminal.color": {
+          "type": "boolean",
+          "default": true,
+          "scope": "window",
+          "description": "Use colour in the Sweepito terminal. Turn off for plain text, like the command line tool's --no-color."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build": "node esbuild.mjs",
+    "build:production": "node esbuild.mjs --production",
+    "watch": "node esbuild.mjs --watch",
+    "profiles": "node scripts/build.mjs",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "tsc --noEmit -p jsconfig.json",
+    "test": "npm run test:unit",
+    "test:unit": "node scripts/build.mjs && vitest run",
+    "test:integration": "node esbuild.mjs && vscode-test",
+    "package": "vsce package --no-dependencies",
+    "vscode:prepublish": "node esbuild.mjs --production"
+  },
+  "dependencies": {
+    "ignore": "^7.0.0",
+    "smol-toml": "^1.3.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.5",
+    "@types/node": "^22.0.0",
+    "@types/vscode": "1.90.0",
+    "@vscode/test-cli": "^0.0.10",
+    "@vscode/test-electron": "^2.5.2",
+    "@vscode/vsce": "^4.1.0",
+    "esbuild": "^0.25.0",
+    "eslint": "^9.39.5",
+    "globals": "^17.14.0",
+    "prettier": "^3.10.1",
+    "typescript": "^5.9.3",
+    "vitest": "^3.0.0"
+  }
+}

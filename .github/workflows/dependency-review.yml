@@ -1,0 +1,23 @@
+name: Dependency review
+
+# Reviews dependency changes in pull requests for known vulnerabilities, for both the Python
+# project (uv.lock) and the VS Code extension (extensions/vscode/package-lock.json).
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dependency-review-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  dependency-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/dependency-review-action@v5

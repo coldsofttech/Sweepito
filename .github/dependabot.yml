@@ -15,3 +15,11 @@ updates:
     groups:
       github-actions:
         patterns: ["*"]
+
+  - package-ecosystem: "npm"
+    directory: "/extensions/vscode"
+    schedule:
+      interval: "weekly"
+    groups:
+      npm-dependencies:
+        patterns: ["*"]

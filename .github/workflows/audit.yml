@@ -24,3 +24,21 @@ jobs:
           --format requirements-txt -o requirements-audit.txt
       - name: Audit
         run: uvx pip-audit --requirement requirements-audit.txt --no-deps --disable-pip
+
+  npm-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: extensions/vscode
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: extensions/vscode/package-lock.json
+      - name: Audit the extension's runtime dependencies
+        run: npm audit --omit=dev --audit-level=high

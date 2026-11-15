@@ -138,6 +138,13 @@ sweepito scan --json | jq '.total_bytes'               # for scripts
 sweepito check --quiet                                 # exit 1 if anything is left
 ```
 
+## VS Code
+
+Prefer to stay in your editor? The Sweepito extension for VS Code lists what can be cleaned
+in a sidebar view, shows the reclaimable size in the status bar and cleans on demand. It runs on
+its own, so it needs neither Python nor the command line tool, only Git. See
+[extensions/vscode](extensions/vscode/README.md).
+
 ## Configuration
 
 Create `sweepito.toml` (or a `[tool.sweepito]` table in `pyproject.toml`). The format is the

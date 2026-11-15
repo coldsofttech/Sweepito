@@ -1,0 +1,7 @@
+dist/
+node_modules/
+package-lock.json
+LICENSE
+src/core/profiles.json
+src/core/config-template.json
+test/integration/workspace/
