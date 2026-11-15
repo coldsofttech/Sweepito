@@ -16,7 +16,7 @@ Signing is off by default.
 
 Usage:  uv sync --group installer
         uv run python scripts/build_installer.py [--sync] [--smoke] [--formats deb rpm]
-See docs/packaging.md for the details.
+See python/docs/packaging.md for the details.
 """
 
 from __future__ import annotations
@@ -139,7 +139,7 @@ def numeric_version(version: str) -> str:
 
 def optional_brand(pattern: str) -> Path | None:
     """The first file in brand/ matching ``pattern``, preferring brand/dark/."""
-    folder = ROOT / "brand"
+    folder = ROOT.parent / "brand"
     if not folder.is_dir():
         return None
     return next(

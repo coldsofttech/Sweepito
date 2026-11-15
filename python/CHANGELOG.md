@@ -5,15 +5,10 @@ All notable changes are recorded here. The format follows
 
 ## [Unreleased]
 
-### Added
-- VS Code extension that scans and cleans your workspace from a sidebar view, the status bar
-  and the Command Palette. It runs natively, with no Python or Sweepito install needed, and
-  supports custom rules and profiles from VS Code settings or `sweepito.toml`, a Doctor
-  check and an installable Git hook.
-
 ## [0.2.0] - 2026-11-15
 
 ### Added
+
 - Windows setup (`setup.exe`) and portable zip, and Linux `.deb` and `.rpm` packages, that bundle
   Python, so Sweepito runs without a Python install. They are attached to each release.
 - `requires_all` for rules (built-in and custom): a rule can now require several marker files to
@@ -35,17 +30,20 @@ All notable changes are recorded here. The format follows
 - `sweepito doctor` reports a hook whose recorded interpreter no longer exists.
 
 ### Changed
+
 - Risk levels now follow documented principles: build output, documentation output and test
   reports are `configurable` instead of `safe`; Unity `Library/` and Lightning logs are `high-impact`.
 - Sweepito is now described as a cleaner of generated project artifacts, not only caches.
 
 ### Fixed
+
 - The Git hook failed with `Permission denied` on Windows (Git Bash). Re-run `sweepito hook install`
   to update existing hooks.
 
 ## [0.1.0] - 2026-10-25
 
 ### Added
+
 - Initial package: `scan`, `clean`, `check`, `report`, `rules`, `profiles`, `config`, `init`, `hook` and
   `doctor` commands.
 - 17 built-in technology profiles (Python, Node.js and package managers, Rust, JVM, .NET, Go,

@@ -2,8 +2,8 @@
 
 ## Getting help
 
-- **Usage questions:** start with the [README](README.md), the [CLI reference](docs/guides/cli.md)
-  and the [configuration guide](docs/guides/configuration.md). Run `sweepito <command> --help`
+- **Usage questions:** start with the [README](README.md), the [CLI reference](python/docs/cli.md)
+  and the [configuration guide](docs/configuration.md). Run `sweepito <command> --help`
   for every option, and `sweepito doctor` to check your environment.
 - **Which rule removed (or kept) something:** run `sweepito scan --verbose` and
   `sweepito rules --explain <rule-id>`; the [profiles and rules](docs/profiles.md) pages list

@@ -2,7 +2,7 @@ import js from "@eslint/js";
 import globals from "globals";
 
 export default [
-    { ignores: ["dist/", "node_modules/", "test/integration/workspace/"] },
+    { ignores: ["dist/", "node_modules/", ".vscode-test/", "coverage/", "test/integration/workspace/"] },
     js.configs.recommended,
     {
         languageOptions: { ecmaVersion: 2022, sourceType: "module", globals: globals.node },

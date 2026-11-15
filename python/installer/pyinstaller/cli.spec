@@ -18,7 +18,7 @@ from PyInstaller.utils.hooks import collect_data_files, collect_submodules
 ROOT = Path(SPECPATH).resolve().parents[1]
 NAME = "sweepito"
 WINDOWS = sys.platform == "win32"
-ICON_DIR = ROOT / "brand"
+ICON_DIR = ROOT.parent / "brand"
 ICON_SUFFIX = ".ico" if WINDOWS else None
 ICON = next(iter(sorted(ICON_DIR.rglob(f"*{ICON_SUFFIX}"), key=lambda p: ("dark" not in p.parts, p))), None) if ICON_SUFFIX else None
 

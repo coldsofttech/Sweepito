@@ -7,7 +7,7 @@ import { cleanText, planText } from "./core/text";
 import { cleanTerminal, planTerminal } from "./core/terminal";
 import { log, toTerminal } from "./output";
 import { allCandidates, changed, entries, errorMessage, folders, lastClean, state, states } from "./state";
-import { renderStatus } from "./views";
+import { renderStatus, setExpanded } from "./views";
 import { configFileSetting, settings } from "./workspace";
 
 const RISKS = Object.keys(RISK);
@@ -85,7 +85,11 @@ export async function check() {
         "Show",
     );
     if (answer === "Clean") await clean(allCandidates(), "this workspace");
-    else if (answer === "Show") await vscode.commands.executeCommand("sweepito.candidates.focus");
+    else if (answer === "Show") {
+        // The view is often already open, so also expand it: that is what "Show" has to make visible.
+        await vscode.commands.executeCommand("sweepito.candidates.focus");
+        setExpanded(true);
+    }
 }
 
 /**

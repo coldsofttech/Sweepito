@@ -1,18 +1,23 @@
 # Sweepito
 
 [![CI](https://github.com/coldsofttech/Sweepito/actions/workflows/ci.yml/badge.svg)](https://github.com/coldsofttech/Sweepito/actions/workflows/ci.yml)
-[![Release](https://img.shields.io/github/v/release/coldsofttech/Sweepito?logo=github)](https://github.com/coldsofttech/Sweepito/releases)
-[![PyPI](https://img.shields.io/pypi/v/sweepito?logo=pypi&logoColor=white)](https://pypi.org/project/sweepito/)
-[![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue?logo=python&logoColor=white)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/github/license/coldsofttech/Sweepito)](LICENSE)
-[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
 
 Safely clean generated project artifacts (caches, build output, test reports and tool
 leftovers) across languages, frameworks, game engines, data and infrastructure tooling.
 
 Sweepito is a command-line tool: you install it and run `sweepito`. It is not a Python
-library and has no Python API to import.
+library and has no Python API to import. It is also available as a VS Code extension.
+
+| Component | Use it when | Details |
+|---|---|---|
+| **Command line tool** | You work in a terminal, scripts or CI | [Install](#install) · [python/](python/README.md) |
+| **Installers** | You want it without Python: `setup.exe` (Windows), `.deb` and `.rpm` (Linux) | [Packaging](python/docs/packaging.md) |
+| **VS Code extension** | You prefer to clean from inside the editor | [VS Code](#vs-code) · [extensions/vscode](extensions/vscode/README.md) |
+
+The command line tool and the extension share the same profiles, rules and `sweepito.toml`
+format.
 
 ## Why Sweepito?
 
@@ -75,7 +80,7 @@ Check the install with `sweepito --version`, and your setup with `sweepito docto
 
 No Python? Download a native installer from the
 [releases](https://github.com/coldsofttech/Sweepito/releases): a `setup.exe` for Windows, and a `.deb`
-or `.rpm` for Linux. See [Packaging](docs/packaging.md).
+or `.rpm` for Linux. See [Packaging](python/docs/packaging.md).
 
 ## Quick start
 
@@ -90,7 +95,7 @@ sweepito init                              # write a starter sweepito.toml
 
 Example:
 
-```
+```text
 $ sweepito scan --risk configurable
 Project: /home/dev/myapp   profiles: common, node, python, rust
                     Cleanup candidates
@@ -142,8 +147,9 @@ sweepito check --quiet                                 # exit 1 if anything is l
 
 Prefer to stay in your editor? The Sweepito extension for VS Code lists what can be cleaned
 in a sidebar view, shows the reclaimable size in the status bar and cleans on demand. It runs on
-its own, so it needs neither Python nor the command line tool, only Git. See
-[extensions/vscode](extensions/vscode/README.md).
+its own, so it needs neither Python nor the command line tool, only Git and VS Code 1.90 or
+later. See [extensions/vscode](extensions/vscode/README.md), or the
+[VS Code guide](extensions/vscode/docs/vscode.md) for every command and setting.
 
 ## Configuration
 
@@ -173,7 +179,7 @@ choose. Precedence is command line, then config file, then profile defaults, the
 Custom rules follow the same safety gates, so a target must still be inside the project,
 untracked and git-ignored (or opt out of the ignore check per rule with
 `allow_untracked = true`, which never applies to tracked files). Details are in
-[docs/guides/configuration.md](docs/guides/configuration.md).
+[docs/configuration.md](docs/configuration.md).
 
 ## Command line
 
@@ -191,12 +197,13 @@ untracked and git-ignored (or opt out of the ignore check per rule with
 | `doctor` | Check Git, the project, the config and hooks (changes nothing) |
 
 Run `sweepito <command> --help` for every option, or read the
-[command line guide](docs/guides/cli.md), which also covers file patterns, JSON output,
+[command line guide](python/docs/cli.md), which also covers file patterns, JSON output,
 recipes and troubleshooting.
 
 ## Git hook setup
 
-With the [pre-commit](https://pre-commit.com) framework, add to `.pre-commit-config.yaml`:
+The hooks run the `sweepito` command, so [install it](#install) first. With the
+[pre-commit](https://pre-commit.com) framework, add to `.pre-commit-config.yaml`:
 
 ```yaml
 repos:
@@ -240,8 +247,10 @@ error, so you can redirect them yourself.
 
 ## Documentation
 
-[CLI](docs/guides/cli.md) · [Configuration](docs/guides/configuration.md) · [Profiles and rules](docs/profiles.md) ·
-[Packaging](docs/packaging.md) · [Architecture](docs/architecture.md) · [Development](docs/development.md) · [Changelog](CHANGELOG.md)
+[CLI](python/docs/cli.md) · [VS Code](extensions/vscode/docs/vscode.md) · [Configuration](docs/configuration.md) · [Profiles and rules](docs/profiles.md) ·
+[Packaging](python/docs/packaging.md) · [VS Code packaging](extensions/vscode/docs/packaging.md) · [Architecture](docs/architecture.md) · [Development](docs/development.md)
+
+Changelogs: [command line tool and installers](python/CHANGELOG.md) · [VS Code extension](extensions/vscode/CHANGELOG.md)
 
 See [docs/README.md](docs/README.md) for an overview, and [SUPPORT.md](SUPPORT.md) if you need help.
 

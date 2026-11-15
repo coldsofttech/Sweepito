@@ -1,5 +1,8 @@
 name: CI
 
+# One workflow for the whole repository, so the single required `ci` check always reports. A
+# `changes` job works out which component a pull request touches, and the jobs of the other
+# component are skipped (a skipped job counts as passed in `ci`).
 on:
   pull_request:
   push:
@@ -13,22 +16,71 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  lint:
+  changes:
+    name: Detect changed components
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      python: ${{ steps.filter.outputs.python }}
+      vscode: ${{ steps.filter.outputs.vscode }}
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 2
+          persist-credentials: false
+      - name: Find the components that changed
+        id: filter
+        run: |
+          python=true
+          vscode=true
+          # Pushes to main always run everything; only pull requests are narrowed down.
+          if [ "$GITHUB_EVENT_NAME" = "pull_request" ] && files="$(git diff --name-only HEAD^ HEAD)"; then
+            echo "$files"
+            python=false
+            vscode=false
+            # Workflow changes can affect both components.
+            if echo "$files" | grep -qE '^\.github/'; then python=true; vscode=true; fi
+            if echo "$files" | grep -qE '^(python/|\.pre-commit-hooks\.yaml$)'; then python=true; fi
+            if echo "$files" | grep -qE '^(extensions/|LICENSE$)'; then vscode=true; fi
+            # The extension bundles the profiles and the starter config from the Python package.
+            if echo "$files" | grep -qE '^python/src/sweepito/(profiles|cli/templates)/'; then vscode=true; fi
+          fi
+          echo "python=$python" >> "$GITHUB_OUTPUT"
+          echo "vscode=$vscode" >> "$GITHUB_OUTPUT"
+
+  py-lint:
+    name: Python lint
+    needs: changes
+    if: needs.changes.outputs.python == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: python
     steps:
-      - uses: actions/checkout@v7
+      - name: Check out the repository
+        uses: actions/checkout@v7
         with:
           persist-credentials: false
-      - uses: astral-sh/setup-uv@v7
-      - run: uv sync --locked
-      - run: uv run ruff check .
-      - run: uv run ruff format --check .
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v7
+      - name: Install locked dependencies
+        run: uv sync --locked
+      - name: Check code with ruff
+        run: uv run ruff check .
+      - name: Check formatting with ruff
+        run: uv run ruff format --check .
 
-  test:
-    name: test (${{ matrix.os }}, ${{ matrix.python }})
+  py-test:
+    name: Python unit tests (${{ matrix.os }}, ${{ matrix.python }})
+    needs: changes
+    if: needs.changes.outputs.python == 'true'
     runs-on: ${{ matrix.os }}
     timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: python
     strategy:
       fail-fast: false
       matrix:
@@ -41,73 +93,115 @@ jobs:
           - { os: windows-latest, python: "3.11" }
           - { os: macos-latest, python: "3.11" }
     steps:
-      - uses: actions/checkout@v7
+      - name: Check out the repository
+        uses: actions/checkout@v7
         with:
           persist-credentials: false
-      - uses: astral-sh/setup-uv@v7
-      - run: uv python install ${{ matrix.python }}
-      - run: uv sync --python ${{ matrix.python }} --locked
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v7
+      - name: Install Python ${{ matrix.python }}
+        run: uv python install ${{ matrix.python }}
+      - name: Install locked dependencies
+        run: uv sync --python ${{ matrix.python }} --locked
       - name: Configure git identity
         run: |
           git config --global user.email "ci@example.com"
           git config --global user.name "ci"
-      - name: Unit tests
+      - name: Run unit tests
         run: uv run --python ${{ matrix.python }} pytest tests/unit -n auto --no-cov
-      - name: Integration tests
+
+  py-int-test:
+    name: Python integration tests (${{ matrix.os }}, ${{ matrix.python }})
+    needs: changes
+    if: needs.changes.outputs.python == 'true'
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: python
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-latest, python: "3.11" }
+          - { os: ubuntu-latest, python: "3.12" }
+          - { os: ubuntu-latest, python: "3.13" }
+          - { os: ubuntu-latest, python: "3.14" }
+          - { os: ubuntu-latest, python: "3.15" }
+          - { os: windows-latest, python: "3.11" }
+          - { os: macos-latest, python: "3.11" }
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v7
+      - name: Install Python ${{ matrix.python }}
+        run: uv python install ${{ matrix.python }}
+      - name: Install locked dependencies
+        run: uv sync --python ${{ matrix.python }} --locked
+      - name: Configure git identity
+        run: |
+          git config --global user.email "ci@example.com"
+          git config --global user.name "ci"
+      - name: Run integration tests
         run: uv run --python ${{ matrix.python }} pytest tests/integration -n auto --no-cov
 
-  build:
+  py-build:
+    name: Python package build
+    needs: changes
+    if: needs.changes.outputs.python == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: python
     steps:
-      - uses: actions/checkout@v7
+      - name: Check out the repository
+        uses: actions/checkout@v7
         with:
           persist-credentials: false
-      - uses: astral-sh/setup-uv@v7
-      - run: uv build
-      - run: uvx twine check --strict dist/*
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v7
+      - name: Build the package
+        run: uv build
+      - name: Check the package metadata with twine
+        run: uvx twine check --strict dist/*
 
-  # VS Code extension (extensions/vscode). Kept as separate jobs from the Python ones above.
   vscode-lint:
+    name: VS Code extension lint
+    needs: changes
+    if: needs.changes.outputs.vscode == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     defaults:
       run:
         working-directory: extensions/vscode
     steps:
-      - uses: actions/checkout@v7
+      - name: Check out the repository
+        uses: actions/checkout@v7
         with:
           persist-credentials: false
-      - uses: actions/setup-node@v7
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
         with:
-          node-version: 20
+          node-version-file: extensions/vscode/.nvmrc
           cache: npm
           cache-dependency-path: extensions/vscode/package-lock.json
-      - run: npm ci
-      - run: npm run lint
-      - run: npm run format:check
-      - run: npm run typecheck
+      - name: Install dependencies
+        run: npm ci
+      - name: Lint
+        run: npm run lint
+      - name: Check formatting
+        run: npm run format:check
+      - name: Type check
+        run: npm run typecheck
 
-  vscode-build:
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    defaults:
-      run:
-        working-directory: extensions/vscode
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          persist-credentials: false
-      - uses: actions/setup-node@v7
-        with:
-          node-version: 20
-          cache: npm
-          cache-dependency-path: extensions/vscode/package-lock.json
-      - run: npm ci
-      - run: npm run build:production
-
-  vscode-tests:
-    name: vscode-tests (node ${{ matrix.node }})
+  vscode-test:
+    name: VS Code extension unit tests (node ${{ matrix.node }})
+    needs: changes
+    if: needs.changes.outputs.vscode == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     defaults:
@@ -116,26 +210,33 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node: [20, 22, 24, 26]
+        node: [22, 24, 26]
     steps:
-      - uses: actions/checkout@v7
+      - name: Check out the repository
+        uses: actions/checkout@v7
         with:
           persist-credentials: false
-      - uses: actions/setup-node@v7
+      - name: Set up Node.js ${{ matrix.node }}
+        uses: actions/setup-node@v7
         with:
           node-version: ${{ matrix.node }}
           cache: npm
           cache-dependency-path: extensions/vscode/package-lock.json
-      - run: npm ci
+      - name: Install dependencies
+        run: npm ci
       - name: Configure git identity
         run: |
           git config --global user.email "ci@example.com"
           git config --global user.name "ci"
-      - run: npm run build:production
-      - run: npm run test:unit
+      - name: Build the extension
+        run: npm run build:production
+      - name: Run unit tests
+        run: npm run test:unit
 
-  vscode-integration-tests:
-    name: vscode-integration-tests (${{ matrix.os }})
+  vscode-int-test:
+    name: VS Code extension integration tests (${{ matrix.os }})
+    needs: changes
+    if: needs.changes.outputs.vscode == 'true'
     runs-on: ${{ matrix.os }}
     timeout-minutes: 20
     defaults:
@@ -146,15 +247,18 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
-      - uses: actions/checkout@v7
+      - name: Check out the repository
+        uses: actions/checkout@v7
         with:
           persist-credentials: false
-      - uses: actions/setup-node@v7
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
         with:
-          node-version: 20
+          node-version-file: extensions/vscode/.nvmrc
           cache: npm
           cache-dependency-path: extensions/vscode/package-lock.json
-      - run: npm ci
+      - name: Install dependencies
+        run: npm ci
       - name: Run integration tests (Linux, headless)
         if: runner.os == 'Linux'
         run: xvfb-run -a npm run test:integration
@@ -162,42 +266,89 @@ jobs:
         if: runner.os != 'Linux'
         run: npm run test:integration
 
+  vscode-build:
+    name: VS Code extension build
+    needs: changes
+    if: needs.changes.outputs.vscode == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: extensions/vscode
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: extensions/vscode/.nvmrc
+          cache: npm
+          cache-dependency-path: extensions/vscode/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+      - name: Build the extension
+        run: npm run build:production
+
   vscode-package:
-    needs: [vscode-lint, vscode-build, vscode-tests]
+    name: VS Code extension package
+    needs: [changes, vscode-lint, vscode-build, vscode-test]
+    if: needs.changes.outputs.vscode == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     defaults:
       run:
         working-directory: extensions/vscode
     steps:
-      - uses: actions/checkout@v7
+      - name: Check out the repository
+        uses: actions/checkout@v7
         with:
           persist-credentials: false
-      - uses: actions/setup-node@v7
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
         with:
-          node-version: 20
+          node-version-file: extensions/vscode/.nvmrc
           cache: npm
           cache-dependency-path: extensions/vscode/package-lock.json
-      - run: npm ci
-      - run: npm run package
-      - uses: actions/upload-artifact@v7
+      - name: Install dependencies
+        run: npm ci
+      - name: Package the extension
+        run: npm run package
+      - name: Upload the .vsix
+        uses: actions/upload-artifact@v7
         with:
           name: vsix
           path: extensions/vscode/*.vsix
           retention-days: 7
 
-  # Single required status check for the branch ruleset.
+  # Single required status check for the branch ruleset and for release.yml, which looks the
+  # check up by its name, so this job keeps the name `ci`. A job skipped because its component did
+  # not change counts as passed; a failed or cancelled job does not.
   ci:
     if: always()
-    needs: [lint, test, build, vscode-lint, vscode-build, vscode-tests, vscode-integration-tests, vscode-package]
+    needs:
+      - changes
+      - py-lint
+      - py-test
+      - py-int-test
+      - py-build
+      - vscode-lint
+      - vscode-test
+      - vscode-int-test
+      - vscode-build
+      - vscode-package
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Require all jobs to succeed
+      - name: Require all jobs to succeed or be skipped
         env:
           RESULTS: ${{ join(needs.*.result, ' ') }}
         run: |
           echo "Results: $RESULTS"
           for result in $RESULTS; do
-            [ "$result" = "success" ] || { echo "A required job did not succeed." >&2; exit 1; }
+            case "$result" in
+              success|skipped) ;;
+              *) echo "A required job did not succeed." >&2; exit 1 ;;
+            esac
           done

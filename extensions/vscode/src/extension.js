@@ -2,7 +2,7 @@
 import path from "node:path";
 import * as vscode from "vscode";
 import { hookStatus, installHook, uninstallHook } from "./hook-commands";
-import { showTerminal } from "./output";
+import { DOCUMENT_SCHEME, documentProvider, showTerminal } from "./output";
 import {
     createConfigFile,
     explainProfile,
@@ -17,7 +17,8 @@ import {
 } from "./reports";
 import { check, chooseRisk, clean, scan } from "./scanning";
 import { allCandidates, changed, state } from "./state";
-import { CandidatesProvider, renderStatus } from "./views";
+import { showMenu } from "./menu";
+import { CandidatesProvider, renderStatus, setExpanded } from "./views";
 
 const RESCAN_SETTINGS = [
     "risk",
@@ -83,6 +84,9 @@ export function activate(context) {
     register("sweepito.explainRule", explainRule);
     register("sweepito.explainProfile", explainProfile);
     register("sweepito.setRisk", chooseRisk);
+    register("sweepito.menu", showMenu);
+    register("sweepito.expandAll", () => setExpanded(true));
+    register("sweepito.collapseAll", () => setExpanded(false));
     register("sweepito.reveal", (node) => {
         const item = node?.items?.[0];
         if (item) {
@@ -93,6 +97,8 @@ export function activate(context) {
     context.subscriptions.push(
         state.statusBar,
         changed,
+        documentProvider,
+        vscode.workspace.registerTextDocumentContentProvider(DOCUMENT_SCHEME, documentProvider),
         vscode.window.createTreeView("sweepito.candidates", { treeDataProvider: new CandidatesProvider() }),
         vscode.workspace.onDidChangeWorkspaceFolders(() => scan({ quiet: true })),
         vscode.workspace.onDidChangeConfiguration((e) => {

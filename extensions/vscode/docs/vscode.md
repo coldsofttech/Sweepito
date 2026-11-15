@@ -1,7 +1,7 @@
 # Sweepito for VS Code: guide
 
 The full guide to the Sweepito extension. The short version is in the
-[extension README](../../extensions/vscode/README.md).
+[extension README](../README.md).
 
 Free up disk space by cleaning caches and build output that your projects can regenerate,
 without leaving the editor. Sweepito only ever removes files that Git ignores, so your source
@@ -13,7 +13,8 @@ You only need Git.
 ## What you get
 
 - **Cleanup candidates view.** Open the Sweepito icon in the activity bar to see what can be
-  cleaned, grouped by technology, then by rule, with the size of each item.
+  cleaned, grouped by technology, then by rule, with the size of each item. Use the buttons in
+  the view title to expand or collapse everything.
 - **Status bar.** Shows how much space can be reclaimed. Click it to scan again.
 - **Command Palette.** Run **Sweepito: Scan**, **Sweepito: Clean**, **Sweepito: Report** or
   **Sweepito: Choose Risk Level for This Session**.
@@ -25,7 +26,8 @@ You only need Git.
   project. **Sweepito: Show Effective Configuration** shows what is in force, and
   **Sweepito: Validate Configuration** checks the file for mistakes.
 - **Doctor.** **Sweepito: Doctor** checks Git, your configuration, the detected technologies
-  and any installed hook, and tells you what is wrong.
+  and any installed hook, and tells you what is wrong. It is also in the gear menu in the view
+  title.
 - **Git hook.** **Sweepito: Install Git Hook** sets up a hook so cleaning (`post-commit`) or a
   report (`pre-commit`) runs on every commit. **Uninstall Git Hook** and **Show Git Hook Status**
   manage it. Existing hook content is kept, and you confirm before anything is installed.
@@ -60,22 +62,22 @@ artifacts, such as build output that takes time to rebuild.
 
 ## Settings
 
-| Setting | Default | What it does |
-|---|---|---|
-| `sweepito.risk` | `safe` | Highest risk level to scan and clean: `safe`, `configurable` or `high-impact`. Choose `custom` to run only your own rules. |
-| `sweepito.profiles` | `["auto"]` | Technologies to scan. `auto` detects them from your files; list IDs such as `node` to force them. |
-| `sweepito.enableRules` | `[]` | Rule IDs to turn on regardless of risk level. |
-| `sweepito.disableRules` | `[]` | Rule IDs to turn off. |
-| `sweepito.exclude` | `[]` | Gitignore-style patterns that are never touched. |
-| `sweepito.customRules` | `[]` | Your own cleanup rules (see below). They always run and appear under the `custom` risk level. |
-| `sweepito.customProfiles` | `{}` | Your own technologies, or extra marker files for built-in ones. |
-| `sweepito.configFile` | `""` | Use this config file instead of searching for one. |
-| `sweepito.noGitCheck` | `false` | High impact: also scan folders that are not Git repositories. Cleaning there always asks for an extra confirmation. |
-| `sweepito.confirmBeforeClean` | `true` | Ask before deleting anything. |
-| `sweepito.quiet` | `false` | Write only failures to the Sweepito output panel. |
-| `sweepito.terminal.color` | `true` | Use colour in the Sweepito terminal. Off is the same as the command line tool's `--no-color`. |
-| `sweepito.autoScan` | `true` | Scan when the workspace opens. |
-| `sweepito.statusBar.enabled` | `true` | Show the reclaimable size in the status bar. |
+| Setting                       | Default    | What it does                                                                                                               |
+| ----------------------------- | ---------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `sweepito.risk`               | `safe`     | Highest risk level to scan and clean: `safe`, `configurable` or `high-impact`. Choose `custom` to run only your own rules. |
+| `sweepito.profiles`           | `["auto"]` | Technologies to scan. `auto` detects them from your files; list IDs such as `node` to force them.                          |
+| `sweepito.enableRules`        | `[]`       | Rule IDs to turn on regardless of risk level.                                                                              |
+| `sweepito.disableRules`       | `[]`       | Rule IDs to turn off.                                                                                                      |
+| `sweepito.exclude`            | `[]`       | Gitignore-style patterns that are never touched.                                                                           |
+| `sweepito.customRules`        | `[]`       | Your own cleanup rules (see below). They always run and appear under the `custom` risk level.                              |
+| `sweepito.customProfiles`     | `{}`       | Your own technologies, or extra marker files for built-in ones.                                                            |
+| `sweepito.configFile`         | `""`       | Use this config file instead of searching for one.                                                                         |
+| `sweepito.noGitCheck`         | `false`    | High impact: also scan folders that are not Git repositories. Cleaning there always asks for an extra confirmation.        |
+| `sweepito.confirmBeforeClean` | `true`     | Ask before deleting anything.                                                                                              |
+| `sweepito.quiet`              | `false`    | Write only failures to the Sweepito output panel.                                                                          |
+| `sweepito.terminal.color`     | `true`     | Use colour in the Sweepito terminal. Off is the same as the command line tool's `--no-color`.                              |
+| `sweepito.autoScan`           | `true`     | Scan when the workspace opens.                                                                                             |
+| `sweepito.statusBar.enabled`  | `true`     | Show the reclaimable size in the status bar.                                                                               |
 
 ## Your own rules
 
@@ -92,7 +94,9 @@ Add rules in `settings.json`:
 
 A rule needs an `id` and `paths`. It can also set `requires`, `requires_all`, `profile` and
 `description`. Rules and profiles from a `sweepito.toml` (or `[tool.sweepito]` in
-`pyproject.toml`) are read too, so a project can share them with the command line tool.
+`pyproject.toml`) are read too, so a project can share them with the command line tool. The
+file format is described in the
+[configuration file reference](../../../docs/configuration.md).
 Settings you choose in VS Code win over the file for `risk` and `profiles`; everything else is
 combined. If a rule or setting is invalid, the status bar shows a warning with the reason.
 

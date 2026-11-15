@@ -1,6 +1,7 @@
 # Packaging and installers
 
 Sweepito ships as a Python package on PyPI and as native installers for each operating system.
+The paths below are relative to `python/` unless they start with `.github/`.
 The installers bundle the Python runtime, so they need no Python on the machine.
 
 | OS | File | Installs to | On `PATH` |
@@ -70,6 +71,7 @@ Installers are unsigned by default, so Windows SmartScreen warns on first run.
 ## CI and releases
 
 - `.github/workflows/installers.yml` builds every installer on pull requests that touch
-  `installer/`, `src/` or the build script, and installs, runs and uninstalls each one.
-- `.github/workflows/release.yml` builds them on a version tag and attaches them, with
+  `python/installer/`, `python/src/`, `brand/` or the build script, and installs, runs and
+  uninstalls each one.
+- `.github/workflows/release.yml` builds them on a `vX.Y.Z` tag and attaches them, with
   `SHA256SUMS.txt`, to the GitHub release. A failing installer stops the release before PyPI.

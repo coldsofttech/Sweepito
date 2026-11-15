@@ -4,7 +4,7 @@ import { context } from "esbuild";
 const production = process.argv.includes("--production");
 const watch = process.argv.includes("--watch");
 
-const profiles = spawnSync(process.execPath, ["scripts/build.mjs"], {
+const profiles = spawnSync(process.execPath, ["scripts/build-profiles.mjs"], {
     stdio: "inherit",
 });
 if (profiles.status !== 0) process.exit(profiles.status ?? 1);

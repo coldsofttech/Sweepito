@@ -1,10 +1,17 @@
-# Configuration
+# Configuration file
 
 Sweepito reads defaults from `sweepito.toml`, `.sweepito.toml`, or a `[tool.sweepito]` table
-in `pyproject.toml`. Use `--config FILE` to read a different file and skip the search.
-Precedence: command line, config file, profile defaults, built-in defaults. The `enable`,
-`disable` and `exclude` lists from the file and the command line are combined, and `disable`
-always beats `enable`. A scalar such as `risk` on the command line overrides the file.
+in `pyproject.toml`. The command line tool and the VS Code extension read the same file, so
+this page is the reference for its format. Parts that apply to only one of them are marked.
+
+- **Command line tool:** use `--config FILE` to read a different file and skip the search.
+  Precedence: command line, config file, profile defaults, built-in defaults. The `enable`,
+  `disable` and `exclude` lists from the file and the command line are combined, and `disable`
+  always beats `enable`. A scalar such as `risk` on the command line overrides the file. See the
+  [command line guide](../python/docs/cli.md) for the options.
+- **VS Code extension:** the `sweepito.configFile` setting replaces the search. VS Code settings
+  and the file are combined, and for `risk` and `profiles` the VS Code setting wins. See the
+  [VS Code guide](../extensions/vscode/docs/vscode.md#settings) for the settings.
 
 A configuration file can never run a command: custom rules only list paths, and the
 `exec` key is rejected. The safety checks apply to every rule, whether built in or custom.
@@ -19,9 +26,13 @@ order:
 2. `.sweepito.toml`
 3. `pyproject.toml`, if it has a `[tool.sweepito]` table
 
-The first match wins. Non-Python projects need no `pyproject.toml`. Run
-`sweepito config show` to see which file is in use, and `sweepito config validate` to check
-it. `sweepito init` writes a starter file.
+The first match wins. Non-Python projects need no `pyproject.toml`.
+
+| | Command line tool | VS Code extension |
+|---|---|---|
+| See which file is in use | `sweepito config show` | **Sweepito: Show Effective Configuration** |
+| Check the file | `sweepito config validate` | **Sweepito: Validate Configuration** |
+| Write a starter file | `sweepito init` | **Sweepito: Create Config File** |
 
 ## Keys
 

@@ -5,3 +5,5 @@ LICENSE
 src/core/profiles.json
 src/core/config-template.json
 test/integration/workspace/
+.vscode-test/
+coverage/

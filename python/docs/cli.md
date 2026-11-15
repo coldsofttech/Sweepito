@@ -159,7 +159,7 @@ paths = ["test-results/", "tmp/e2e/**"]
 ```
 
 Custom rules always run, show as `custom`, and follow the same safety gates as built-in rules.
-They take no `risk` and no command. See the [configuration guide](configuration.md) for every
+They take no `risk` and no command. See the [configuration guide](../../docs/configuration.md) for every
 key. Check the result with `sweepito config show` and `sweepito config validate`.
 
 ## doctor

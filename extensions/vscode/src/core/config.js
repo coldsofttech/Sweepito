@@ -137,7 +137,7 @@ function readToml(file) {
     try {
         return parse(fs.readFileSync(file, "utf8"));
     } catch (error) {
-        throw new Error(`Cannot read ${file}: ${error.message}`);
+        throw new Error(`Cannot read ${file}: ${error.message}`, { cause: error });
     }
 }
 

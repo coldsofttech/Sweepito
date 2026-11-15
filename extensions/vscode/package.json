@@ -26,6 +26,7 @@
     "Other"
   ],
   "engines": {
+    "node": "^22.12.0 || >=24",
     "vscode": "^1.90.0"
   },
   "main": "./dist/extension.js",
@@ -183,6 +184,24 @@
         "icon": "$(shield)"
       },
       {
+        "command": "sweepito.expandAll",
+        "title": "Expand All",
+        "category": "Sweepito",
+        "icon": "$(expand-all)"
+      },
+      {
+        "command": "sweepito.collapseAll",
+        "title": "Collapse All",
+        "category": "Sweepito",
+        "icon": "$(collapse-all)"
+      },
+      {
+        "command": "sweepito.menu",
+        "title": "More Actions",
+        "category": "Sweepito",
+        "icon": "$(gear)"
+      },
+      {
         "command": "sweepito.cleanProfile",
         "title": "Clean This Profile",
         "category": "Sweepito",
@@ -236,19 +255,24 @@
           "group": "navigation@1"
         },
         {
-          "command": "sweepito.setRisk",
-          "when": "view == sweepito.candidates",
+          "command": "sweepito.clean",
+          "when": "view == sweepito.candidates && isWorkspaceTrusted",
           "group": "navigation@2"
         },
         {
-          "command": "sweepito.clean",
-          "when": "view == sweepito.candidates && isWorkspaceTrusted",
+          "command": "sweepito.expandAll",
+          "when": "view == sweepito.candidates",
           "group": "navigation@3"
         },
         {
-          "command": "sweepito.report",
+          "command": "sweepito.collapseAll",
           "when": "view == sweepito.candidates",
           "group": "navigation@4"
+        },
+        {
+          "command": "sweepito.menu",
+          "when": "view == sweepito.candidates",
+          "group": "navigation@5"
         }
       ],
       "view/item/context": [
@@ -463,13 +487,13 @@
     "build": "node esbuild.mjs",
     "build:production": "node esbuild.mjs --production",
     "watch": "node esbuild.mjs --watch",
-    "profiles": "node scripts/build.mjs",
+    "profiles": "node scripts/build-profiles.mjs",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit -p jsconfig.json",
     "test": "npm run test:unit",
-    "test:unit": "node scripts/build.mjs && vitest run",
+    "test:unit": "node scripts/build-profiles.mjs && vitest run",
     "test:integration": "node esbuild.mjs && vscode-test",
     "package": "vsce package --no-dependencies",
     "vscode:prepublish": "node esbuild.mjs --production"
@@ -479,17 +503,20 @@
     "smol-toml": "^1.3.0"
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.5",
+    "@eslint/js": "^10.0.1",
     "@types/node": "^22.0.0",
     "@types/vscode": "1.90.0",
-    "@vscode/test-cli": "^0.0.10",
+    "@vscode/test-cli": "^0.0.15",
     "@vscode/test-electron": "^2.5.2",
     "@vscode/vsce": "^4.1.0",
-    "esbuild": "^0.25.0",
-    "eslint": "^9.39.5",
+    "esbuild": "^0.28.2",
+    "eslint": "^10.15.0",
     "globals": "^17.14.0",
     "prettier": "^3.10.1",
     "typescript": "^5.9.3",
-    "vitest": "^3.0.0"
+    "vitest": "^4.1.12"
+  },
+  "overrides": {
+    "mocha": "^12.0.3"
   }
 }

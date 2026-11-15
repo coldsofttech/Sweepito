@@ -1,7 +1,8 @@
 name: Dependency review
 
 # Reviews dependency changes in pull requests for known vulnerabilities, for both the Python
-# project (uv.lock) and the VS Code extension (extensions/vscode/package-lock.json).
+# project (python/uv.lock) and the VS Code extension (extensions/vscode/package-lock.json). The
+# action reviews every manifest changed in the pull request in one pass, so one job covers both.
 on:
   pull_request:
 
@@ -14,10 +15,13 @@ concurrency:
 
 jobs:
   dependency-review:
+    name: Review dependency changes
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v7
+      - name: Check out the repository
+        uses: actions/checkout@v7
         with:
           persist-credentials: false
-      - uses: actions/dependency-review-action@v5
+      - name: Review dependencies for known vulnerabilities
+        uses: actions/dependency-review-action@v5

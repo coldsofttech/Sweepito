@@ -7,7 +7,7 @@ from pathlib import Path
 
 from sweepito.registry import Registry
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[3]
 PROFILES_DIR = ROOT / "docs" / "profiles"
 INDEX = ROOT / "docs" / "profiles.md"
 REGISTRY = Registry.build()

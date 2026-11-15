@@ -31,16 +31,31 @@ export function renderStatus() {
     statusBar.show();
 }
 
+/**
+ * How the tree opens its nodes. VS Code only applies a new collapsible state to an item it has not
+ * seen before, so Expand All and Collapse All bump `generation`, which is part of every item's id.
+ */
+const expansion = { all: false, generation: 0 };
+
+/** @param {boolean} all Expand every node (true) or collapse every node (false). */
+export function setExpanded(all) {
+    expansion.all = all;
+    expansion.generation++;
+    changed.fire(undefined);
+}
+
 /** @implements {vscode.TreeDataProvider<any>} */
 export class CandidatesProvider {
     onDidChangeTreeData = changed.event;
 
     /** @param {any} node */
     getTreeItem(node) {
-        const collapsible = node.expandable
-            ? vscode.TreeItemCollapsibleState.Collapsed
-            : vscode.TreeItemCollapsibleState.None;
+        const opened = expansion.all
+            ? vscode.TreeItemCollapsibleState.Expanded
+            : vscode.TreeItemCollapsibleState.Collapsed;
+        const collapsible = node.expandable ? opened : vscode.TreeItemCollapsibleState.None;
         const item = new vscode.TreeItem(node.label, collapsible);
+        item.id = `${node.id}@${expansion.generation}`;
         item.description = node.description;
         item.contextValue = node.kind;
         item.tooltip = node.tooltip;
@@ -56,6 +71,10 @@ export class CandidatesProvider {
     /** @param {any} [node] */
     getChildren(node) {
         const descriptions = new Map(entries().flatMap((e) => [...e.descriptions]));
-        return childrenOf(entries(), node, descriptions);
+        // The id is the path from the top, so a node keeps its identity across scans.
+        return childrenOf(entries(), node, descriptions).map((child) => ({
+            ...child,
+            id: `${node?.id ?? ""}/${child.root ?? child.label}`,
+        }));
     }
 }

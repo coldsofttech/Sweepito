@@ -45,14 +45,32 @@ export function toTerminal(render) {
     state.terminalWriter.fire(`${render(styles(color)).replace(/\r?\n/g, "\r\n")}\r\n\r\n`);
 }
 
+/** URI scheme of the read-only documents behind the Markdown results. */
+export const DOCUMENT_SCHEME = "sweepito-doc";
+/** Content of each open result, by document path. */
+const documents = new Map();
+const documentsChanged = new vscode.EventEmitter();
+
+/** @type {vscode.TextDocumentContentProvider & vscode.Disposable} */
+export const documentProvider = {
+    onDidChange: documentsChanged.event,
+    provideTextDocumentContent: (uri) => documents.get(uri.path) ?? "",
+    dispose: () => documentsChanged.dispose(),
+};
+
 /**
- * Opens Markdown in an editor with a preview.
+ * Shows Markdown as a rendered preview in a single tab. The text lives in a read-only document that
+ * is not shown, so there is no editor tab and nothing to save. Showing the same result again (a
+ * result has the same title each time) refreshes the open tab.
  * @param {string} content
  */
 export async function showMarkdown(content) {
-    const doc = await vscode.workspace.openTextDocument({ language: "markdown", content });
-    await vscode.window.showTextDocument(doc, { preview: true });
-    await vscode.commands.executeCommand("markdown.showPreview");
+    const title = content.match(/^#\s+(.+)$/m)?.[1] ?? "Sweepito";
+    const path = `/${title.replace(/[\\/:*?"<>|]/g, "-")}.md`;
+    documents.set(path, content);
+    const uri = vscode.Uri.from({ scheme: DOCUMENT_SCHEME, path });
+    documentsChanged.fire(uri);
+    await vscode.commands.executeCommand("markdown.showPreview", uri);
 }
 
 /**

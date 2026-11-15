@@ -8,7 +8,14 @@ suite("Sweepito extension", () => {
 
     test("registers its commands", async () => {
         const commands = await vscode.commands.getCommands(true);
-        for (const id of ["sweepito.scan", "sweepito.clean", "sweepito.setRisk"]) {
+        for (const id of [
+            "sweepito.scan",
+            "sweepito.clean",
+            "sweepito.setRisk",
+            "sweepito.expandAll",
+            "sweepito.collapseAll",
+            "sweepito.menu",
+        ]) {
             assert.ok(commands.includes(id), `${id} is registered`);
         }
     });

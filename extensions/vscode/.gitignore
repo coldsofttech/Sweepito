@@ -1,7 +1,19 @@
+# Dependencies
 node_modules/
+
+# Build output
 dist/
 *.vsix
+
+# Generated at build time from the Python package
 src/core/profiles.json
 src/core/config-template.json
-LICENSE
+
+# Test runner downloads and caches
 .vscode-test/
+.vscode-test-web/
+coverage/
+
+# Tooling caches and logs
+.eslintcache
+npm-debug.log*

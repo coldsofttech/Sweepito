@@ -1,10 +1,21 @@
 name: Release
 
-# Pushing `vX.Y.Z` checks the tag against the package version, re-runs lint and the full test
-# suite (which enforces the coverage minimum), publishes to PyPI and creates a GitHub release.
+# Two kinds of tag start a release, and each runs only its own jobs:
+#
+# - `vX.Y.Z` releases the Python package: it checks the tag against the package version, re-runs
+#   lint and the full test suite (which enforces the coverage minimum), builds the installers,
+#   publishes to PyPI and creates a GitHub release with the package files and installers.
+# - `vscode-vX.Y.Z` releases the VS Code extension: it checks the tag against "version" in
+#   extensions/vscode/package.json, always builds the .vsix and attaches it to a GitHub release.
+#   Publishing to the Visual Studio Marketplace and Open VSX happens only when VSCE_PAT /
+#   OVSX_PAT are set.
+#
+# The `v*` glob would also match `vscode-v1.2.3`, so every job checks the tag prefix itself.
 on:
   push:
-    tags: ["v*.*.*"]
+    tags:
+      - "v[0-9]*.[0-9]*.[0-9]*"
+      - "vscode-v[0-9]*.[0-9]*.[0-9]*"
 
 permissions:
   contents: read
@@ -14,36 +25,51 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  verify:
+  # ---- Python package ----------------------------------------------------------------------
+
+  py-verify:
+    name: Verify the Python package
+    if: ${{ !startsWith(github.ref_name, 'vscode-v') }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: python
     steps:
-      - uses: actions/checkout@v7
+      - name: Check out the repository
+        uses: actions/checkout@v7
         with:
           persist-credentials: false
-      - uses: astral-sh/setup-uv@v7
-      - name: The tag matches the package version
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v7
+      - name: Check the tag matches the package version
         env:
           TAG: ${{ github.ref_name }}
         run: |
           version="${TAG#v}"
           # A fixed string, closing quote included, so 0.2.0 does not match 0.2.0rc1.
           grep -qF "__version__ = \"$version\"" src/sweepito/__init__.py || {
-            echo "Tag $TAG does not match __version__ in src/sweepito/__init__.py"; exit 1; }
-      - run: uv sync --locked
-      - run: uv run ruff check .
-      - run: |
+            echo "Tag $TAG does not match __version__ in python/src/sweepito/__init__.py"; exit 1; }
+      - name: Install locked dependencies
+        run: uv sync --locked
+      - name: Check code with ruff
+        run: uv run ruff check .
+      - name: Run the full test suite
+        run: |
           git config --global user.email "ci@example.com"
           git config --global user.name "ci"
           uv run pytest -n auto
 
   installers:
-    needs: verify
-    name: installers (${{ matrix.name }})
+    name: Build installers (${{ matrix.name }})
+    needs: py-verify
     runs-on: ${{ matrix.os }}
     timeout-minutes: 30
     permissions:
       contents: read
+    defaults:
+      run:
+        working-directory: python
     strategy:
       fail-fast: true
       matrix:
@@ -51,8 +77,10 @@ jobs:
           - { name: windows, os: windows-latest }
           - { name: linux, os: ubuntu-latest }
     steps:
-      - uses: actions/checkout@v7
-      - uses: astral-sh/setup-uv@v7
+      - name: Check out the repository
+        uses: actions/checkout@v7
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v7
         with:
           python-version: "3.13"
       - name: Read tool versions
@@ -74,38 +102,73 @@ jobs:
           sha256sum --ignore-missing --check checksums.txt
           tar -xzf "nfpm_${VERSION}_Linux_x86_64.tar.gz" nfpm
           sudo install nfpm /usr/local/bin/nfpm
-      - run: uv sync --locked --group installer
+      - name: Install locked dependencies
+        run: uv sync --locked --group installer
       - name: Build, sign (when configured) and smoke test the installers
         env:
           SIGN_COMMAND: ${{ vars.SIGN_COMMAND }}
         run: uv run python scripts/build_installer.py --smoke
-      - uses: actions/upload-artifact@v7
+      - name: Upload the installers
+        uses: actions/upload-artifact@v7
         with:
           name: installers-${{ matrix.name }}
-          path: dist/installer/*
+          path: python/dist/installer/*
 
-  publish:
-    needs: [verify, installers]
+  py-publish:
+    name: Publish to PyPI
+    needs: [py-verify, installers]
     runs-on: ubuntu-latest
     timeout-minutes: 10
     environment: pypi
     permissions:
       id-token: write
-      contents: write
+      contents: read
+    defaults:
+      run:
+        working-directory: python
     steps:
-      - uses: actions/checkout@v7
+      - name: Check out the repository
+        uses: actions/checkout@v7
         with:
           persist-credentials: false
-      - uses: astral-sh/setup-uv@v7
-      - run: uv build
-      - run: uvx twine check --strict dist/*
-      - uses: pypa/gh-action-pypi-publish@release/v1
-      - uses: actions/download-artifact@v8
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v7
+      - name: Build the package
+        run: uv build
+      - name: Check the package metadata with twine
+        run: uvx twine check --strict dist/*
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: python/dist/
+      - name: Upload the package files
+        uses: actions/upload-artifact@v7
+        with:
+          name: dist
+          path: python/dist/*
+          if-no-files-found: error
+
+  # Creates the GitHub release with the package files and the installers, once PyPI has the package.
+  installers-publish:
+    name: Create the GitHub release (Python package)
+    needs: [py-publish, installers]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - name: Download the package files
+        uses: actions/download-artifact@v8
+        with:
+          name: dist
+          path: dist
+      - name: Download the installers
+        uses: actions/download-artifact@v8
         with:
           pattern: installers-*
           path: installers
           merge-multiple: true
-      - name: Create GitHub release
+      - name: Create the GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -116,3 +179,161 @@ jobs:
           else
             gh release create "$GITHUB_REF_NAME" dist/* installers/* --repo "$GITHUB_REPOSITORY" --generate-notes
           fi
+
+  # ---- VS Code extension -------------------------------------------------------------------
+
+  vscode-build:
+    name: Build the VS Code extension
+    if: ${{ startsWith(github.ref_name, 'vscode-v') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      checks: read
+    defaults:
+      run:
+        working-directory: extensions/vscode
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: extensions/vscode/.nvmrc
+          cache: npm
+          cache-dependency-path: extensions/vscode/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check the tag matches the extension version
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          VERSION="$(node -p "require('./package.json').version")"
+          if [ "$TAG" != "vscode-v$VERSION" ]; then
+            echo "Tag $TAG does not match extensions/vscode/package.json version $VERSION" >&2
+            exit 1
+          fi
+
+      - name: Require CI to have passed on this commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          CONCLUSION="$(gh api "repos/${{ github.repository }}/commits/${{ github.sha }}/check-runs?check_name=ci" \
+            --jq '[.check_runs[] | select(.status == "completed")] | sort_by(.completed_at) | last | .conclusion')"
+          if [ "$CONCLUSION" != "success" ]; then
+            echo "The ci check has not succeeded on ${{ github.sha }} (found: ${CONCLUSION:-none}). Wait for CI on main to pass, then re-tag." >&2
+            exit 1
+          fi
+
+      - name: Package the extension
+        run: npm run package
+
+      - name: Upload the .vsix
+        uses: actions/upload-artifact@v7
+        with:
+          name: vsix
+          path: extensions/vscode/*.vsix
+          if-no-files-found: error
+
+  vscode-publish:
+    name: Create the GitHub release (VS Code extension)
+    needs: vscode-build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Download the .vsix
+        uses: actions/download-artifact@v8
+        with:
+          name: vsix
+      - name: Create the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          # A release written by hand before the tag keeps its notes; only the .vsix is added.
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            gh release upload "$TAG" ./*.vsix --clobber
+          else
+            gh release create "$TAG" ./*.vsix --title "$TAG" --generate-notes --verify-tag
+          fi
+
+  vscode-marketplace:
+    name: Publish to the Visual Studio Marketplace
+    needs: vscode-build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: extensions/vscode
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: extensions/vscode/.nvmrc
+          cache: npm
+          cache-dependency-path: extensions/vscode/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+      - name: Download the .vsix
+        uses: actions/download-artifact@v8
+        with:
+          name: vsix
+          path: extensions/vscode
+      - name: Publish to the Visual Studio Marketplace
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+        run: |
+          if [ -z "$VSCE_PAT" ]; then
+            echo "VSCE_PAT is not set; skipping Marketplace publish."
+            exit 0
+          fi
+          npx vsce publish --packagePath ./*.vsix
+
+  vscode-open-vsx:
+    name: Publish to Open VSX
+    needs: vscode-build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: extensions/vscode
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: extensions/vscode/.nvmrc
+          cache: npm
+          cache-dependency-path: extensions/vscode/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+      - name: Download the .vsix
+        uses: actions/download-artifact@v8
+        with:
+          name: vsix
+          path: extensions/vscode
+      - name: Publish to Open VSX
+        env:
+          OVSX_PAT: ${{ secrets.OVSX_PAT }}
+        run: |
+          if [ -z "$OVSX_PAT" ]; then
+            echo "OVSX_PAT is not set; skipping Open VSX publish."
+            exit 0
+          fi
+          npx ovsx publish ./*.vsix --pat "$OVSX_PAT"

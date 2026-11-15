@@ -25,12 +25,27 @@ suite("Report commands", () => {
         }
     });
 
-    test("Doctor opens its result as a Markdown document", async () => {
+    test("Doctor opens its result as one preview tab, with no editor tab to save", async () => {
         await vscode.commands.executeCommand("sweepito.doctor");
-        // The command also opens a preview, which takes the focus, so look at the open documents.
-        const doc = vscode.workspace.textDocuments.find(
-            (d) => d.languageId === "markdown" && /healthy/i.test(d.getText()),
+        // The preview opens a moment after the command returns.
+        const doctorTabs = async () => {
+            for (let attempt = 0; attempt < 30; attempt++) {
+                const found = vscode.window.tabGroups.all
+                    .flatMap((group) => group.tabs)
+                    .filter((tab) => /doctor/i.test(tab.label));
+                if (found.length > 0) return found;
+                await new Promise((resolve) => setTimeout(resolve, 100));
+            }
+            return [];
+        };
+        const tabsFound = await doctorTabs();
+        // VS Code may drop a document that no editor shows, so load it again by its address.
+        const doc = await vscode.workspace.openTextDocument(
+            vscode.Uri.from({ scheme: "sweepito-doc", path: "/Sweepito doctor.md" }),
         );
-        assert.ok(doc, "a Markdown document with the doctor result is open");
+        assert.ok(/sweepito doctor/i.test(doc.getText()), "the doctor result is held in a read-only document");
+        assert.ok(!doc.isDirty && !doc.isUntitled, "there is nothing to save");
+        assert.strictEqual(tabsFound.length, 1, "exactly one tab shows the result");
+        assert.ok(tabsFound[0].input instanceof vscode.TabInputWebview, "and it is the rendered preview");
     });
 });
