@@ -35,13 +35,16 @@ homepage: ${PKG_HOMEPAGE}
 license: ${PKG_LICENSE}
 vendor: ${PKG_MAINTAINER}
 
-# PyInstaller bundles the Python runtime and every library except the C library.
+# PyInstaller bundles the Python runtime and every library except the C library. Sweepito runs
+# git to decide what is safe to remove, so the package depends on it.
 depends:
   - libc6
+  - git
 overrides:
   rpm:
     depends:
       - glibc
+      - git
 
 # nfpm only expands ${...} in file paths when the entry says expand: true.
 # File modes are taken from the folder as built on Linux (the executable must be 755); the build
