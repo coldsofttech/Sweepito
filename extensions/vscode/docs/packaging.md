@@ -1,7 +1,7 @@
 # Packaging and publishing
 
 The extension ships as a single `.vsix` file. It is published to the Visual Studio Marketplace
-and Open VSX, and attached to each GitHub release. Run the commands below from
+and attached to each GitHub release. Run the commands below from
 `extensions/vscode/`.
 
 ## What is in the package
@@ -44,12 +44,11 @@ command line tool.
 Publishing is done by the release workflow, not from a developer machine.
 
 - **GitHub release.** Always. The `.vsix` is attached to the release for the tag.
-- **Visual Studio Marketplace.** Under the `coldsofttech` publisher, when the `VSCE_PAT`
-  repository secret is set.
-- **Open VSX.** When the `OVSX_PAT` repository secret is set.
+- **Visual Studio Marketplace.** Under the `coldsofttech` publisher, through trusted
+  publishing: the Marketplace trusts the `release.yml` workflow, so no token is stored.
 
-When a token is missing, that publish step is skipped with a message and the rest of the release
-still completes. Tokens come from repository secrets only, never from files.
+The publish job runs in the `vscode` GitHub environment, so a reviewer has to approve the release
+before anything is published. The extension is not published to Open VSX yet.
 
 ## CI and releases
 

@@ -179,6 +179,6 @@ publisher in the PyPI project settings. The Git tag is also what pre-commit user
    ```
 
 The release workflow checks the tag against `package.json` and that `ci` passed on the tagged
-commit, builds the `.vsix` and attaches it to a GitHub release. It publishes to the Visual Studio
-Marketplace and Open VSX only when the `VSCE_PAT` and `OVSX_PAT` repository secrets are set;
-otherwise those steps are skipped with a message.
+commit, builds the `.vsix` and attaches it to a GitHub release. It then waits for a reviewer to
+approve the `vscode` environment before publishing to the Visual Studio Marketplace (trusted
+publishing, no token).

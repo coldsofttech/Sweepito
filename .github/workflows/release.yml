@@ -7,8 +7,8 @@ name: Release
 #   publishes to PyPI and creates a GitHub release with the package files and installers.
 # - `vscode-vX.Y.Z` releases the VS Code extension: it checks the tag against "version" in
 #   extensions/vscode/package.json, always builds the .vsix and attaches it to a GitHub release.
-#   Publishing to the Visual Studio Marketplace and Open VSX happens only when VSCE_PAT /
-#   OVSX_PAT are set.
+#   Publishing to the Visual Studio Marketplace (trusted publishing, no token) waits for approval
+#   of the `vscode` environment.
 #
 # The `v*` glob would also match `vscode-v1.2.3`, so every job checks the tag prefix itself.
 on:
@@ -266,11 +266,17 @@ jobs:
             gh release create "$TAG" ./*.vsix --title "$TAG" --generate-notes --verify-tag
           fi
 
+  # Trusted publishing: the Marketplace trusts this workflow and the `vscode` environment, so there
+  # is no token. The environment holds the approval before anything is published.
   vscode-marketplace:
     name: Publish to the Visual Studio Marketplace
     needs: vscode-build
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    environment: vscode
+    permissions:
+      contents: read
+      id-token: write
     defaults:
       run:
         working-directory: extensions/vscode
@@ -293,47 +299,4 @@ jobs:
           name: vsix
           path: extensions/vscode
       - name: Publish to the Visual Studio Marketplace
-        env:
-          VSCE_PAT: ${{ secrets.VSCE_PAT }}
-        run: |
-          if [ -z "$VSCE_PAT" ]; then
-            echo "VSCE_PAT is not set; skipping Marketplace publish."
-            exit 0
-          fi
-          npx vsce publish --packagePath ./*.vsix
-
-  vscode-open-vsx:
-    name: Publish to Open VSX
-    needs: vscode-build
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    defaults:
-      run:
-        working-directory: extensions/vscode
-    steps:
-      - name: Check out the repository
-        uses: actions/checkout@v7
-        with:
-          persist-credentials: false
-      - name: Set up Node.js
-        uses: actions/setup-node@v7
-        with:
-          node-version-file: extensions/vscode/.nvmrc
-          cache: npm
-          cache-dependency-path: extensions/vscode/package-lock.json
-      - name: Install dependencies
-        run: npm ci
-      - name: Download the .vsix
-        uses: actions/download-artifact@v8
-        with:
-          name: vsix
-          path: extensions/vscode
-      - name: Publish to Open VSX
-        env:
-          OVSX_PAT: ${{ secrets.OVSX_PAT }}
-        run: |
-          if [ -z "$OVSX_PAT" ]; then
-            echo "OVSX_PAT is not set; skipping Open VSX publish."
-            exit 0
-          fi
-          npx ovsx publish ./*.vsix --pat "$OVSX_PAT"
+        run: npx vsce publish --oidc --packagePath ./*.vsix
