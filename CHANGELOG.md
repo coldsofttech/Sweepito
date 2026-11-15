@@ -5,6 +5,8 @@ All notable changes are recorded here. The format follows
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-15
+
 ### Added
 - `commitrocket` profile with `commitrocket.report-tmp` (partial `--report` temp files). Closes #17.
 - `batchvault` profile (`batchvault.staging`, `batchvault.manifest-tmp`), both opt-in, detected from

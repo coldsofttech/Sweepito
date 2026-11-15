@@ -218,7 +218,7 @@ With the [pre-commit](https://pre-commit.com) framework, add to `.pre-commit-con
 ```yaml
 repos:
   - repo: https://github.com/coldsofttech/Sweepito
-    rev: v0.1.0
+    rev: v0.2.0
     hooks:
       - id: sweepito-clean     # post-commit cleanup
       # - id: sweepito-scan    # report-only at pre-commit
