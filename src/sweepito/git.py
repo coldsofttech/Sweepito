@@ -5,11 +5,13 @@ All paths passed in and returned are posix-style and relative to ``root``.
 
 from __future__ import annotations
 
-import os
-import subprocess
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 from sweepito.errors import GitError
+
+if TYPE_CHECKING:
+    import subprocess
+    from pathlib import Path
 
 
 def _run(
@@ -19,6 +21,9 @@ def _run(
     data: bytes | None = None,
     ok: tuple[int, ...] = (0,),
 ) -> subprocess.CompletedProcess[bytes]:
+    import os
+    import subprocess
+
     env = {**os.environ, "GIT_OPTIONAL_LOCKS": "0"}
     try:
         proc = subprocess.run(
@@ -43,6 +48,8 @@ def _split(output: bytes) -> list[str]:
 
 
 def version() -> str | None:
+    import subprocess
+
     try:
         proc = subprocess.run(["git", "--version"], capture_output=True, check=False)
     except FileNotFoundError:
@@ -52,6 +59,8 @@ def version() -> str | None:
 
 def toplevel(path: Path) -> Path | None:
     """Return the work tree root containing ``path``, or None if not in a repo."""
+    from pathlib import Path
+
     if not path.is_dir():
         return None
     proc = _run(path, ["rev-parse", "--show-toplevel"], ok=(0, 128))
@@ -61,6 +70,8 @@ def toplevel(path: Path) -> Path | None:
 
 
 def hooks_dir(root: Path) -> Path:
+    from pathlib import Path
+
     proc = _run(root, ["rev-parse", "--git-path", "hooks"])
     path = Path(proc.stdout.decode(errors="replace").strip())
     return path if path.is_absolute() else (root / path).resolve()

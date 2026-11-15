@@ -2,14 +2,16 @@
 
 from __future__ import annotations
 
-import re
-import tomllib
 from dataclasses import dataclass, field
-from pathlib import Path
+from typing import TYPE_CHECKING, Any
 
 from sweepito.errors import ConfigError
-from sweepito.models import Risk, Rule
-from sweepito.registry import CUSTOM_PROFILE
+from sweepito.models import Risk
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from sweepito.models import Rule
 
 CONFIG_NAMES = ("sweepito.toml", ".sweepito.toml")
 
@@ -20,6 +22,7 @@ _RULE_KEYS = {
     "id",
     "paths",
     "requires",
+    "requires_all",
     "risk",
     "profile",
     "description",
@@ -28,7 +31,7 @@ _RULE_KEYS = {
 }
 _PROFILE_KEYS = {"markers", "description"}
 _TOP_KEYS = {"defaults", "clean", "hook", "rule", "profile"}
-_RULE_ID = re.compile(r"^[a-z0-9][a-z0-9._-]*$")
+_RULE_ID = r"^[a-z0-9][a-z0-9._-]*$"
 
 
 @dataclass
@@ -72,7 +75,7 @@ class Settings:
     no_git_check: bool = False
     quiet: bool = False
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "profiles": list(self.profiles),
             "risk": self.risk.label,
@@ -101,7 +104,9 @@ def find_config(start: Path, stop: Path | None = None) -> Path | None:
         current = current.parent
 
 
-def _read_toml(path: Path) -> dict:
+def _read_toml(path: Path) -> dict[str, Any]:
+    import tomllib
+
     try:
         return tomllib.loads(path.read_text(encoding="utf-8"))
     except (OSError, UnicodeDecodeError) as exc:
@@ -117,11 +122,11 @@ def _has_pyproject_table(path: Path) -> bool:
         return False
 
 
-def _norm(table: dict) -> dict:
+def _norm(table: dict[str, Any]) -> dict[str, Any]:
     return {key.replace("-", "_"): value for key, value in table.items()}
 
 
-def _table(value: object, where: str, allowed: set[str]) -> dict:
+def _table(value: object, where: str, allowed: set[str]) -> dict[str, Any]:
     if not isinstance(value, dict):
         raise ConfigError(f"[{where}] must be a table.")
     table = _norm(value)
@@ -139,6 +144,8 @@ def _strings(value: object, where: str) -> tuple[str, ...]:
 
 def validate_pattern(pattern: str, where: str) -> None:
     """Reject patterns that could escape the project root or negate matches."""
+    import re
+
     problems = (
         not pattern.strip(),
         pattern.startswith(("!", "#", "~")),
@@ -152,6 +159,11 @@ def validate_pattern(pattern: str, where: str) -> None:
 
 
 def _parse_rule(raw: object, index: int) -> Rule:
+    import re
+
+    from sweepito.models import Rule
+    from sweepito.registry import CUSTOM_PROFILE
+
     where = f"[[rule]] #{index + 1}"
     table = _table(raw, where, _RULE_KEYS)
     if "exec" in table:
@@ -165,7 +177,7 @@ def _parse_rule(raw: object, index: int) -> Rule:
             "Use 'disable' to switch one off."
         )
     rule_id = table.get("id")
-    if not isinstance(rule_id, str) or not _RULE_ID.match(rule_id):
+    if not isinstance(rule_id, str) or not re.match(_RULE_ID, rule_id):
         raise ConfigError(
             f"{where}: 'id' is required (lowercase letters, digits, . _ -)."
         )
@@ -175,6 +187,7 @@ def _parse_rule(raw: object, index: int) -> Rule:
     for pattern in paths:
         validate_pattern(pattern, f"rule {rule_id!r}")
     requires = _strings(table.get("requires", []), f"{where} 'requires'")
+    requires_all = _strings(table.get("requires_all", []), f"{where} 'requires_all'")
     allow_untracked = table.get("allow_untracked", False)
     if not isinstance(allow_untracked, bool):
         raise ConfigError(f"{where}: 'allow_untracked' must be true or false.")
@@ -187,6 +200,7 @@ def _parse_rule(raw: object, index: int) -> Rule:
         paths=paths,
         risk=Risk.CUSTOM,
         requires=requires,
+        requires_all=requires_all,
         description=str(table.get("description", "")),
         allow_untracked=allow_untracked,
         builtin=False,

@@ -51,3 +51,10 @@ def repo(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> Repo:
     project = Repo(root, capsys)
     project.git("init", "-q")
     return project
+
+
+def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
+    """Mark everything under tests/integration so ``-m integration`` selects it."""
+    for item in items:
+        if "integration" in item.path.relative_to(Path(__file__).parent).parts[:1]:
+            item.add_marker(pytest.mark.integration)

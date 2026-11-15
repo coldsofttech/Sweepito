@@ -1,0 +1,10 @@
+id = "cornea"
+description = "Cornea Shell (configuration, build recipes and the per-user window data are never touched)"
+markers = ["cornea.toml"]
+
+[[rule]]
+id = "cornea.log"
+paths = ["cornea.log*"]
+requires = ["cornea.toml"]
+risk = "safe"
+description = "Cornea debug log and its rotated copies (recreated on the next run with --log-file)"

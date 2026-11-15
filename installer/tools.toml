@@ -1,0 +1,7 @@
+# Versions of the installer tools that are not Python packages, pinned in one place. The build
+# workflows read this file; PyInstaller is pinned by uv.lock (the "installer" group).
+# Dependabot does not see these, so check for new releases when you update the rest.
+
+[tools]
+nsis = "3.13"   # https://nsis.sourceforge.io/ ; Windows setup builder
+nfpm = "2.48.0" # https://github.com/goreleaser/nfpm/releases ; Linux deb and rpm builder

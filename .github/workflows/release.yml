@@ -1,42 +1,113 @@
-name: release
+name: Release
 
+# Pushing `vX.Y.Z` checks the tag against the package version, re-runs lint and the full test
+# suite (which enforces the coverage minimum), publishes to PyPI and creates a GitHub release.
 on:
   push:
     tags: ["v*.*.*"]
 
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref_name }}
+  cancel-in-progress: false
+
 jobs:
   verify:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
       - uses: astral-sh/setup-uv@v7
-      - name: Check versions match the tag
+      - name: The tag matches the package version
+        env:
+          TAG: ${{ github.ref_name }}
         run: |
-          tag="${GITHUB_REF_NAME#v}"
-          pyproject=$(grep -m1 '^version' pyproject.toml | cut -d'"' -f2)
-          package=$(grep -m1 '__version__' src/sweepito/__init__.py | cut -d'"' -f2)
-          test "$tag" = "$pyproject" && test "$tag" = "$package" \
-            || { echo "Version mismatch: tag=$tag pyproject=$pyproject package=$package"; exit 1; }
-      - run: uv sync
+          version="${TAG#v}"
+          # A fixed string, closing quote included, so 0.2.0 does not match 0.2.0rc1.
+          grep -qF "__version__ = \"$version\"" src/sweepito/__init__.py || {
+            echo "Tag $TAG does not match __version__ in src/sweepito/__init__.py"; exit 1; }
+      - run: uv sync --locked
       - run: uv run ruff check .
       - run: |
           git config --global user.email "ci@example.com"
           git config --global user.name "ci"
           uv run pytest -n auto
 
-  publish:
+  installers:
     needs: verify
+    name: installers (${{ matrix.name }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - { name: windows, os: windows-latest }
+          - { name: linux, os: ubuntu-latest }
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v7
+        with:
+          python-version: "3.13"
+      - name: Read tool versions
+        id: tools
+        shell: bash
+        run: |
+          python -c "import tomllib, os; t = tomllib.load(open('installer/tools.toml', 'rb'))['tools']; open(os.environ['GITHUB_OUTPUT'], 'a').write(''.join(f'{k}={v}\n' for k, v in t.items()))"
+      - name: Install NSIS
+        if: runner.os == 'Windows'
+        run: choco install nsis --version "${{ steps.tools.outputs.nsis }}" --yes --no-progress
+      - name: Install nfpm (checksum verified)
+        if: runner.os == 'Linux'
+        env:
+          VERSION: ${{ steps.tools.outputs.nfpm }}
+        run: |
+          base="https://github.com/goreleaser/nfpm/releases/download/v${VERSION}"
+          curl -fsSLO "${base}/nfpm_${VERSION}_Linux_x86_64.tar.gz"
+          curl -fsSLO "${base}/checksums.txt"
+          sha256sum --ignore-missing --check checksums.txt
+          tar -xzf "nfpm_${VERSION}_Linux_x86_64.tar.gz" nfpm
+          sudo install nfpm /usr/local/bin/nfpm
+      - run: uv sync --locked --group installer
+      - name: Build, sign (when configured) and smoke test the installers
+        env:
+          SIGN_COMMAND: ${{ vars.SIGN_COMMAND }}
+        run: uv run python scripts/build_installer.py --smoke
+      - uses: actions/upload-artifact@v7
+        with:
+          name: installers-${{ matrix.name }}
+          path: dist/installer/*
+
+  publish:
+    needs: [verify, installers]
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     environment: pypi
     permissions:
       id-token: write
       contents: write
     steps:
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
       - uses: astral-sh/setup-uv@v7
       - run: uv build
+      - run: uvx twine check --strict dist/*
       - uses: pypa/gh-action-pypi-publish@release/v1
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: installers-*
+          path: installers
+          merge-multiple: true
       - name: Create GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "$GITHUB_REF_NAME" dist/* --generate-notes
+        run: |
+          (cd installers && sha256sum * > SHA256SUMS.txt)
+          gh release create "$GITHUB_REF_NAME" dist/* installers/* --repo "$GITHUB_REPOSITORY" --generate-notes

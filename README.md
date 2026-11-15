@@ -1,7 +1,6 @@
 # Sweepito
 
-[![Tests](https://github.com/coldsofttech/Sweepito/actions/workflows/tests.yml/badge.svg)](https://github.com/coldsofttech/Sweepito/actions/workflows/tests.yml)
-[![Lint](https://github.com/coldsofttech/Sweepito/actions/workflows/lint.yml/badge.svg)](https://github.com/coldsofttech/Sweepito/actions/workflows/lint.yml)
+[![CI](https://github.com/coldsofttech/Sweepito/actions/workflows/ci.yml/badge.svg)](https://github.com/coldsofttech/Sweepito/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/coldsofttech/Sweepito?logo=github)](https://github.com/coldsofttech/Sweepito/releases)
 [![PyPI](https://img.shields.io/pypi/v/sweepito?logo=pypi&logoColor=white)](https://pypi.org/project/sweepito/)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue?logo=python&logoColor=white)](https://www.python.org/downloads/)
@@ -9,7 +8,11 @@
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
 
-Safely clean caches and build artifacts across languages, frameworks and tools.
+Safely clean generated project artifacts (caches, build output, test reports and tool
+leftovers) across languages, frameworks, game engines, data and infrastructure tooling.
+
+Sweepito is a command-line tool: you install it and run `sweepito`. It is not a Python
+library and has no Python API to import.
 
 ## Why Sweepito?
 
@@ -26,7 +29,7 @@ what the folder is.** A `build/` directory is a candidate beside a `CMakeLists.t
 
 ## What you get
 
-- **17 technology profiles and 97 rules**, detected automatically from marker files
+- **29 technology profiles and 142 rules**, detected automatically from marker files
   (`Cargo.toml`, `pom.xml`, `package.json`, ...). Repositories with several technologies and
   nested projects are handled per project.
 - **Conservative by default.** Only `safe` caches are cleaned. Build output is opt-in, and
@@ -37,8 +40,8 @@ what the folder is.** A `build/` directory is a candidate beside a `CMakeLists.t
 - **Git hooks**: post-commit cleanup through the `pre-commit` framework or a native hook,
   silent when there is nothing to do.
 - **Machine-readable output** (`--json`) and meaningful exit codes for automation.
-- **Small and cross-platform**: Python 3.11+, two dependencies (`pathspec`, `rich`), with a CI
-  matrix covering Linux, macOS and Windows.
+- **Small and cross-platform**: it runs on Linux, macOS and Windows, and works on any project in
+  any language as long as the project is a Git repository.
 
 ## Safety model
 
@@ -58,13 +61,21 @@ Built-in rules never target application data, infrastructure state (`*.tfstate`)
 
 ## Install
 
-Requires Python 3.11 or later and Git.
+Requires Python 3.11 or later and [Git](https://git-scm.com/). Because Sweepito is a program
+rather than a library, [pipx](https://pipx.pypa.io/) and [uv](https://docs.astral.sh/uv/) are the
+best fit: they keep it out of your project environments, and your project does not need to be
+a Python project.
 
 ```bash
 pipx install sweepito          # or: uv tool install sweepito
-uvx sweepito scan              # run without installing
-pip install sweepito           # into the current environment
+uvx sweepito scan              # run once without installing
 ```
+
+Check the install with `sweepito --version`, and your setup with `sweepito doctor`.
+
+No Python? Download a native installer from the
+[releases](https://github.com/coldsofttech/Sweepito/releases): a `setup.exe` for Windows, and a `.deb`
+or `.rpm` for Linux. See [Packaging](docs/packaging.md).
 
 ## Quick start
 
@@ -100,27 +111,10 @@ Add `--json` for plain machine-readable output, or `--no-color` to turn colour o
 
 ## Profiles
 
-| Profile | Covers | Rules | Safe / configurable / high-impact |
-|---|---|---:|---|
-| `python` | Python, Django, Flask, FastAPI, pytest, Ruff, mypy, tox, coverage | 13 | 6 / 6 / 1 |
-| `node` | Node.js, React, Next.js, Vue, Nuxt, Angular, Vite, Svelte, Astro | 15 | 8 / 6 / 1 |
-| `node-pm` | npm, pnpm, Yarn, Bun project-local stores | 2 | 0 / 1 / 1 |
-| `rust` | Rust and Cargo | 2 | 0 / 2 / 0 |
-| `jvm` | Maven, Gradle, Kotlin, Spring Boot | 5 | 1 / 4 / 0 |
-| `dotnet` | C#, F#, ASP.NET Core | 5 | 1 / 4 / 0 |
-| `go` | Go modules and build tools | 3 | 1 / 1 / 1 |
-| `cpp` | CMake, Make, Ninja, Meson | 6 | 1 / 5 / 0 |
-| `php` | Composer, Laravel, Symfony | 7 | 2 / 4 / 1 |
-| `ruby` | Bundler, Rails, Sinatra | 6 | 2 / 3 / 1 |
-| `dart` | Dart and Flutter | 3 | 0 / 3 / 0 |
-| `swift` | Swift Package Manager, Xcode | 4 | 0 / 3 / 1 |
-| `elixir` | Mix and Phoenix | 6 | 3 / 2 / 1 |
-| `r` | R, Shiny, renv, RMarkdown | 6 | 1 / 3 / 2 |
-| `jupyter` | Notebooks and ML workflow outputs | 5 | 1 / 1 / 3 |
-| `terraform` | Terraform and Terragrunt | 4 | 1 / 3 / 0 |
-| `common` | OS and editor junk, generic logs (always active) | 5 | 2 / 3 / 0 |
-
-The full list of targets, markers and risk levels is in [docs/profiles.md](docs/profiles.md).
+Sweepito covers web and Node.js tooling, Python, JVM languages, .NET, Go, Rust, C and C++, PHP,
+Ruby, Dart and Flutter, Swift, Elixir, R and Jupyter, Terraform, Docker, data engineering, game
+engines (Unity, Unreal, Godot), and OS and editor junk that is always cleaned. Every profile, with
+its markers, targets and risk levels, is listed in [docs/profiles.md](docs/profiles.md).
 
 ### Risk levels
 
@@ -172,7 +166,7 @@ choose. Precedence is command line, then config file, then profile defaults, the
 Custom rules follow the same safety gates, so a target must still be inside the project,
 untracked and git-ignored (or opt out of the ignore check per rule with
 `allow_untracked = true`, which never applies to tracked files). Details are in
-[docs/configuration.md](docs/configuration.md).
+[docs/guides/configuration.md](docs/guides/configuration.md).
 
 ## Command line
 
@@ -186,10 +180,12 @@ untracked and git-ignored (or opt out of the ignore check per rule with
 | `rules` | List every cleanup rule and its risk (`--explain RULE` for one) |
 | `config show` / `validate` | Show the effective settings or validate the file |
 | `init` | Write a starter `sweepito.toml` |
-| `hook install` / `uninstall` / `status` | Manage the native Git hook |
-| `doctor` | Diagnose Git, config and hooks |
+| `hook install` / `uninstall` / `status` | Manage the native Git hook (`--stage post-commit` or `pre-commit`) |
+| `doctor` | Check Git, the project, the config and hooks (changes nothing) |
 
-Run `sweepito <command> --help` for every option, or read [docs/cli.md](docs/cli.md).
+Run `sweepito <command> --help` for every option, or read the
+[command line guide](docs/guides/cli.md), which also covers file patterns, JSON output,
+recipes and troubleshooting.
 
 ## Git hook setup
 
@@ -198,7 +194,7 @@ With the [pre-commit](https://pre-commit.com) framework, add to `.pre-commit-con
 ```yaml
 repos:
   - repo: https://github.com/coldsofttech/Sweepito
-    rev: v0.1.0
+    rev: v0.2.0
     hooks:
       - id: sweepito-clean     # post-commit cleanup
       # - id: sweepito-scan    # report-only at pre-commit
@@ -235,29 +231,18 @@ error, so you can redirect them yourself.
 | 4 | Safety refusal (not a Git repo, high-impact without the flag, no consent) |
 | 130 | Interrupted |
 
-## Development setup
-
-```bash
-git clone https://github.com/coldsofttech/Sweepito
-cd Sweepito
-uv sync                       # uses Python 3.11, the minimum supported version
-uv run pre-commit install
-uv run pytest -n auto
-uv run ruff check . && uv run ruff format --check .
-```
-
-See [docs/development.md](docs/development.md) and [docs/architecture.md](docs/architecture.md).
-
 ## Documentation
 
-[CLI](docs/cli.md) · [Configuration](docs/configuration.md) · [Profiles and rules](docs/profiles.md) ·
-[Architecture](docs/architecture.md) · [Development](docs/development.md) · [Changelog](CHANGELOG.md)
+[CLI](docs/guides/cli.md) · [Configuration](docs/guides/configuration.md) · [Profiles and rules](docs/profiles.md) ·
+[Packaging](docs/packaging.md) · [Architecture](docs/architecture.md) · [Development](docs/development.md) · [Changelog](CHANGELOG.md)
+
+See [docs/README.md](docs/README.md) for an overview, and [SUPPORT.md](SUPPORT.md) if you need help.
 
 ## Contributing
 
 Contributions are welcome, especially new technologies and rules. Please read
 [CONTRIBUTING.md](CONTRIBUTING.md) first; every change keeps the safety invariants and comes
-with tests. Everyone taking part is expected to follow the [Code of Conduct](CODE_OF_CONDUCT.md).
+with tests. To work on the code, see [docs/development.md](docs/development.md). Everyone taking part is expected to follow the [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## Security
 

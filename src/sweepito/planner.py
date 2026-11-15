@@ -2,23 +2,26 @@
 
 from __future__ import annotations
 
-import os
-import stat
-from fnmatch import fnmatchcase
-from pathlib import Path
+from typing import TYPE_CHECKING
 
-import pathspec
+if TYPE_CHECKING:
+    import os
+    from pathlib import Path
 
-from sweepito import git
-from sweepito.config import Settings
-from sweepito.errors import ConfigError, SafetyRefusal
-from sweepito.models import Candidate, Plan, Profile, Rule, Skipped
-from sweepito.registry import Registry
+    import pathspec
+
+    from sweepito.config import Settings
+    from sweepito.models import Plan, Profile, Rule
+    from sweepito.registry import Registry
 
 _GLOB_CHARS = set("*?[")
 
 
 def build_plan(root: Path, settings: Settings, registry: Registry) -> Plan:
+    from sweepito import git
+    from sweepito.errors import SafetyRefusal
+    from sweepito.models import Candidate, Plan, Skipped
+
     root = root.resolve()
     in_git = git.toplevel(root) is not None
     if not in_git and not settings.no_git_check:
@@ -43,17 +46,16 @@ def build_plan(root: Path, settings: Settings, registry: Registry) -> Plan:
     raw: dict[str, tuple[Rule, bool]] = {}
     for rule in rules:
         profile = registry.profiles[rule.profile]
-        requires = rule.requires or profile.markers
-        dirs = _marker_dirs(requires, files, marker_cache) if requires else {""}
+        dirs = _rule_dirs(rule, profile.markers, files, marker_cache)
         source = entries + untracked if rule.allow_untracked else entries
         for rel, is_dir in _match_rule(root, rule, dirs, source):
             raw.setdefault(rel, (rule, is_dir))
 
-    exclude = (
-        pathspec.GitIgnoreSpec.from_lines(list(settings.exclude))
-        if settings.exclude
-        else None
-    )
+    exclude: pathspec.GitIgnoreSpec | None = None
+    if settings.exclude:
+        import pathspec
+
+        exclude = pathspec.GitIgnoreSpec.from_lines(list(settings.exclude))
     tracked_files, tracked_dirs = git.tracked(root) if in_git else (set(), set())
     survivors: list[tuple[str, Rule, bool]] = []
     for rel, (rule, is_dir) in sorted(raw.items()):
@@ -97,6 +99,8 @@ def build_plan(root: Path, settings: Settings, registry: Registry) -> Plan:
 
 
 def _check_rule_ids(settings: Settings, registry: Registry) -> None:
+    from sweepito.errors import ConfigError
+
     unknown = sorted(
         {
             rid
@@ -113,6 +117,11 @@ def _check_rule_ids(settings: Settings, registry: Registry) -> None:
 
 def _inventory(root: Path, in_git: bool) -> tuple[list[str], list[str]]:
     """Return (non-ignored files for marker detection, entries that may be cleaned)."""
+    import os
+    from pathlib import Path
+
+    from sweepito import git
+
     if in_git:
         return git.list_files(root), git.list_ignored(root)
     files: list[str] = []
@@ -130,6 +139,26 @@ def _inventory(root: Path, in_git: bool) -> tuple[list[str], list[str]]:
     return files, entries
 
 
+def _rule_dirs(
+    rule: Rule,
+    profile_markers: tuple[str, ...],
+    files: list[str],
+    cache: dict[str, set[str]],
+) -> set[str]:
+    """Directories where a rule may fire.
+
+    ``requires`` is "any of" (the profile's markers when empty and no ``requires_all``);
+    ``requires_all`` adds markers that must all exist in the same directory.
+    """
+    any_of = rule.any_markers(profile_markers)
+    dirs = _marker_dirs(any_of, files, cache) if any_of else None
+    for marker in rule.requires_all:
+        if marker not in cache:
+            cache[marker] = _find_marker(marker, files)
+        dirs = set(cache[marker]) if dirs is None else dirs & cache[marker]
+    return {""} if dirs is None else dirs
+
+
 def _marker_dirs(
     requires: tuple[str, ...], files: list[str], cache: dict[str, set[str]]
 ) -> set[str]:
@@ -143,6 +172,8 @@ def _marker_dirs(
 
 
 def _find_marker(marker: str, files: list[str]) -> set[str]:
+    from fnmatch import fnmatchcase
+
     segments = marker.count("/") + 1
     dirs: set[str] = set()
     for name in files:
@@ -161,6 +192,8 @@ def _active_profiles(
     files: list[str],
     cache: dict[str, set[str]],
 ) -> list[str]:
+    from sweepito.errors import ConfigError
+
     requested = settings.profiles
     if "auto" in requested:
         explicit = [p for p in requested if p != "auto"]
@@ -227,6 +260,9 @@ def _split_patterns(
 def _match_rule(
     root: Path, rule: Rule, dirs: set[str], entries: list[str]
 ) -> list[tuple[str, bool]]:
+    import os
+    import stat
+
     literals, globs = _split_patterns(rule.paths)
     found: list[tuple[str, bool]] = []
     for base in sorted(dirs):
@@ -243,6 +279,8 @@ def _match_rule(
                 continue
             found.append((rel, is_dir))
     if globs:
+        import pathspec
+
         spec = pathspec.GitIgnoreSpec.from_lines(globs)
         for entry in entries:
             is_dir = entry.endswith("/")
@@ -272,9 +310,6 @@ def inside_git_dir(rel: str) -> bool:
     return ".git" in rel.split("/")
 
 
-_REPARSE_POINT = getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0x400)
-
-
 def is_link(st: os.stat_result) -> bool:
     """True for a symlink or, on Windows, any reparse point such as a junction.
 
@@ -282,12 +317,17 @@ def is_link(st: os.stat_result) -> bool:
     would let a recursive walk follow it out of the project. ``st`` must come from
     ``lstat`` or ``DirEntry.stat(follow_symlinks=False)``.
     """
+    import stat
+
     if stat.S_ISLNK(st.st_mode):
         return True
-    return bool(getattr(st, "st_file_attributes", 0) & _REPARSE_POINT)
+    reparse_point = getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0x400)
+    return bool(getattr(st, "st_file_attributes", 0) & reparse_point)
 
 
 def _path_is_link(path: Path) -> bool:
+    import os
+
     try:
         return is_link(os.lstat(path))
     except OSError:
@@ -296,6 +336,8 @@ def _path_is_link(path: Path) -> bool:
 
 def confined(root: Path, rel: str) -> bool:
     """True if the parent of ``rel`` resolves inside the root (links not followed)."""
+    import os
+
     if ".." in rel.split("/"):
         return False
     parent = os.path.realpath((root / rel).parent)
@@ -307,6 +349,9 @@ def confined(root: Path, rel: str) -> bool:
 
 
 def _size(path: Path, is_dir: bool) -> int:
+    import os
+    import stat
+
     try:
         st = os.lstat(path)
         if not is_dir or is_link(st):

@@ -5,6 +5,38 @@ All notable changes are recorded here. The format follows
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-15
+
+### Added
+- Windows setup (`setup.exe`) and portable zip, and Linux `.deb` and `.rpm` packages, that bundle
+  Python, so Sweepito runs without a Python install. They are attached to each release.
+- `requires_all` for rules (built-in and custom): a rule can now require several marker files to
+  exist together.
+- `cornea` profile with a `cornea.log` rule for Cornea Shell debug logs, detected from `cornea.toml`.
+- `commitrocket` profile with `commitrocket.report-tmp` (partial `--report` temp files). Closes #17.
+- `batchvault` profile (`batchvault.staging`, `batchvault.manifest-tmp`), both opt-in, detected from
+  `batchvault.toml`.
+- `docker` profile with a `docker.buildx-cache` rule for local BuildKit cache exports. Docker
+  daemon storage, volumes and bind-mounted data are never targeted.
+- `node` profile: Nx, Vitest, Storybook and Webpack caches, plus opt-in Playwright, Cypress and Rush
+  rules.
+- `python` profile: Sphinx, MkDocs, Pixi, PDM and Pylint rules, each gated on its own marker, and an opt-in Schemathesis cache rule.
+- `data-eng` profile with dbt (`dbt.target`, `dbt.logs`, `dbt.packages`) and Spark (`spark.warehouse`)
+  rules. Data directories are never targeted.
+- More cleanup rules for the `node-pm`, `python`, `jvm`, `go`, `cpp`, `ruby` and `terraform` profiles,
+  and `build.sbt` now activates the JVM profile.
+- Profiles for Clojure, Haskell, OCaml, Perl, Unity, Unreal Engine and Godot.
+- `sweepito doctor` reports a hook whose recorded interpreter no longer exists.
+
+### Changed
+- Risk levels now follow documented principles: build output, documentation output and test
+  reports are `configurable` instead of `safe`; Unity `Library/` and Lightning logs are `high-impact`.
+- Sweepito is now described as a cleaner of generated project artifacts, not only caches.
+
+### Fixed
+- The Git hook failed with `Permission denied` on Windows (Git Bash). Re-run `sweepito hook install`
+  to update existing hooks.
+
 ## [0.1.0] - 2026-10-25
 
 ### Added

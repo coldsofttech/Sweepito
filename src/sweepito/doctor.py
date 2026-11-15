@@ -2,13 +2,11 @@
 
 from __future__ import annotations
 
-import sys
-from dataclasses import asdict, dataclass
-from importlib import metadata
+from dataclasses import dataclass
+from typing import TYPE_CHECKING
 
-from sweepito import __version__, api, git, hooks
-from sweepito.config import Options
-from sweepito.errors import SweepitoError
+if TYPE_CHECKING:
+    from typing import Any
 
 MIN_PYTHON = (3, 11)
 
@@ -20,11 +18,15 @@ class Check:
     detail: str
     required: bool = False  # a failed required check makes doctor exit non-zero
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, Any]:
+        from dataclasses import asdict
+
         return asdict(self)
 
 
 def _dependency(name: str) -> Check:
+    from importlib import metadata
+
     try:
         return Check(name, True, metadata.version(name), required=True)
     except metadata.PackageNotFoundError:
@@ -32,6 +34,13 @@ def _dependency(name: str) -> Check:
 
 
 def run_checks(path: str | None = None, config_file: str | None = None) -> list[Check]:
+    import os
+    import sys
+
+    from sweepito import __version__, api, git, hooks
+    from sweepito.config import Options
+    from sweepito.errors import SweepitoError
+
     python = sys.version_info
     checks = [
         Check("Sweepito", True, __version__),
@@ -95,6 +104,18 @@ def run_checks(path: str | None = None, config_file: str | None = None) -> list[
                 "installed" if installed else "not installed",
             )
         )
+        pinned = hooks.pinned_interpreter(ctx.root, stage) if installed else None
+        if pinned and pinned != hooks.posix_path(sys.executable):
+            usable = os.access(pinned, os.X_OK)
+            checks.append(
+                Check(
+                    f"{stage} hook interpreter",
+                    usable,
+                    pinned
+                    if usable
+                    else f"{pinned} is missing; re-run `sweepito hook install`",
+                )
+            )
     return checks
 
 

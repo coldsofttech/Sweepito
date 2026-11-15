@@ -1,0 +1,70 @@
+# nfpm configuration for the command line's .deb and .rpm packages (Linux). The program is the same on every distribution
+# only, so there is one Linux package: the PyInstaller folder built by installer/pyinstaller/cli.spec.
+#
+#   nfpm package --config installer/linux/nfpm.yaml --packager deb --target dist/
+#   nfpm package --config installer/linux/nfpm.yaml --packager rpm --target dist/
+#
+# nfpm fills the ${...} values from the environment; scripts/build_installer.py sets them from
+# pyproject.toml and the code, so renaming the project needs no edit here:
+#
+#   PKG_NAME          package and command name, from [project.scripts] (sweepito)
+#   PKG_VERSION       from __version__ (0.1.0)
+#   PKG_ARCH          amd64 or arm64, the architecture the folder was built on
+#   PKG_DESCRIPTION   [project] description
+#   PKG_MAINTAINER    "Name <email>", from [project] authors
+#   PKG_HOMEPAGE      [project.urls] Homepage
+#   PKG_LICENSE       [project] license (an SPDX id, MIT)
+#   PKG_SOURCE_DIR    the PyInstaller output folder (build/installer/sweepito)
+#   PKG_LICENSE_FILE  the LICENSE file
+#
+# The folder is installed whole under /usr/lib/<name>/ (the executable and its lib/ must stay
+# together, as a one-folder build needs) and the command is a symlink in /usr/bin, so it is on PATH
+# for every user. Packages are always system-wide and need root, the way apt and dnf install them;
+# they run non-interactively (apt-get install -y, dnf install -y). Removing the package deletes
+# only what it installed. Nothing in a user's home folder (settings, data) is ever touched.
+name: ${PKG_NAME}
+arch: ${PKG_ARCH}
+platform: linux
+version: ${PKG_VERSION}
+version_schema: semver
+section: utils
+priority: optional
+maintainer: ${PKG_MAINTAINER}
+description: ${PKG_DESCRIPTION}
+homepage: ${PKG_HOMEPAGE}
+license: ${PKG_LICENSE}
+vendor: ${PKG_MAINTAINER}
+
+# PyInstaller bundles the Python runtime and every library except the C library. Sweepito runs
+# git to decide what is safe to remove, so the package depends on it.
+depends:
+  - libc6
+  - git
+overrides:
+  rpm:
+    depends:
+      - glibc
+      - git
+
+# nfpm only expands ${...} in file paths when the entry says expand: true.
+# File modes are taken from the folder as built on Linux (the executable must be 755); the build
+# script normalises them (folders 755, files 644, executables 755) before packaging.
+contents:
+  - src: ${PKG_SOURCE_DIR}/
+    dst: /usr/lib/${PKG_NAME}/
+    type: tree
+    expand: true
+    file_info:
+      owner: root
+      group: root
+  - src: /usr/lib/${PKG_NAME}/${PKG_NAME}
+    dst: /usr/bin/${PKG_NAME}
+    type: symlink
+    expand: true
+  - src: ${PKG_LICENSE_FILE}
+    dst: /usr/share/doc/${PKG_NAME}/copyright
+    expand: true
+    file_info:
+      mode: 0644
+      owner: root
+      group: root

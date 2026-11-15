@@ -2,16 +2,19 @@
 
 from __future__ import annotations
 
-import os
-import stat
-from pathlib import Path
+from typing import TYPE_CHECKING
 
-from sweepito import git
-from sweepito.models import CleanResult, Failure, Plan, Skipped
-from sweepito.planner import confined, inside_git_dir, is_link
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from sweepito.models import CleanResult, Plan
 
 
 def apply_plan(plan: Plan, *, in_git: bool = True) -> CleanResult:
+    from sweepito import git
+    from sweepito.models import CleanResult, Failure, Skipped
+    from sweepito.planner import confined, inside_git_dir
+
     result = CleanResult()
     root = plan.root
     # Re-read tracked state right before deleting, in case it changed since planning.
@@ -46,6 +49,12 @@ def _remove(path: Path) -> tuple[int, list[tuple[str, str]]]:
     as links and never traversed, so nothing outside the tree can be deleted through
     them.
     """
+    import os
+    import stat
+    from pathlib import Path
+
+    from sweepito.planner import is_link
+
     freed = 0
     errors: list[tuple[str, str]] = []
     try:
@@ -91,6 +100,9 @@ def _remove(path: Path) -> tuple[int, list[tuple[str, str]]]:
 
 def _unlink(path: Path) -> tuple[int, list[tuple[str, str]]]:
     """Remove one file or link; a directory link goes without touching its target."""
+    import os
+    import stat
+
     try:
         st = os.lstat(path)
         directory_link = stat.S_ISDIR(st.st_mode) or bool(

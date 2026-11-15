@@ -3,22 +3,16 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from pathlib import Path
+from typing import TYPE_CHECKING
 
-from sweepito import git
-from sweepito.config import (
-    FileConfig,
-    Options,
-    Settings,
-    find_config,
-    load_config,
-    merge,
-)
 from sweepito.errors import ConfigError
-from sweepito.executor import apply_plan
-from sweepito.models import CleanResult, Plan
-from sweepito.planner import build_plan
-from sweepito.registry import Registry
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from sweepito.config import FileConfig, Options, Settings
+    from sweepito.models import CleanResult, Plan
+    from sweepito.registry import Registry
 
 
 @dataclass
@@ -32,6 +26,10 @@ class Context:
 
 def resolve_root(path: str | None = None) -> Path:
     """The project root: ``path``, else the git root of the cwd, else the cwd."""
+    from pathlib import Path
+
+    from sweepito import git
+
     if path:
         root = Path(path).resolve()
         if not root.is_dir():
@@ -45,8 +43,15 @@ def resolve_root(path: str | None = None) -> Path:
 def prepare(
     root: Path, options: Options | None = None, config_file: str | None = None
 ) -> Context:
+    from pathlib import Path
+
+    from sweepito import git
+    from sweepito.config import FileConfig, Options, find_config, load_config, merge
+    from sweepito.registry import Registry
+
     options = options or Options()
     top = git.toplevel(root)
+    path: Path | None
     if config_file:
         path = Path(config_file)
         if not path.is_file():
@@ -65,8 +70,12 @@ def prepare(
 
 
 def scan(ctx: Context) -> Plan:
+    from sweepito.planner import build_plan
+
     return build_plan(ctx.root, ctx.settings, ctx.registry)
 
 
 def clean(ctx: Context, plan: Plan) -> CleanResult:
+    from sweepito.executor import apply_plan
+
     return apply_plan(plan, in_git=ctx.in_git)

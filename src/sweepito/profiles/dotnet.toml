@@ -5,7 +5,7 @@ markers = ["*.csproj", "*.fsproj", "*.vbproj", "*.sln"]
 [[rule]]
 id = "dotnet.testresults"
 paths = ["TestResults/"]
-risk = "safe"
+risk = "configurable"
 description = "Test run output"
 
 [[rule]]

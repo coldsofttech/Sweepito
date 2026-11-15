@@ -1,0 +1,23 @@
+id = "docker"
+description = "Docker, Compose, Dev Containers, BuildKit and Skaffold (daemon images, volumes and caches are never touched)"
+markers = [
+  "Dockerfile",
+  "compose.yaml",
+  "compose.yml",
+  "docker-compose.yaml",
+  "docker-compose.yml",
+  ".devcontainer/devcontainer.json",
+  ".devcontainer.json",
+  "skaffold.yaml",
+]
+
+# Compose, Dev Containers and Skaffold write no fixed project-local generated folder, so they
+# get no rules. Bind-mounted data folders are never targeted. The only conventional
+# project-local location is a BuildKit cache exported with `--cache-to type=local,dest=...`.
+
+[[rule]]
+id = "docker.buildx-cache"
+paths = ["/.buildx-cache/", "/.buildx-cache-new/"]
+requires = ["Dockerfile"]
+risk = "configurable"
+description = "Local BuildKit cache export (next build is slower)"

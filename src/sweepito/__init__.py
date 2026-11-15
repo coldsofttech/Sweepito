@@ -1,3 +1,3 @@
-"""Sweepito: safely clean caches and build artifacts."""
+"""Sweepito: safely clean generated project artifacts."""
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"

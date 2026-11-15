@@ -4,9 +4,10 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import IntEnum
-from pathlib import Path
+from typing import TYPE_CHECKING, Any
 
-from sweepito.errors import ConfigError
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 class Risk(IntEnum):
@@ -21,6 +22,8 @@ class Risk(IntEnum):
 
     @classmethod
     def parse(cls, value: object) -> Risk:
+        from sweepito.errors import ConfigError
+
         if isinstance(value, str):
             key = value.strip().upper().replace("-", "_")
             if key in cls.__members__:
@@ -38,9 +41,17 @@ class Rule:
     paths: tuple[str, ...]
     risk: Risk
     requires: tuple[str, ...] = ()
+    requires_all: tuple[str, ...] = ()
     description: str = ""
     allow_untracked: bool = False
     builtin: bool = True
+
+    def any_markers(self, profile_markers: tuple[str, ...]) -> tuple[str, ...]:
+        """Markers of which one must exist: ``requires``, else the profile's markers.
+
+        A rule that lists only ``requires_all`` does not use the profile's markers.
+        """
+        return self.requires or (() if self.requires_all else profile_markers)
 
 
 @dataclass(frozen=True)
@@ -71,7 +82,7 @@ class Candidate:
     is_dir: bool
     size: int
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "rule": self.rule,
             "profile": self.profile,
@@ -88,7 +99,7 @@ class Skipped:
     rule: str
     reason: str
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, Any]:
         return {"path": self.path, "rule": self.rule, "reason": self.reason}
 
 
@@ -103,7 +114,7 @@ class Plan:
     def total_bytes(self) -> int:
         return sum(c.size for c in self.candidates)
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "root": str(self.root),
             "profiles": self.profiles,
@@ -118,7 +129,7 @@ class Failure:
     path: str
     error: str
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, Any]:
         return {"path": self.path, "error": self.error}
 
 
@@ -129,7 +140,7 @@ class CleanResult:
     skipped: list[Skipped] = field(default_factory=list)
     freed_bytes: int = 0
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "removed": [c.to_dict() for c in self.removed],
             "failed": [f.to_dict() for f in self.failed],

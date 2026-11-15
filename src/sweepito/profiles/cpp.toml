@@ -41,3 +41,10 @@ paths = ["/.ninja_log", "/.ninja_deps"]
 requires = ["build.ninja"]
 risk = "configurable"
 description = "Ninja logs"
+
+[[rule]]
+id = "cpp.compile-commands"
+paths = ["/compile_commands.json"]
+requires = ["CMakeLists.txt", "meson.build", "build.ninja", "Makefile"]
+risk = "configurable"
+description = "Generated compilation database (clangd needs it; regenerate with CMake, Bear or similar)"

@@ -1,0 +1,29 @@
+"""Integration tests for the node-pm profile."""
+
+from tests.integration.profiles.support import Case, ProfileSuite
+
+CASE = Case(
+    id="node-pm",
+    profile="node-pm",
+    markers={"package.json": "{}", "pnpm-lock.yaml": "", "yarn.lock": ""},
+    targets={
+        "node-pm.pnpm-store": [".pnpm-store/"],
+        "node-pm.yarn-cache": [".yarn/cache/"],
+        "node-pm.yarn-unplugged": [
+            ".yarn/unplugged/",
+            ".yarn/install-state.gz",
+            ".yarn/build-state.yml",
+        ],
+    },
+    blocked_without={
+        "node-pm.pnpm-store": ["pnpm-lock.yaml"],
+        "node-pm.yarn-cache": ["yarn.lock"],
+        "node-pm.yarn-unplugged": ["yarn.lock"],
+    },
+)
+
+CASES = [CASE]
+
+
+class TestNodePm(ProfileSuite):
+    case = CASE

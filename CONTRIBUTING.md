@@ -34,10 +34,10 @@ More detail is in [docs/development.md](docs/development.md) and
 ## Adding or changing a rule
 
 1. Edit `src/sweepito/profiles/<profile>.toml`.
-2. Update the matching `tests/integration/test_<profile>.py`: add the targets, and for a
+2. Update the matching `tests/integration/profiles/test_<profile>.py`: add the targets, and for a
    rule with `requires` also list the marker files in `blocked_without`. The guard tests in
    `test_registry_coverage.py` fail if you forget.
-3. Regenerate `docs/profiles.md` and add a line to `CHANGELOG.md` under `[Unreleased]`.
+3. Add or update `docs/profiles/<id>.md` (and the summary in `docs/profiles.md`) and add a line to `CHANGELOG.md` under `[Unreleased]`.
 
 To add a whole new technology, add a new profile TOML and a matching test module.
 

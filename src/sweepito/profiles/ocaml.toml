@@ -1,0 +1,10 @@
+id = "ocaml"
+description = "OCaml: dune"
+markers = ["dune-project"]
+
+[[rule]]
+id = "ocaml.build"
+paths = ["/_build/"]
+requires = ["dune-project"]
+risk = "configurable"
+description = "dune build output"

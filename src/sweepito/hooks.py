@@ -2,33 +2,83 @@
 
 from __future__ import annotations
 
-import os
-import stat
-from pathlib import Path
+from typing import TYPE_CHECKING
 
-from sweepito import git
 from sweepito.errors import ConfigError
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 BEGIN = "# >>> sweepito >>>"
 END = "# <<< sweepito <<<"
 STAGES = {
-    "post-commit": "sweepito clean --hook --non-interactive --quiet",
-    "pre-commit": "sweepito scan --hook --quiet",
+    "post-commit": "clean --hook --non-interactive --quiet",
+    "pre-commit": "scan --hook --quiet",
 }
+_PINNED = r"^if \[ -x (?P<py>'[^\n]*?') \]"
 
 
-def _block(stage: str) -> str:
-    command = STAGES[stage]
+def posix_path(path: str) -> str:
+    """Express an interpreter path the way POSIX sh (e.g. Git Bash) expects it."""
+    import os
+    import re
+
+    if os.name == "nt" or re.match(r"^[A-Za-z]:[\\/]", path):
+        from pathlib import PureWindowsPath
+
+        win = PureWindowsPath(path)
+        if win.drive:
+            rest = "/".join(win.parts[1:])
+            return f"/{win.drive[0].lower()}/{rest}"
+        return win.as_posix()
+    return path
+
+
+def _quote(value: str) -> str:
+    return "'" + value.replace("'", "'\\''") + "'"
+
+
+def _block(stage: str, python: str | None = None) -> str:
+    """Hook block.
+
+    Prefer the interpreter that installed the hook (``python -m sweepito``), which
+    does not depend on PATH or on ``Scripts/sweepito[.exe]`` shims; fall back to a
+    ``sweepito`` found on PATH, and stay silent if neither is available.
+    """
+    import sys
+
+    args = STAGES[stage]
+    py = _quote(posix_path(python or sys.executable))
+    fail = f'|| echo "sweepito: {stage} hook failed (exit $?)" >&2'
     return (
         f"{BEGIN}\n"
-        f"if command -v sweepito >/dev/null 2>&1; then\n"
-        f'  {command} || echo "sweepito: {stage} hook failed" >&2\n'
+        f"if [ -x {py} ] && {py} -c 'import sweepito' >/dev/null 2>&1; then\n"
+        f"  {py} -m sweepito {args} {fail}\n"
+        f"elif command -v sweepito >/dev/null 2>&1; then\n"
+        f"  sweepito {args} {fail}\n"
         f"fi\n"
         f"{END}\n"
     )
 
 
+def pinned_interpreter(root: Path, stage: str) -> str | None:
+    """The interpreter recorded in an installed hook, or None."""
+    import re
+    import shlex
+
+    path = hook_path(root, stage)
+    if not path.exists():
+        return None
+    match = re.search(_PINNED, path.read_text(encoding="utf-8"), re.MULTILINE)
+    if not match:
+        return None
+    parts = shlex.split(match.group("py"))
+    return parts[0] if parts else None
+
+
 def hook_path(root: Path, stage: str) -> Path:
+    from sweepito import git
+
     if stage not in STAGES:
         raise ConfigError(
             f"Unsupported hook stage {stage!r}; use post-commit or pre-commit."
@@ -45,6 +95,8 @@ def _strip(text: str) -> str:
 
 
 def install(root: Path, stage: str = "post-commit") -> Path:
+    import stat
+
     path = hook_path(root, stage)
     path.parent.mkdir(parents=True, exist_ok=True)
     existing = path.read_text(encoding="utf-8") if path.exists() else ""
@@ -60,6 +112,8 @@ def install(root: Path, stage: str = "post-commit") -> Path:
 
 def uninstall(root: Path, stage: str = "post-commit") -> bool:
     """Remove the Sweepito block. Returns True if one was removed."""
+    import os
+
     path = hook_path(root, stage)
     if not path.exists():
         return False

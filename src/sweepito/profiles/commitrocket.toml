@@ -1,0 +1,9 @@
+id = "commitrocket"
+description = "CommitRocket (batched commit and push; the resume journal in .git is never touched)"
+markers = ["commitrocket.toml", ".commitrocketignore"]
+
+[[rule]]
+id = "commitrocket.report-tmp"
+paths = ["*.json.*.tmp"]
+risk = "safe"
+description = "Partial JSON report left by a killed run (the next run rewrites it)"
