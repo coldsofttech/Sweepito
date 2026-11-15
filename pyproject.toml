@@ -40,6 +40,7 @@ dev = [
     "ruff>=0.6",
     "pre-commit>=3",
     "mypy>=2.4.1",
+    "pytest-cov>=6.0",
 ]
 
 [tool.uv]
@@ -54,7 +55,7 @@ packages = ["src/sweepito"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
-addopts = "--strict-markers"
+addopts = "--strict-markers --cov=sweepito --cov-report=term-missing --cov-fail-under=80"
 markers = [
     "e2e: tests that run the installed command line program",
     "integration: tests that drive real git repositories (everything in tests/integration)",
@@ -72,3 +73,6 @@ src = ["src", "tests"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B"]
+
+[tool.coverage.run]
+branch = true
