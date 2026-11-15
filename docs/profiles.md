@@ -70,6 +70,7 @@ Custom rules follow the same safety gates as built-in ones.
 | [`clojure`](profiles/clojure.md) | `project.clj`, `deps.edn` | 2 | 2 | 0 | 0 |
 | [`commitrocket`](profiles/commitrocket.md) | `commitrocket.toml`, `.commitrocketignore` | 1 | 1 | 0 | 0 |
 | [`common`](profiles/common.md) | always active | 5 | 2 | 3 | 0 |
+| [`cornea`](profiles/cornea.md) | `cornea.toml` | 1 | 1 | 0 | 0 |
 | [`cpp`](profiles/cpp.md) | `CMakeLists.txt`, `Makefile`, `build.ninja`, `meson.build` | 7 | 1 | 6 | 0 |
 | [`dart`](profiles/dart.md) | `pubspec.yaml` | 3 | 0 | 3 | 0 |
 | [`data-eng`](profiles/data-eng.md) | `dbt_project.yml`, `build.sbt` | 4 | 2 | 0 | 2 |
@@ -94,7 +95,7 @@ Custom rules follow the same safety gates as built-in ones.
 | [`terraform`](profiles/terraform.md) | `*.tf`, `terragrunt.hcl` | 5 | 1 | 4 | 0 |
 | [`unity`](profiles/unity.md) | `ProjectSettings/ProjectVersion.txt` | 3 | 2 | 1 | 0 |
 | [`unreal`](profiles/unreal.md) | `*.uproject` | 2 | 0 | 2 | 0 |
-| **Total** | | **141** | **53** | **70** | **18** |
+| **Total** | | **142** | **54** | **70** | **18** |
 
 Each page in `docs/profiles/` lists its rules with their targets, markers and risk, an example
 configuration and the notes about what is never targeted.

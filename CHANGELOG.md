@@ -8,6 +8,7 @@ All notable changes are recorded here. The format follows
 ## [0.2.0] - 2026-11-15
 
 ### Added
+- `cornea` profile with a `cornea.log` rule for Cornea Shell debug logs, detected from `cornea.toml`.
 - `commitrocket` profile with `commitrocket.report-tmp` (partial `--report` temp files). Closes #17.
 - `batchvault` profile (`batchvault.staging`, `batchvault.manifest-tmp`), both opt-in, detected from
   `batchvault.toml`.
