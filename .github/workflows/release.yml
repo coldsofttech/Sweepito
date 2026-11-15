@@ -110,4 +110,9 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           (cd installers && sha256sum * > SHA256SUMS.txt)
-          gh release create "$GITHUB_REF_NAME" dist/* installers/* --repo "$GITHUB_REPOSITORY" --generate-notes
+          # A release written by hand before the tag keeps its notes; only the files are added.
+          if gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" dist/* installers/* --clobber --repo "$GITHUB_REPOSITORY"
+          else
+            gh release create "$GITHUB_REF_NAME" dist/* installers/* --repo "$GITHUB_REPOSITORY" --generate-notes
+          fi
