@@ -50,6 +50,8 @@ installer = [
 
 [tool.uv]
 package = true
+# Wait a week before using a newly published release, in line with the Dependabot cool-down.
+exclude-newer = "7 days"
 
 [tool.hatch.version]
 path = "src/sweepito/__init__.py"

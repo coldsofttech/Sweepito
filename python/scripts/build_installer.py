@@ -98,8 +98,8 @@ def sign_windows(files: list[Path]) -> None:
         command = template.replace("{file}", f'"{file}"')
         print("+", command, flush=True)
         # SIGN_COMMAND is set by whoever runs the build (a CI variable), so it is
-        # trusted input.
-        subprocess.run(command, check=True, cwd=ROOT, shell=True)  # noqa: S602
+        # trusted input, and it needs the shell to run any signing tool.
+        subprocess.run(command, check=True, cwd=ROOT, shell=True)  # noqa: S602  # nosemgrep
 
 
 # ---- PyInstaller ---------------------------------------------------------------------
