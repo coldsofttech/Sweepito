@@ -1,26 +1,65 @@
 name: Audit
 
-# Checks locked dependencies for known vulnerabilities. Dependency review only covers
-# pull requests, so this catches advisories published against dependencies already in use.
-# Sweepito itself is left out; the lock file is only read, so no network access to it is needed.
+# Checks locked dependencies for known vulnerabilities. It runs when a lock file changes in a
+# pull request, every Monday (to catch advisories published against dependencies already in use)
+# and on demand. Sweepito itself is left out; the lock file is only read, so no network access
+# to it is needed. This workflow is not part of the required `ci` check.
 on:
+  pull_request:
+    paths:
+      - python/uv.lock
+      - extensions/vscode/package-lock.json
+      - .github/workflows/audit.yml
+  schedule:
+    - cron: "0 6 * * 1"
   workflow_dispatch:
 
 permissions:
   contents: read
 
+concurrency:
+  group: audit-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  pip-audit:
+  py-audit:
+    name: Audit Python dependencies
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: python
     steps:
-      - uses: actions/checkout@v7
+      - name: Check out the repository
+        uses: actions/checkout@v7
         with:
           persist-credentials: false
-      - uses: astral-sh/setup-uv@v7
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v7
       - name: Export locked dependencies
         run: >-
           uv export --locked --no-emit-project --no-hashes
           --format requirements-txt -o requirements-audit.txt
-      - name: Audit
+      - name: Audit locked dependencies with pip-audit
         run: uvx pip-audit --requirement requirements-audit.txt --no-deps --disable-pip
+
+  vscode-audit:
+    name: Audit VS Code extension dependencies
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: extensions/vscode
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: extensions/vscode/.nvmrc
+          cache: npm
+          cache-dependency-path: extensions/vscode/package-lock.json
+      - name: Audit runtime dependencies with npm audit
+        run: npm audit --omit=dev --audit-level=high

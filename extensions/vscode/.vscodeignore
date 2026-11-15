@@ -1,0 +1,8 @@
+**
+!dist/extension.js
+!dist/sweepito-hook.js
+!media/**
+!README.md
+!LICENSE
+!package.json
+!CHANGELOG.md

@@ -1,7 +1,19 @@
 name: Feature request
-description: Suggest an improvement to the tool itself
+description: Suggest an improvement to Sweepito, its installers or the VS Code extension
 labels: [enhancement]
 body:
+  - type: dropdown
+    id: component
+    attributes:
+      label: Which part is this about?
+      options:
+        - CLI (Python package)
+        - Installer (Windows setup.exe, Linux deb/rpm)
+        - VS Code extension
+        - Documentation
+        - Not sure
+    validations:
+      required: true
   - type: textarea
     id: problem
     attributes:

@@ -8,6 +8,19 @@ body:
         If Sweepito deleted something it should not have (a tracked file, or anything
         outside the project), please use **private vulnerability reporting** from the
         Security tab instead of this form.
+  - type: dropdown
+    id: component
+    attributes:
+      label: Where did it happen?
+      options:
+        - CLI (Python package)
+        - Installer (Windows setup.exe, Linux deb/rpm)
+        - VS Code extension
+        - Profiles or rules
+        - Documentation
+        - Not sure
+    validations:
+      required: true
   - type: textarea
     id: what-happened
     attributes:
@@ -19,7 +32,10 @@ body:
     id: reproduce
     attributes:
       label: Steps to reproduce
-      description: The command, plus `sweepito scan --json -v` output if relevant.
+      description: |
+        CLI and installers: the command, plus `sweepito scan --json -v` output if relevant.
+        VS Code extension: the command or view you used, plus the "Sweepito" output channel
+        (View > Output) if relevant.
       render: shell
     validations:
       required: true
@@ -27,13 +43,17 @@ body:
     id: config
     attributes:
       label: Configuration
-      description: Contents of `sweepito.toml` (or `[tool.sweepito]`), if you have one.
+      description: |
+        Contents of `sweepito.toml` (or `[tool.sweepito]`), and for the VS Code extension any
+        `sweepito.*` settings you changed, if you have them.
       render: toml
   - type: input
     id: version
     attributes:
       label: Sweepito version
-      description: Output of `sweepito --version`
+      description: |
+        CLI and installers: output of `sweepito --version`.
+        VS Code extension: the extension version from the Extensions view.
     validations:
       required: true
   - type: dropdown
@@ -47,4 +67,11 @@ body:
     id: python
     attributes:
       label: Python and Git versions
+      description: Not needed for the VS Code extension, which does not use Python.
       placeholder: "Python 3.12.4, git 2.45.0"
+  - type: input
+    id: vscode
+    attributes:
+      label: VS Code version
+      description: VS Code extension only. Help > About.
+      placeholder: "1.146.0"

@@ -1,0 +1,102 @@
+name: Security
+
+# Static analysis (Semgrep) for the Python project and the VS Code extension. Findings are
+# uploaded as SARIF, so they show up in the repository's Security tab (Code scanning), and the
+# jobs fail when they find a problem. These jobs are not part of the required `ci` check, so a new
+# rule does not block unrelated pull requests. The weekly run catches rules added after a merge.
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "0 5 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: security-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Also scans .github/ (the workflows belong to the repository, not to one component).
+  # Actions are pinned to version tags on purpose (Dependabot keeps them current), so the
+  # rule that asks for commit SHAs is excluded.
+  py-semgrep:
+    name: Scan Python and workflows with Semgrep
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Run Semgrep
+        run: >
+          pipx run semgrep scan
+          --config p/python
+          --config p/owasp-top-ten
+          --config p/github-actions
+          --exclude tests
+          --exclude-rule yaml.github-actions.security.github-actions-mutable-action-tag.github-actions-mutable-action-tag
+          --error
+          --sarif --output semgrep-python.sarif
+          python .github
+      # Semgrep lists findings silenced with `# nosemgrep` in the SARIF file as suppressed, and code
+      # scanning does not honour that, so it would open an alert for each. Leave them out.
+      - name: Drop suppressed findings from the results
+        if: always() && hashFiles('semgrep-python.sarif') != ''
+        run: |
+          jq '.runs |= map(.results |= map(select((.suppressions // []) | length == 0)))' semgrep-python.sarif > filtered.sarif
+          mv filtered.sarif semgrep-python.sarif
+      - name: Upload results to code scanning
+        if: always() && hashFiles('semgrep-python.sarif') != '' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: semgrep-python.sarif
+          category: semgrep-python
+
+  vscode-semgrep:
+    name: Scan VS Code extension with Semgrep
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Run Semgrep
+        run: >
+          pipx run semgrep scan
+          --config p/javascript
+          --config p/nodejs
+          --config p/owasp-top-ten
+          --exclude test
+          --exclude node_modules
+          --exclude dist
+          --exclude .vscode-test
+          --error
+          --sarif --output semgrep-vscode.sarif
+          extensions/vscode
+      # Semgrep lists findings silenced with `# nosemgrep` in the SARIF file as suppressed, and code
+      # scanning does not honour that, so it would open an alert for each. Leave them out.
+      - name: Drop suppressed findings from the results
+        if: always() && hashFiles('semgrep-vscode.sarif') != ''
+        run: |
+          jq '.runs |= map(.results |= map(select((.suppressions // []) | length == 0)))' semgrep-vscode.sarif > filtered.sarif
+          mv filtered.sarif semgrep-vscode.sarif
+      - name: Upload results to code scanning
+        if: always() && hashFiles('semgrep-vscode.sarif') != '' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: semgrep-vscode.sarif
+          category: semgrep-vscode

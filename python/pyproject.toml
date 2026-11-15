@@ -1,0 +1,89 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "sweepito"
+dynamic = ["version"]
+description = "Safely clean generated project artifacts across languages, frameworks, game engines, data and infrastructure tooling."
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.11"
+authors = [{ name = "coldsofttech" }]
+keywords = ["cleanup", "cache", "build", "pre-commit", "developer-tools"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Topic :: Software Development",
+    "Topic :: Utilities",
+]
+dependencies = [
+    "pathspec>=0.12",
+    "rich>=13",
+]
+
+[project.urls]
+Homepage = "https://github.com/coldsofttech/Sweepito"
+Issues = "https://github.com/coldsofttech/Sweepito/issues"
+Support = "https://github.com/coldsofttech/Sweepito/blob/main/SUPPORT.md"
+
+[project.scripts]
+sweepito = "sweepito.cli:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=8",
+    "pytest-xdist>=3",
+    "ruff>=0.6",
+    "pre-commit>=3",
+    "mypy>=2.4.1",
+    "pytest-cov>=6.0",
+]
+# Builds the installers (scripts/build_installer.py); not needed to run or test Sweepito.
+installer = [
+    "pyinstaller>=6.22.3",
+]
+
+[tool.uv]
+package = true
+# Wait a week before using a newly published release, in line with the Dependabot cool-down.
+exclude-newer = "7 days"
+
+[tool.hatch.version]
+path = "src/sweepito/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/sweepito"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "--strict-markers --cov=sweepito --cov-report=term-missing --cov-fail-under=80"
+markers = [
+    "e2e: tests that run the installed command line program",
+    "integration: tests that drive real git repositories (everything in tests/integration)",
+]
+
+[tool.mypy]
+strict = true
+files = ["src"]
+python_version = "3.11"
+
+[tool.installer]
+# The company shown as publisher in Add/Remove programs, the file properties and the install folder.
+publisher = "ColdSoft Technologies"
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.coverage.run]
+branch = true

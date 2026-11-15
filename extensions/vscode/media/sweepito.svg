@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="22 24 212 212" width="212" height="212" fill="none">
+  <!-- Activity bar icon: one colour on a transparent background, because VS Code uses it as a mask.
+       The viewBox hugs the drawing so it fills the 24px icon box like the built-in icons do. -->
+  <path d="M128 36 L208 64 V124 C208 172 172 204 128 224 C84 204 48 172 48 124 V64 Z" stroke="currentColor" stroke-width="16" stroke-linejoin="round"/>
+  <g transform="rotate(35 128 128)" fill="currentColor">
+    <rect x="122" y="62" width="12" height="70" rx="6"/>
+    <rect x="108" y="128" width="40" height="14" rx="4"/>
+    <path d="M106 142 H150 L160 192 H96 Z"/>
+  </g>
+  <circle cx="182" cy="176" r="6" fill="currentColor"/>
+  <circle cx="162" cy="196" r="4" fill="currentColor"/>
+</svg>

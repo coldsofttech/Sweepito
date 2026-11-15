@@ -49,7 +49,7 @@ When a folder could be either, choose the higher level.
 ## Configuring any profile
 
 Settings live in `sweepito.toml` (or `[tool.sweepito]` in `pyproject.toml`), the same for every
-language. See the [configuration guide](guides/configuration.md) for every key.
+language. See the [configuration guide](configuration.md) for every key.
 
 ```toml
 [defaults]

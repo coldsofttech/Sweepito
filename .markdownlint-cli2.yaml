@@ -1,4 +1,7 @@
 config:
   MD013: false # line length
+  MD024: # repeated headings: changelogs repeat "Added" and "Fixed" under each version
+    siblings_only: true
   MD033: false # inline HTML
   MD041: false # first line heading (templates start with a subheading)
+  MD060: false # table column style (tables use compact separator rows)

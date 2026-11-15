@@ -6,11 +6,13 @@ name: installers
 on:
   pull_request:
     paths:
-      - installer/**
-      - scripts/build_installer.py
-      - src/**
-      - pyproject.toml
-      - uv.lock
+      - python/installer/**
+      - python/scripts/build_installer.py
+      - python/src/**
+      - python/pyproject.toml
+      - python/uv.lock
+      - brand/**
+      - LICENSE
       - .github/workflows/installers.yml
   workflow_dispatch:
 
@@ -23,12 +25,17 @@ concurrency:
 
 jobs:
   windows:
-    name: windows (setup.exe)
+    name: Windows installer (setup.exe)
     runs-on: windows-latest
     timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: python
     steps:
-      - uses: actions/checkout@v7
-      - uses: astral-sh/setup-uv@v7
+      - name: Check out the repository
+        uses: actions/checkout@v7
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v7
         with:
           python-version: "3.13"
       - name: Read tool versions
@@ -38,7 +45,8 @@ jobs:
           python -c "import tomllib, os; t = tomllib.load(open('installer/tools.toml', 'rb'))['tools']; open(os.environ['GITHUB_OUTPUT'], 'a').write(''.join(f'{k}={v}\n' for k, v in t.items()))"
       - name: Install NSIS
         run: choco install nsis --version "${{ steps.tools.outputs.nsis }}" --yes --no-progress
-      - run: uv sync --locked --group installer
+      - name: Install locked dependencies
+        run: uv sync --locked --group installer
       - name: Build the installer and smoke test the executable
         run: uv run python scripts/build_installer.py --smoke
       - name: Install, run and uninstall the setup (per user)
@@ -61,21 +69,27 @@ jobs:
           Start-Process -Wait -FilePath "$dir/uninstall.exe" -ArgumentList '/S', "_?=$dir"
           if (Test-Path $exe) { throw "uninstall left the program behind" }
           if ((& $userPath) -like "*$dir*") { throw "uninstall left PATH changed" }
-      - uses: actions/upload-artifact@v7
+      - name: Upload the Windows installer
+        uses: actions/upload-artifact@v7
         with:
           name: installers-windows
           path: |
-            dist/installer/*.exe
-            dist/installer/*.zip
+            python/dist/installer/*.exe
+            python/dist/installer/*.zip
           retention-days: 7
 
   linux:
-    name: linux (deb, rpm)
+    name: Linux packages (deb, rpm)
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: python
     steps:
-      - uses: actions/checkout@v7
-      - uses: astral-sh/setup-uv@v7
+      - name: Check out the repository
+        uses: actions/checkout@v7
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v7
         with:
           python-version: "3.13"
       - name: Read tool versions
@@ -93,7 +107,8 @@ jobs:
           tar -xzf "nfpm_${VERSION}_Linux_x86_64.tar.gz" nfpm
           sudo install nfpm /usr/local/bin/nfpm
           nfpm --version
-      - run: uv sync --locked --group installer
+      - name: Install locked dependencies
+        run: uv sync --locked --group installer
       - name: Build the packages and smoke test the executable
         run: uv run python scripts/build_installer.py --smoke
       - name: Install, run and remove the deb
@@ -115,10 +130,11 @@ jobs:
             hash -r
             if command -v sweepito; then echo "sweepito is still installed"; exit 1; fi
           '
-      - uses: actions/upload-artifact@v7
+      - name: Upload the Linux packages
+        uses: actions/upload-artifact@v7
         with:
           name: installers-linux
           path: |
-            dist/installer/*.deb
-            dist/installer/*.rpm
+            python/dist/installer/*.deb
+            python/dist/installer/*.rpm
           retention-days: 7
