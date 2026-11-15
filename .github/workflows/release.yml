@@ -1,22 +1,36 @@
-name: release
+name: Release
 
+# Pushing `vX.Y.Z` checks the tag against the package version, re-runs lint and the full test
+# suite (which enforces the coverage minimum), publishes to PyPI and creates a GitHub release.
 on:
   push:
     tags: ["v*.*.*"]
 
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref_name }}
+  cancel-in-progress: false
+
 jobs:
   verify:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
       - uses: astral-sh/setup-uv@v7
-      - name: Check versions match the tag
+      - name: The tag matches the package version
+        env:
+          TAG: ${{ github.ref_name }}
         run: |
-          tag="${GITHUB_REF_NAME#v}"
-          package=$(grep -m1 '__version__' src/sweepito/__init__.py | cut -d'"' -f2)
-          test "$tag" = "$package" \
-            || { echo "Version mismatch: tag=$tag package=$package"; exit 1; }
-      - run: uv sync
+          version="${TAG#v}"
+          # A fixed string, closing quote included, so 0.2.0 does not match 0.2.0rc1.
+          grep -qF "__version__ = \"$version\"" src/sweepito/__init__.py || {
+            echo "Tag $TAG does not match __version__ in src/sweepito/__init__.py"; exit 1; }
+      - run: uv sync --locked
       - run: uv run ruff check .
       - run: |
           git config --global user.email "ci@example.com"
@@ -26,16 +40,20 @@ jobs:
   publish:
     needs: verify
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     environment: pypi
     permissions:
       id-token: write
       contents: write
     steps:
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
       - uses: astral-sh/setup-uv@v7
       - run: uv build
+      - run: uvx twine check --strict dist/*
       - uses: pypa/gh-action-pypi-publish@release/v1
       - name: Create GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "$GITHUB_REF_NAME" dist/* --generate-notes
+        run: gh release create "$GITHUB_REF_NAME" dist/* --repo "$GITHUB_REPOSITORY" --generate-notes

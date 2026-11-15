@@ -63,7 +63,7 @@ only Git. They cover behavior across modules (`test_clean.py`, `test_output.py`,
 tests there need no decorator. Markers are registered in `pyproject.toml` and
 `--strict-markers` is on, so a typo in a marker name is an error.
 
-The `tests.yml` workflow and local runs can use `pytest-xdist` (`-n auto`, one worker per
+The `ci.yml` workflow and local runs can use `pytest-xdist` (`-n auto`, one worker per
 CPU core). Leave it off when debugging a single test, since output and breakpoints are
 easier without workers.
 
@@ -97,8 +97,8 @@ Integration tests are left to CI. Run the hooks on everything with
 
 | Workflow | When | What |
 | --- | --- | --- |
-| `lint.yml` | Pushes to `main`, pull requests | `ruff check` and `ruff format --check` |
-| `tests.yml` | Pushes to `main`, pull requests | Unit tests, then integration tests, on Ubuntu with Python 3.11, 3.12, 3.13, 3.14 and 3.15, and on Windows and macOS with 3.11 |
+| `ci.yml` | Pushes to `main`, pull requests | Lint (`ruff check`, `ruff format --check`), unit then integration tests on Ubuntu with Python 3.11 to 3.15 and on Windows and macOS with 3.11, and a package build checked with `twine`. The final `ci` job is the single required status check |
+| `audit.yml` | Manual | Audits the locked dependencies for known vulnerabilities with `pip-audit` |
 | `release.yml` | Pushing a tag like `v0.2.0` | Checks the tag against `__version__`, re-runs lint and tests, builds with `uv build`, publishes to PyPI and creates a GitHub release |
 
 ## Releasing

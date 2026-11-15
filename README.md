@@ -1,7 +1,6 @@
 # Sweepito
 
-[![Tests](https://github.com/coldsofttech/Sweepito/actions/workflows/tests.yml/badge.svg)](https://github.com/coldsofttech/Sweepito/actions/workflows/tests.yml)
-[![Lint](https://github.com/coldsofttech/Sweepito/actions/workflows/lint.yml/badge.svg)](https://github.com/coldsofttech/Sweepito/actions/workflows/lint.yml)
+[![CI](https://github.com/coldsofttech/Sweepito/actions/workflows/ci.yml/badge.svg)](https://github.com/coldsofttech/Sweepito/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/coldsofttech/Sweepito?logo=github)](https://github.com/coldsofttech/Sweepito/releases)
 [![PyPI](https://img.shields.io/pypi/v/sweepito?logo=pypi&logoColor=white)](https://pypi.org/project/sweepito/)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue?logo=python&logoColor=white)](https://www.python.org/downloads/)

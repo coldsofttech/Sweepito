@@ -1,0 +1,26 @@
+name: Audit
+
+# Checks locked dependencies for known vulnerabilities. Dependency review only covers
+# pull requests, so this catches advisories published against dependencies already in use.
+# Sweepito itself is left out; the lock file is only read, so no network access to it is needed.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pip-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@v7
+      - name: Export locked dependencies
+        run: >-
+          uv export --locked --no-emit-project --no-hashes
+          --format requirements-txt -o requirements-audit.txt
+      - name: Audit
+        run: uvx pip-audit --requirement requirements-audit.txt --no-deps --disable-pip
