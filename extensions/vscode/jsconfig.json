@@ -6,7 +6,8 @@
     "resolveJsonModule": true,
     "checkJs": false,
     "noEmit": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "types": ["node"]
   },
   "include": ["src/**/*.js", "test/**/*.js", "scripts/**/*.mjs"]
 }
