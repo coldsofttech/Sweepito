@@ -29,7 +29,7 @@ what the folder is.** A `build/` directory is a candidate beside a `CMakeLists.t
 
 ## What you get
 
-- **28 technology profiles and 140 rules**, detected automatically from marker files
+- **28 technology profiles and 141 rules**, detected automatically from marker files
   (`Cargo.toml`, `pom.xml`, `package.json`, ...). Repositories with several technologies and
   nested projects are handled per project.
 - **Conservative by default.** Only `safe` caches are cleaned. Build output is opt-in, and
@@ -109,7 +109,7 @@ Add `--json` for plain machine-readable output, or `--no-color` to turn colour o
 
 | Profile | Covers | Rules | Safe / configurable / high-impact |
 |---|---|---:|---|
-| `python` | Python, Django, Flask, FastAPI, pytest, Ruff, mypy, Pylint, tox, coverage, Sphinx, MkDocs, Pixi, PDM | 19 | 8 / 9 / 2 |
+| `python` | Python, Django, Flask, FastAPI, pytest, Ruff, mypy, Pylint, tox, coverage, Sphinx, MkDocs, Pixi, PDM | 20 | 8 / 10 / 2 |
 | `node` | Node.js, React, Next.js, Vue, Nuxt, Angular, Vite, Svelte, Astro | 22 | 12 / 9 / 1 |
 | `node-pm` | npm, pnpm, Yarn, Bun project-local stores | 3 | 0 / 1 / 2 |
 | `rust` | Rust and Cargo | 2 | 0 / 2 / 0 |

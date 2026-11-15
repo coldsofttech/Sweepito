@@ -13,7 +13,7 @@ All notable changes are recorded here. The format follows
   daemon storage, volumes and bind-mounted data are never targeted.
 - `node` profile: Nx, Vitest, Storybook and Webpack caches, plus opt-in Playwright, Cypress and Rush
   rules.
-- `python` profile: Sphinx, MkDocs, Pixi, PDM and Pylint rules, each gated on its own marker.
+- `python` profile: Sphinx, MkDocs, Pixi, PDM and Pylint rules, each gated on its own marker, and an opt-in Schemathesis cache rule.
 - `data-eng` profile with dbt (`dbt.target`, `dbt.logs`, `dbt.packages`) and Spark (`spark.warehouse`)
   rules. Data directories are never targeted.
 - More cleanup rules for the `node-pm`, `python`, `jvm`, `go`, `cpp`, `ruby` and `terraform` profiles,

@@ -20,6 +20,7 @@ Python, Django, Flask, FastAPI, pytest, Ruff, mypy, Pylint, tox, coverage, Sphin
 | `python.coverage` | `.coverage`, `.coverage.*`, `htmlcov/`, `coverage.xml` | `pyproject.toml`, `setup.py`, `setup.cfg`, `requirements*.txt`, `Pipfile`, `manage.py` | safe | Coverage data and reports |
 | `python.mkdocs` | `/site/` | `mkdocs.yml` | configurable | MkDocs build output (could be a published folder) |
 | `python.pdm` | `/.pdm-python`, `/.pdm-build/` | `pdm.lock` | configurable | PDM interpreter pointer and build cache |
+| `python.schemathesis` | `.schemathesis/` | `pyproject.toml`, `setup.py`, `setup.cfg`, `requirements*.txt`, `Pipfile`, `manage.py` | configurable | Schemathesis cache (holds failing cases kept for replay) |
 | `python.hypothesis` | `.hypothesis/` | `pyproject.toml`, `setup.py`, `setup.cfg`, `requirements*.txt`, `Pipfile`, `manage.py` | configurable | Hypothesis example database (holds regression seeds) |
 | `python.tox` | `.tox/`, `.nox/` | `pyproject.toml`, `setup.py`, `setup.cfg`, `requirements*.txt`, `Pipfile`, `manage.py` | configurable | tox and nox environments |
 | `python.eggs` | `.eggs/`, `*.egg-info/` | `pyproject.toml`, `setup.py`, `setup.cfg`, `requirements*.txt`, `Pipfile`, `manage.py` | configurable | Setuptools build metadata |

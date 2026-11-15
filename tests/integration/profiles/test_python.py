@@ -29,6 +29,7 @@ CASE = Case(
         "python.pylint": [".pylint.d/"],
         "python.pytest": [".pytest_cache/"],
         "python.ruff": [".ruff_cache/"],
+        "python.schemathesis": [".schemathesis/"],
         "python.sphinx": ["_build/"],
         "python.tox": [".tox/", ".nox/"],
         "python.typecheckers": [".pyre/", ".pytype/"],

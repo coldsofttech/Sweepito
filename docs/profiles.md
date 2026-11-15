@@ -86,7 +86,7 @@ Custom rules follow the same safety gates as built-in ones.
 | [`ocaml`](profiles/ocaml.md) | `dune-project` | 1 | 1 | 0 | 0 |
 | [`perl`](profiles/perl.md) | `Makefile.PL`, `Build.PL`, `cpanfile` | 3 | 3 | 0 | 0 |
 | [`php`](profiles/php.md) | `composer.json`, `artisan` | 7 | 2 | 4 | 1 |
-| [`python`](profiles/python.md) | `pyproject.toml`, `setup.py`, `setup.cfg`, `requirements*.txt`, `Pipfile`, `manage.py` | 19 | 8 | 9 | 2 |
+| [`python`](profiles/python.md) | `pyproject.toml`, `setup.py`, `setup.cfg`, `requirements*.txt`, `Pipfile`, `manage.py` | 20 | 8 | 10 | 2 |
 | [`r`](profiles/r.md) | `DESCRIPTION`, `*.Rproj`, `renv.lock` | 6 | 1 | 3 | 2 |
 | [`ruby`](profiles/ruby.md) | `Gemfile`, `config/application.rb` | 7 | 2 | 3 | 2 |
 | [`rust`](profiles/rust.md) | `Cargo.toml` | 2 | 0 | 2 | 0 |
@@ -94,7 +94,7 @@ Custom rules follow the same safety gates as built-in ones.
 | [`terraform`](profiles/terraform.md) | `*.tf`, `terragrunt.hcl` | 5 | 1 | 4 | 0 |
 | [`unity`](profiles/unity.md) | `ProjectSettings/ProjectVersion.txt` | 3 | 2 | 1 | 0 |
 | [`unreal`](profiles/unreal.md) | `*.uproject` | 2 | 0 | 2 | 0 |
-| **Total** | | **140** | **53** | **69** | **18** |
+| **Total** | | **141** | **53** | **70** | **18** |
 
 Each page in `docs/profiles/` lists its rules with their targets, markers and risk, an example
 configuration and the notes about what is never targeted.
