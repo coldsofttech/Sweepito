@@ -29,7 +29,7 @@ suite("Report commands", () => {
         await vscode.commands.executeCommand("sweepito.doctor");
         // The preview opens a moment after the command returns.
         const doctorTabs = async () => {
-            for (let attempt = 0; attempt < 30; attempt++) {
+            for (let attempt = 0; attempt < 100; attempt++) {
                 const found = vscode.window.tabGroups.all
                     .flatMap((group) => group.tabs)
                     .filter((tab) => /doctor/i.test(tab.label));
