@@ -247,3 +247,27 @@ def test_declining_the_prompt_deletes_nothing(
     assert code == 0
     assert "Aborted" in out
     assert repo.exists("src/__pycache__")
+
+
+def test_hook_pins_installing_interpreter_with_path_fallback(repo: Repo) -> None:
+    import sys
+
+    from sweepito import hooks
+
+    repo.run("hook", "install", str(repo.root))
+    text = (repo.root / ".git" / "hooks" / "post-commit").read_text()
+    py = hooks.posix_path(sys.executable)
+    assert f"'{py}' -m sweepito clean --hook" in text
+    assert "elif command -v sweepito" in text
+    assert hooks.pinned_interpreter(repo.root, "post-commit") == py
+
+
+def test_posix_path_converts_windows_paths_for_git_bash() -> None:
+    from sweepito import hooks
+
+    assert (
+        hooks.posix_path(r"C:\Users\me\Python315\python.exe")
+        == "/c/Users/me/Python315/python.exe"
+    )
+    block = hooks._block("post-commit", r"C:\Program Files\Py\python.exe")
+    assert "'/c/Program Files/Py/python.exe' -m sweepito" in block

@@ -19,6 +19,11 @@ All notable changes are recorded here. The format follows
 - More cleanup rules for the `node-pm`, `python`, `jvm`, `go`, `cpp`, `ruby` and `terraform` profiles,
   and `build.sbt` now activates the JVM profile.
 - Profiles for Clojure, Haskell, OCaml, Perl, Unity, Unreal Engine and Godot.
+- `sweepito doctor` reports a hook whose recorded interpreter no longer exists.
+
+### Fixed
+- The Git hook failed with `Permission denied` on Windows (Git Bash). Re-run `sweepito hook install`
+  to update existing hooks.
 
 ## [0.1.0] - 2026-10-25
 
