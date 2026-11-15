@@ -3,12 +3,13 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from pathlib import Path
 from typing import TYPE_CHECKING
 
 from sweepito.errors import ConfigError
 
 if TYPE_CHECKING:
+    from pathlib import Path
+
     from sweepito.config import FileConfig, Options, Settings
     from sweepito.models import CleanResult, Plan
     from sweepito.registry import Registry
@@ -25,6 +26,8 @@ class Context:
 
 def resolve_root(path: str | None = None) -> Path:
     """The project root: ``path``, else the git root of the cwd, else the cwd."""
+    from pathlib import Path
+
     from sweepito import git
 
     if path:
@@ -40,6 +43,8 @@ def resolve_root(path: str | None = None) -> Path:
 def prepare(
     root: Path, options: Options | None = None, config_file: str | None = None
 ) -> Context:
+    from pathlib import Path
+
     from sweepito import git
     from sweepito.config import FileConfig, Options, find_config, load_config, merge
     from sweepito.registry import Registry

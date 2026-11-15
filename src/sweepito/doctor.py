@@ -2,12 +2,11 @@
 
 from __future__ import annotations
 
-import sys
-from dataclasses import asdict, dataclass
-from typing import Any
+from dataclasses import dataclass
+from typing import TYPE_CHECKING
 
-from sweepito import __version__
-from sweepito.errors import SweepitoError
+if TYPE_CHECKING:
+    from typing import Any
 
 MIN_PYTHON = (3, 11)
 
@@ -20,6 +19,8 @@ class Check:
     required: bool = False  # a failed required check makes doctor exit non-zero
 
     def to_dict(self) -> dict[str, Any]:
+        from dataclasses import asdict
+
         return asdict(self)
 
 
@@ -34,9 +35,11 @@ def _dependency(name: str) -> Check:
 
 def run_checks(path: str | None = None, config_file: str | None = None) -> list[Check]:
     import os
+    import sys
 
-    from sweepito import api, git, hooks
+    from sweepito import __version__, api, git, hooks
     from sweepito.config import Options
+    from sweepito.errors import SweepitoError
 
     python = sys.version_info
     checks = [

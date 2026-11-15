@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import os
-import stat
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -51,6 +49,8 @@ def _remove(path: Path) -> tuple[int, list[tuple[str, str]]]:
     as links and never traversed, so nothing outside the tree can be deleted through
     them.
     """
+    import os
+    import stat
     from pathlib import Path
 
     from sweepito.planner import is_link
@@ -100,6 +100,9 @@ def _remove(path: Path) -> tuple[int, list[tuple[str, str]]]:
 
 def _unlink(path: Path) -> tuple[int, list[tuple[str, str]]]:
     """Remove one file or link; a directory link goes without touching its target."""
+    import os
+    import stat
+
     try:
         st = os.lstat(path)
         directory_link = stat.S_ISDIR(st.st_mode) or bool(

@@ -5,7 +5,6 @@ All paths passed in and returned are posix-style and relative to ``root``.
 
 from __future__ import annotations
 
-import os
 from typing import TYPE_CHECKING
 
 from sweepito.errors import GitError
@@ -22,6 +21,7 @@ def _run(
     data: bytes | None = None,
     ok: tuple[int, ...] = (0,),
 ) -> subprocess.CompletedProcess[bytes]:
+    import os
     import subprocess
 
     env = {**os.environ, "GIT_OPTIONAL_LOCKS": "0"}
