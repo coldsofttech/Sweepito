@@ -47,6 +47,13 @@ jobs:
           --error
           --sarif --output semgrep-python.sarif
           python .github
+      # Semgrep lists findings silenced with `# nosemgrep` in the SARIF file as suppressed, and code
+      # scanning does not honour that, so it would open an alert for each. Leave them out.
+      - name: Drop suppressed findings from the results
+        if: always() && hashFiles('semgrep-python.sarif') != ''
+        run: |
+          jq '.runs |= map(.results |= map(select((.suppressions // []) | length == 0)))' semgrep-python.sarif > filtered.sarif
+          mv filtered.sarif semgrep-python.sarif
       - name: Upload results to code scanning
         if: always() && hashFiles('semgrep-python.sarif') != '' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
         uses: github/codeql-action/upload-sarif@v4
@@ -80,6 +87,13 @@ jobs:
           --error
           --sarif --output semgrep-vscode.sarif
           extensions/vscode
+      # Semgrep lists findings silenced with `# nosemgrep` in the SARIF file as suppressed, and code
+      # scanning does not honour that, so it would open an alert for each. Leave them out.
+      - name: Drop suppressed findings from the results
+        if: always() && hashFiles('semgrep-vscode.sarif') != ''
+        run: |
+          jq '.runs |= map(.results |= map(select((.suppressions // []) | length == 0)))' semgrep-vscode.sarif > filtered.sarif
+          mv filtered.sarif semgrep-vscode.sarif
       - name: Upload results to code scanning
         if: always() && hashFiles('semgrep-vscode.sarif') != '' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
         uses: github/codeql-action/upload-sarif@v4
