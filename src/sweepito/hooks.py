@@ -2,11 +2,6 @@
 
 from __future__ import annotations
 
-import os
-import re
-import shlex
-import stat
-import sys
 from typing import TYPE_CHECKING
 
 from sweepito.errors import ConfigError
@@ -20,11 +15,14 @@ STAGES = {
     "post-commit": "clean --hook --non-interactive --quiet",
     "pre-commit": "scan --hook --quiet",
 }
-_PINNED = re.compile(r"^if \[ -x (?P<py>'[^\n]*?') \]", re.MULTILINE)
+_PINNED = r"^if \[ -x (?P<py>'[^\n]*?') \]"
 
 
 def posix_path(path: str) -> str:
     """Express an interpreter path the way POSIX sh (e.g. Git Bash) expects it."""
+    import os
+    import re
+
     if os.name == "nt" or re.match(r"^[A-Za-z]:[\\/]", path):
         from pathlib import PureWindowsPath
 
@@ -47,6 +45,8 @@ def _block(stage: str, python: str | None = None) -> str:
     does not depend on PATH or on ``Scripts/sweepito[.exe]`` shims; fall back to a
     ``sweepito`` found on PATH, and stay silent if neither is available.
     """
+    import sys
+
     args = STAGES[stage]
     py = _quote(posix_path(python or sys.executable))
     fail = f'|| echo "sweepito: {stage} hook failed (exit $?)" >&2'
@@ -63,10 +63,13 @@ def _block(stage: str, python: str | None = None) -> str:
 
 def pinned_interpreter(root: Path, stage: str) -> str | None:
     """The interpreter recorded in an installed hook, or None."""
+    import re
+    import shlex
+
     path = hook_path(root, stage)
     if not path.exists():
         return None
-    match = _PINNED.search(path.read_text(encoding="utf-8"))
+    match = re.search(_PINNED, path.read_text(encoding="utf-8"), re.MULTILINE)
     if not match:
         return None
     parts = shlex.split(match.group("py"))
@@ -92,6 +95,8 @@ def _strip(text: str) -> str:
 
 
 def install(root: Path, stage: str = "post-commit") -> Path:
+    import stat
+
     path = hook_path(root, stage)
     path.parent.mkdir(parents=True, exist_ok=True)
     existing = path.read_text(encoding="utf-8") if path.exists() else ""
@@ -107,6 +112,8 @@ def install(root: Path, stage: str = "post-commit") -> Path:
 
 def uninstall(root: Path, stage: str = "post-commit") -> bool:
     """Remove the Sweepito block. Returns True if one was removed."""
+    import os
+
     path = hook_path(root, stage)
     if not path.exists():
         return False

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import os
 import sys
 from dataclasses import asdict, dataclass
 from typing import Any
@@ -34,6 +33,8 @@ def _dependency(name: str) -> Check:
 
 
 def run_checks(path: str | None = None, config_file: str | None = None) -> list[Check]:
+    import os
+
     from sweepito import api, git, hooks
     from sweepito.config import Options
 
